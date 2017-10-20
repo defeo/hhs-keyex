@@ -1,0 +1,102 @@
+Une proposition de titre/plan pour l'article hhs-keyex
+
+D'abord quelques commentaires: ont déjà été publiés (ou sont publics) jusqu'à présent
+- l'essai 'hard homogeneous spaces' de Couveignes
+- le mémoire de master de Stolbunov (assez mal écrit)
+- des slides de divers exposés de Stolbunov sur le sujet
+- tous les articles de calcul d'isogénies liés à sea: elkies 'modular curves and related computational issues', schoof, morain, bmss, etc.
+- Galbraith, Galbraith-Hess-Smart, Galbraith-Stolbunov: la manière 'classique' de calculer un chemin dans le graphe d'isogénies
+- Childs, Jao & Soukharev: la manière quantique de récupérer la clé privée.
+
+Je dirais que ça ne sert à rien de répéter dans l'article des choses qui ont déjà été publiées, sinon pour les présenter brièvement.
+De ce fait, il y a sans doute deux objectifs:
+1. Présenter les améliorations que l'on a à l'échange de clés: utilisation de points de torsion et recherche de bonne courbe initiale, et éventuellement les implications sur la sécurité
+2. Discuter/compléter les papiers ci-dessus (?)
+3. Discuter de l'implem, donner des benchmarks
+
+Pour le point 1, je pense qu'on peut s'inspirer de ce qu'on a déjà fait pour l'abstract du poster à Issac. Dans le 2, je ferais peut-être rentrer les remarques de Luca sur le fait que l'attaque quantique possède trop de 'couches imbriquées' et donc ne serait pas réalisable 'en pratique' (?).
+
+Je dirais que l'objectif principal est quand même le 1.
+
+Dans ce qui suit, je propose les grandes lignes d'un plan et quelques points qui peuvent être abordés dans chaque partie.
+
+##########
+
+Le titre: Improving the Ordinary Isogeny Diffie--Hellman key exchange protocol
+
+0* Introduction
+
+C'est un exemple de cryptosystème à base d'isogénies, analogue de SIDH mais en utilisant des courbes ordinaires (d'où le titre, je ne sais pas ce que vous en pensez).
+La structure des isogénies est différente, ici on est dans le cadre des 'hard homogeneous spaces'
+Citer Couveignes, Rostovtsev-Stolbunov
+Résumer les caractéristiques principales du cryptosystème: il n'est pas compétitif en pratique, il existe une attaque quantique sous-exponentielle (en citant les papiers adéquats).
+Dire pourquoi on s'y intéresse tout de même ? (Cela peut donner une sécurité post-quantique même en présence d'une attaque sous-exponentielle, on peut chercher à estimer cette sécurité...?) Par exemple parce qu'on ne sait pas générer des courbes supersingulières pour SIDH à partir d'autre chose que le j-invariant 0, qui est cassé ?
+-> D'où l'objectif de ce papier: une analyse plus fine de la sécurité quantique, et des améliorations/accélérations du protocole en pratique.
+Présentation rapide du plan.
+
+1* Background on elliptic curves, isogenies and complex multiplication
+
+(Je ne pense pas que l'on puisse faire l'économie d'une section comme celle-ci... Je pense qu'on peut partir du principe que le lecteur s'intéresse à l'isogeny-based crypto, et donc connaît ce qu'est une courbe elliptique et une isogénie. Est-ce que l'on peut partir du principe que le lecteur sait ce qu'est un groupe de classes ?)
+
+Présenter notamment le concept de courbe/équation modulaire, et la théorie de la multiplication complexe (action du groupe de classes).
+On peut aussi éventuellement parler de volcans d'isogénies: dire que 'génériquement' on a un cratère cyclique et c'est tout, mais dans le cas où l divise le conducteur on peut avoir d'autres branches descendantes.
+
+On peut essayer de donner une présentation comme dans le papier: finalement, un idéal de norme l c'est (l, v) où v est la valeur propre, et pour calculer l'action on calcule une isogénie et l'on vérifie que la valeur propre du Frobenius est la bonne.
+
+2* The Ordinary Diffie-Hellman key exchange
+
+Pour présenter l'échange de clés en lui-même, sous forme d'algotithmes.
+Détailler jusqu'au niveau 'calcul du noyau' et 'test de la valeur propre', que l'on laisse sans plus de discussion pour l'instant.
+Mettre l'accent sur les paramètres à notre disposition: le corps de base, la courbe initiale, le nombre de pas maximum pour chaque nombre premier.
+Faire la remarque que la taille de l'espace de clés dépend surtout du nombre de nombres premiers utilisés
+
+(Eventuellement dans une autre section) faire un review rapide des algorithmes à notre disposition pour le calcul d'isogénies, en faisant référence aux articles pertinents.
+Je pense que l'on peut mettre l'accent que l'on peut atteindre une complexité quasi-linéaire en l pour toutes les étapes (cf Sutherland 'on the evaluation of modular equations', bmss, et on a seulement 2 possibilités à tester pour la valeur propre).
+
+3* Improvements
+
+Faire une première remarque qu'il est plus efficace d'utiliser des courbes qui ont plus de petits nombres premiers d'Elkies.
+
+Présenter la deuxième version de l'algorithme de calcul de pas qui utilise des points rationnels (ou qui vivent dans une petite extension). Cette deuxième version est plus efficace si la valeur propre a un plus petit ordre multiplicatif.
+
+Cela amène à vouloir chercher des courbes dont la trace mod l a de bonnes propriétés pour de petits l. Présenter la stratégie de recherche SEA--early-abort. Cela vaut-il la peine de parler de la sélection de candidats à l'aide d'une courbe modulaire, vu le peu que cela fait gagner à la fin ? Je trouve que c'est intéressant, mais l'intérêt est plutôt théorique je dirais.
+
+4* Remarks on security
+
+Deux parties: d'abord la sécurité classique, ensuite la sécurité quantique.
+
+Au niveau classique, on indique l'algorithme de Galbraith (& Hess & Smart, ou & Stolbunov...). Peut-être mentionner le fait que la sécurité repose sur des heuristiques, à savoir une bonne répartition des marches aléatoires dans le graphe, à des niveaux très inférieurs à ce que peut garantir GRH.
+Il reste des questions non résolues: quelle est l'impact de la structure de groupe ? (Dans ses slides Stolbunov insiste beaucoup pour avoir un groupe cyclique, je n'en vois pas vraiment l'intérêt si ce n'est une forme de superstition !)
+Est-ce que la structure supplémentaire des courbes peut être exploitée ?
+
+Au niveau quantique: l'attaque est certes sous-exponentielle, mais on peut tout de même tenter d'évaluer des paramètres de sécurité. On peut peut-être s'inspirer des recommandations du NIST ? Quelles ressources demande l'attaque de Childs et al. relativement à ce que le NIST envisage ?
+
+5* Key exchange in practice
+
+On présente des paramètres pour viser à 128 bits de sécurité classique.
+Donner le corps de base choisi, et la meilleure courbe obtenue par la recherche ci-dessus, la trace du Frobenius et le discriminant de l'ordre maximal (qu'il faudra calculer avec ECM par exemple, car on peut espérer qu'il n'a pas deux grands facteurs premiers...), et une minoration explicite du nombre de classes.
+Proposer aussi le nombre de pas à effectuer pour chaque nombre premier d'Elkies.
+
+Je devrais travailler le code pour pouvoir atteindre un échange de clé complet, et être capable de dire: tant de temps a été dépensé en calculs de Frobenius, tant de temps en multiplications scalaires, etc.
+
+Indiquer l'existence du paquet Julia en préparation.
+
+(Je remarque d'ailleurs que dans le papier SIDH, on mentionne une performance de 229 secondes pour l'échange de clés au niveau de 128 bits de sécurité, que je n'atteins pas même avec les meilleures courbes que j'ai trouvées...)
+
+Faire aussi des commentaires sur la sécurité quantique de ces paramètres, en fonction de la discussion précédente.
+On peut faire des remarques sur l'implem: dire que l'on utilise une version de BMSS pour le calcul du noyau, et que l'on peut encore stocker des équations modulaires pour les niveaux que l'on regarde.
+
+6* Conclusion
+
+- A quel point a-t-on accéléré le cryptosystème ?
+- Ce protocole a-t-il finalement un intérêt dans le cadre de la crypto post-quantique ?
+
+
+
+
+
+
+
+
+
+
