@@ -32,11 +32,20 @@ end
 function lift(x::FinFieldElem)
 	Fl = parent(x)
 	@assert Nemo.isprime(order(Fl))
-	i = ZZ(0)
+	i = 0
 	while i != x
 		i += 1
 	end
 	return i
+end
+
+function my_show(D::Dict)
+	for k in keys(D)
+		print(k)
+		print(" -> ")
+		print(D[k])
+		print("\n")
+	end
 end
 
 ################################################################################
@@ -129,17 +138,13 @@ function is_frobenius_eigenvalue(v, K, E)
 	
 	#We assume the elliptic curve is in short Weierstrass form.
 	FrobX = power_binexp(Xbar, p)
-	FrobY = power_binexp(Xbar^3 + a * Xbar + p, div(p-1, 2)) #we forget the Y factor
+	FrobY = power_binexp(Xbar^3 + a * Xbar + b, div(p-1, 2)) #we forget the Y factor
 	
 	Eext = EllipticCurve(RR(a), RR(b))
 	Pgeneric = Point(RR(Xbar), Ybar, RR(1), Eext) #the generic point in our kernel
 	
-	### FAILS ####
-	vx, vy, vz = v * Pgeneric
-	##############
-	
-	@assert vz == RR(1) #just in case...
-	if (vx == FrobX & vy == Ybar * FrobY)
+	vx, vy, vz = coordinates(projective_scalar_mul(Pgeneric, v))
+	if (vx == FrobX * vz) & (vy == Ybar * FrobY * vz)
 		return true
 	else
 		return false
@@ -154,7 +159,7 @@ end
 
 function step_torsion(E, ell, Card)
 	P = torsionpoint(E, ell, Card)
-	return image(Isogeny(E, P))
+	return image(Isogeny(E, P, ell))
 end
 
 
@@ -202,10 +207,10 @@ end
 ################################################################################
 
 
-E0 = EllipticCurve(F(1), F(1))
+E0 = EllipticCurve(F(1), F(9)) # a nice example
 ZZY, Y = PolynomialRing(ZZ, "Y")
-frob_poly = Y^2 - ZZ(14234351195508672941)*Y + ZZ(340282366920938463463374607431768211507) #this was computed with Sage
-Card = ZZ(340282366920938463449140256236259538567)
+frob_poly = Y^2 + ZZ(13815554068038022463)*Y + ZZ(340282366920938463463374607431768211507) #this was computed with Sage
+Card = ZZ(340282366920938463477190161499806233971)
 
 #Which primes are we going to use?
 #We only want to use primes for which the isogeny graph is a simple cycle, i.e.
@@ -254,9 +259,9 @@ for ell in primes_use_step
 end
 for ell in primes_use_step_torsion
 	if orders[ell] == 1
-		bounds[ell] = 100
+		bounds[ell] = 300
 	else
-		bounds[ell] = 10
+		bounds[ell] = 15
 	end
 end
 
@@ -269,11 +274,14 @@ for ell in primes_use_step_torsion
 	key_space_size *= (bounds[ell] + 1)
 end
 
-print("Orders : ")
-show(orders)
+print("Extension degrees: ")
+my_show(orders)
 print("\n")
-print("Eigenvalues : ")
-show(eigenvalues)
+print("Frobenius eigenvalues: ")
+my_show(eigenvalues)
+print("\n")
+print("Bounds for the number of steps: ")
+my_show(bounds)
 print("\n")
 print("Key space size : ")
 print(key_space_size)
@@ -297,6 +305,12 @@ end
 function walk(E, key, Card, primes_use_step, primes_use_step_torsion, eigenvalues, orders)
 	Eprime = E
 	for ell in primes_use_step_torsion
+		print(key[ell])
+		print(" steps for the prime ")
+		print(ell)
+		print(" (torsion points over degree ")
+		print(orders[ell])
+		print(" extension)\n")
 		if key[ell] != 0
 			if orders[ell] == 1
 				Eprime = several_steps_torsion(Eprime, ell, Card, key[ell])
@@ -306,6 +320,10 @@ function walk(E, key, Card, primes_use_step, primes_use_step_torsion, eigenvalue
 		end
 	end
 	for ell in primes_use_step
+		print(key[ell])
+		print(" steps for the prime ")
+		print(ell)
+		print(" (modular equation)\n")
 		#let's say the first root is the positive direction
 		if key[ell] > 0
 			Eprime = several_steps(Eprime, ell, eigenvalues[ell][1], key[ell])
@@ -318,16 +336,38 @@ end
 
 #Key exchange proper
 function key_exchange_toy_example()
+	print("Starting key exchange...\n")
+	
 	alice_key = key_generation(primes_use_step, primes_use_step_torsion, bounds)
 	bob_key = key_generation(primes_use_step, primes_use_step_torsion, bounds)
 	
+	print("Alice's key is ")
+	my_show(alice_key)
+	print("\nand Bob's key is ")
+	my_show(bob_key)
+	print("\n")
+	
+	print("Alice starts walking...\n")
 	alice_curve = walk(E0, alice_key, Card, primes_use_step, primes_use_step_torsion, eigenvalues, orders)
+	print("Alice ended at ")
+	print(alice_curve)
+	print("\n")
+	
+	print("Bob starts walking...\n")
 	bob_curve = walk(E0, bob_key, Card, primes_use_step, primes_use_step_torsion, eigenvalues, orders)
+	print("Bob ended at ")
+	print(bob_curve)
+	print("\n")
 	#They publish the curves...
 	
+	print("Performing the second walks...\n")
 	alice_secret = walk(bob_curve, alice_key, Card, primes_use_step, primes_use_step_torsion, eigenvalues, orders)
 	bob_secret = walk(alice_curve, bob_key, Card, primes_use_step, primes_use_step_torsion, eigenvalues, orders)
 	@assert alice_secret == bob_secret
+	
+	print("The common secret is ")
+	print(alice_secret)
+	print("\n")
 end
 
 key_exchange_toy_example()
