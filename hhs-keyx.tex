@@ -5,6 +5,25 @@
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
 
+%Shortcuts
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Cl}{\mathcal{C}}
+\renewcommand{\O}{\mathcal{O}}
+\newcommand{\isom}{\overset{\sim}{\longrightarrow}}
+\newcommand{\from}{\ensuremath{\,:\ }}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\suchthat}{\,|\,}
+
+\newtheorem{theorem}{Theorem}
+
+\DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\Ker}{Ker}
+\DeclareMathOperator{\Card}{Card}
+\DeclareMathOperator{\Ell}{Ell}
+
 \title{Towards practical key exchange from ordinary isogeny graphs}
 \author{Luca De Feo, Jean Kieffer, Benjamin Smith}
 
@@ -36,28 +55,270 @@ pratique.  Présentation rapide du plan.
 
 \section{Mathematical background}
 
-(Je ne pense pas que l'on puisse faire l'économie d'une section comme
-celle-ci... Je pense qu'on peut partir du principe que le lecteur
-s'intéresse à l'isogeny-based crypto, et donc connaît ce qu'est une
-courbe elliptique et une isogénie. Est-ce que l'on peut partir du
-principe que le lecteur sait ce qu'est un groupe de classes ?)
+In this paper, we present a key exchange protocol based on the action of
+an abelian group that is related to prime-degree isogenies between ordinary
+elliptic curves. In this section, we briefly present standard results that
+we will use in the sequel.
 
-Présenter notamment le concept de courbe/équation modulaire, et la
-théorie de la multiplication complexe (action du groupe de classes).
-On peut aussi éventuellement parler de volcans d'isogénies: dire que
-'génériquement' on a un cratère cyclique et c'est tout, mais dans le
-cas où l divise le conducteur on peut avoir d'autres branches
-descendantes.
+\subsection{Isogenies and the Frobenius endomorphism}
 
-On peut essayer de donner une présentation comme dans le papier:
-finalement, un idéal de norme l c'est (l, v) où v est la valeur
-propre, et pour calculer l'action on calcule une isogénie et l'on
-vérifie que la valeur propre du Frobenius est la bonne.
 
-\section{The Rostovtsev-Stolbunov key-exchange protocol}
+We assume the reader to have some familiarity with elliptic curves over 
+finite fields and isogenies between them. A well-known reference for these 
+concepts is the book of Silverman \cite{Sil1}. We will call 
+\emph{$\ell$-isogeny} an isogeny of degree $\ell$, where $\ell$ is a prime.
+Here we always assume that $\ell$ is prime to the characteristic;
+in particular our $\ell$-isogenies are separable. We will call two isogenies
+\emph{isomorphic} if they differ by postcomposition by an isomorphism.
+
+Let $\phi\from E\to E'$ be an $\ell$-isogeny over a finite field $k$. Then 
+$\phi$ has a \emph{kernel}, which can be described as the set of $\bar{k}$-
+points on $E$ mapped by $\phi$ to the neutral element of $E'$. It satisfies
+\[
+\Card(\Ker(\phi)) = \ell.
+\]
+Therefore, the points in $\Ker(\phi)$ are $\ell$-torsion points on the curve 
+$E$, that is, we have the inclusion
+\[
+\Ker(\phi) \subset E[\ell](\bar{k}).
+\]
+
+Standard theory tells us that $E[\ell](\bar{k})$ is isomorphic to $(\Z/\ell\Z)^2$
+as a group. We may thus view it as a vector space of dimension two over the 
+finite field $\Z/\ell\Z$ in which $\Ker(\phi)$ is a subspace of dimension one. 
+This correspondence between $\ell$-isogenies and subgroups of order $\ell$ is 
+one-to-one: if $G$ is a subgroup of $E(\bar{k})$ of order $\ell$, then there 
+exists an isogeny $\phi\from E\to E'$ with kernel $G$, and $\phi$ is uniquely 
+determined up to isomorphism. In this case we write $E' = E/G$.
+
+Call an isogeny $\phi$ \emph{$k$-rational} if it can be written as rational 
+fractions with coefficients in $k$. One can show that $\phi$ is $k$-rational if 
+and only if $\Ker(\phi)$ is.
+Rationality is related to the Frobenius endomorphism of the curve $E$, which is 
+defined as follows. Let $q$ be the order of $k$, and write $E$ as a plane curve 
+with coordinates $x, y$. Then the Frobenius of $E$ is
+\[
+\begin{aligned}
+\pi_E \from E &\to E \\
+ (x, y) &\mapsto (x^q, y^q).
+\end{aligned}
+\]
+
+A point on $E$ is $k$-rational if and only if it is invariant under $\pi_E$, 
+and a subgroup of $E(\bar{k})$ is $k$-rational if and only if it is (globally) 
+stable under $\pi_E$. Going back to the description of $E[\ell](\bar{k})$ as a 
+vector space over $(\Z/\ell\Z)$, we are saying that an $\ell$-isogeny $\phi$ is 
+$k$-rational if and only if the line $\Ker(\phi)$ is an eigenspace for the 
+endomorphism $\pi_E$ restricted to $E[\ell](\bar{k})$. If $v$ denotes the 
+eigenvalue of $\pi_E$ on this subspace, we will say that $\phi$ has \emph{
+direction $v$}.
+
+
+The number of rational isogenies from $E$ to another curve is then related to 
+the behaviour of $\pi_E$ as an endomorphism of $E[\ell](\bar{k})$. If it acts 
+as a scalar matrix, all $\ell+1$ lines are left stable, so $\ell+1$ rational 
+isogenies exist; while if it acts as
+\[
+\left(
+\begin{matrix}
+\alpha & * \\
+0 & \alpha
+\end{matrix}
+\right)
+\quad
+\text{(with $\alpha$ and $*$ nonzero in $\Z/\ell\Z$)}
+\]
+there is only one stable line, hence only one rational isogeny. In these cases, 
+we say that $\pi_E$ has a \emph{double eigenvalue} modulo $\ell$, or that $\ell$
+ is \emph{ramified}.
+
+Two other situations can arise: either $\pi_E$ has two distinct eigenvalues 
+modulo $\ell$ and there are two rational $\ell$-isogenies starting from $E$, or 
+$\pi_E$ has no eigenvalue at all and there are no rational $\ell$-isogenies. 
+Following the tradition dating back to the study of Schoof's algorithm for 
+point counting, we will call such primes \emph{Elkies} and \emph{Atkin} 
+respectively.
+
+
+
+\subsection{Ordinary elliptic curves and the theory of complex multiplication}
+
+An elliptic curve $E/k$ is called \emph{ordinary} when its endomorphism ring $
+\End(E)$ is an order in a quadratic imaginary field (other curves are called 
+\emph{supersingular} and their endomorphism rings are orders in a quaternion 
+algebra). Here, an \emph{order} is a subring which is a $\Z$-module of maximal 
+rank. 
+
+From now on we will restrict attention to ordinary curves and rational 
+isogenies. For example, we will call two curves $E$ and $E'$ \emph{isogenous} 
+if there exists a rational isogeny from $E$ to $E'$. This is an equivalence 
+relation: according to a theorem of Tate, $E$ and $E'$ are isogenous if and 
+only if they have the same number of points over $k$. Hasse's theory then 
+implies that the rings $\Z[\pi_E]$ and $\Z[\pi_{E'}]$ are naturally isomorphic (
+$\pi_{E'}$ being the image of $\pi_{E}$): indeed we have
+\[
+\pi_E^2 - t_E\pi_E + q = 0
+\]
+where $t$ is an integer such that
+\[
+\Card(E(k)) = p + 1 - t_E.
+\]
+These rings are of finite index in the endomorphism rings, and as a consequence 
+$\End(E)$ and $\End(E')$ can be viewed as orders in the \emph{same} quadratic 
+imaginary field $K = \Z[\pi_E]\otimes\Q$. Furthermore, these isomorphisms can 
+be made coherent across an isogeny class in the sense that the Frobenius 
+endomorphism always corresponds to the same element of $K$.
+
+If $\phi\from E\to E'$ is an $\ell$-isogeny, then the orders $\End(E)$ and $\End
+(E')$ are very close to each other. One has the following classification: either
+\[
+\begin{aligned}[l]
+&\End(E) = \End(E'),
+&\qquad\text{$\phi$ is then called \emph{horizontal}, or} &\\
+&[\End(E):\End(E')] = \ell,
+&\qquad\text{$\phi$ is then called \emph{descending}, or} &\\
+&[\End(E'):\End(E)] = \ell,
+&\qquad\text{$\phi$ is then called \emph{ascending}.} &
+\end{aligned}
+\]
+
+We now present the group action used in the Rostovtsev--Stolbunov key exchange 
+protocol. Let $\frak a$ be an ideal in $\End(E)$. Then we have a natural \emph
+{${\frak a}$-torsion} subgroup of $E$ to look at:
+\[
+E[\frak a](\bar{k}) = \set{P\in E(\bar{k}) \suchthat \sigma(P) = 0\ 
+\forall\sigma\in\End(E)}.
+\]
+This subgroup is the kernel of a rational isogeny $\phi_{\frak a}$ that is well-
+defined up to postcomposition by an isomorphism, hence the codomain of $\phi_{
+\frak a}$ is well-defined up to isomorphism over $\bar{k}$. We will call this 
+codomain $\frak a\cdot E$, in other words
+\[
+\frak a\cdot E = E/E[\frak a].
+\]
+
+The isogeny $\phi_{\frak a}$ is always horizontal, hence we have $\End(\frak a
+\cdot E) = \End(E)$, and its degree is the \emph{norm} of $\frak a$ as an ideal 
+of $\End(E)$.
+Let us call $\Ell_k(\O)$ the set of isomorphism classes over $\bar{k}$ of 
+curves whose endomorphism ring is isomorphic to $\O$. It turns out that the 
+construction above may be extended into a group action: namely, the group of 
+fractional ideals of $\End(E)$ acts on the set $\Ell_k(\End(E))$. Furthermore, 
+principal ideals act trivially, so that this action factorises as an action of 
+the \emph{ideal class group} $\Cl(\End(E))$ on the set $\Ell_k(\End(E))$.
+
+The main theorem of complex multiplication states that this action is \emph{
+simply transitive}; in other terms, $\Ell_k(\End(E))$ is a principal 
+homogeneous space under the group $\Cl(\End(E))$. If we fix a curve $E$ as a 
+base point, we thus have a bijection
+\[
+\begin{aligned}
+\Cl(\End(E)) &\to \Ell_k(\End(E)) \\
+\text{Ideal class of }\frak a &\mapsto \text{Isomorphism class }\frak a\cdot E.
+\end{aligned}
+\]
+
+Remember that the Frobenius characteristic equation
+\[
+X^2 - t_E X + q = 0
+\]
+of discriminant $\Delta_E$ is a defining equation for the field $K = \End(E)
+\otimes\Q$. The discriminant of $\End(E)$ divides $\Delta_E$ since $\End(E)$ 
+contains the ring $\Z[\pi_E]$. Hence, we can summarize the previous discussion 
+in the following way: let $\ell$ be an odd prime, prime to the characteristic. 
+Then either
+\begin{enumerate}
+\item $\Delta_E$ is not a square modulo $\ell$. Then $\ell$ is Atkin, and there 
+are no rational $\ell$-isogenies starting from $E$. The prime $\ell$ is inert 
+in $K$, so that there are no ideals of norm $\ell$ in $\End(E)$.
+\item $\Delta_E$ is nonzero and a square modulo $\ell$. Then $\ell$ is Elkies, 
+and there are exactly two $\ell$-isogenies starting from $E$ whose directions 
+are the two Frobenius eigenvalues modulo $\ell$. They are horizontal since $\ell
+$ is prime to $\Delta_E$. The prime $\ell$ splits in $K$, and there are two 
+ideals of norm $\ell$ in $\End(E)$ that are complex conjugates of each other, $
+\frak a_\ell$ and $\frak a_\ell^{-1}$. One can show that the action of the 
+ideal $\frak a_\ell$ in always given by $\ell$-isogenies in the same direction $
+v$, which satisfies
+\[
+\pi_E = v \mod \frak a_\ell.
+\]
+Of course, the same is true for $\frak a_\ell^{-1}$. Since the eigenvalues are 
+distinct, we may safely identify the ideal $\frak a_\ell$ with the pair $(\ell, 
+v)$.
+\item $\Delta_E$ is zero modulo $\ell$. Then $\ell$ is ramified. The situation 
+is more complicated: there can be either zero or one ideal of norm $\ell$ in $
+\End(E)$, depending on its conductor, and there may be non-horizontal 
+isogenies. In any case, all these isogenies are associated with the same 
+Frobenius eigenvalue.
+
+\end{enumerate}
+
+
+\subsection{Modular curves}
+
+Elliptic curves equipped with $\ell$-isogenies (or, more generally, some 
+additional structure) can be naturally identified to \emph{points} on a 
+mathematical object called a \emph{modular curve}. Constructing modular curves 
+in general is not easy, and we will simply recall here some well-known 
+properties. As above, let $\ell$ be a prime distinct from the characteristic of 
+$k$. 
+Then there exists a smooth curve $X_0(\ell)$ defined over $k$ with the 
+following property: there is a bijection
+\[
+X_0(\ell)(k) \isom \set{
+\begin{matrix}
+\text{Isomorphism classes over $\bar{k}$ of pairs $(E, G)$}\\
+\text{where $G$ is a subgroup of order $\ell$ defined over $k$.}
+\end{matrix}
+}
+\]
+
+Of course, this is not a mere bijection: it is functorial in $k$, and one side 
+can be deduced from the other by algebraic means.
+In this work, we use modular curves presented as \emph{plane curves} up to 
+birational equivalence, i.e. given as an equation of the form
+$\Phi(X, Y) = 0.$
+In order to find such an equation, it is enough to find to functions $X$ and $Y$
+ on the curve that generate its function field. One can obtain an equation for $
+X_0(\ell)$ using the two functions
+\[
+\begin{aligned}
+X(E, G) &= j(E), \\
+Y(E, G) &= j(E/G)
+\end{aligned}
+\]
+where $j(E)$ denotes the $j$-invariant of the elliptic curve $E$. Indeed, $X$ 
+and $Y$ are well defined and algebraic, and can be shown to generate the 
+function field of $X_0(\ell)$. They are linked by a polynomial equation
+\[
+\Phi_\ell(X, Y) = 0
+\]
+where $\Phi_\ell$ is called the \emph{classical modular polynomial} of level $
+\ell$. The coefficients of $\Phi_\ell$ can be obtained by considering the 
+modular curve $\Phi_\ell$ over $\C$, for example.
+
+These polynomials quickly become difficult to compute, hence one uses different 
+functions on $X_0(\ell)$ when $\ell$ becomes large, giving rise to the so-
+called \emph{Atkin modular polynomials}. The classical polynomial $\Phi_\ell$ 
+is still arguably the simplest to use, since one only has to solve the 
+polynomial equation $\Phi_\ell(j(E), Y) = 0$ to find the $j$-invariants of 
+curves linked to $E$ by an $\ell$-isogeny. Here one sees how equations of 
+modular curves can be used in the context of isogeny computations.
+
+In general, the curve $\Phi(X, Y) = 0$ is no longer smooth: for example, double 
+points may appear, so that $k$-points on this curve are no longer in bijection 
+with geometric data as above. Still, plane equations are useful. For example, 
+one can show that double points of $X_0(\ell)$ in the coordinates $X, Y$ 
+correspond to elliptic curves $E$ that have a nontrivial endomorphism of degree 
+$\ell^2$, and this is easily controlled.
+
+
+\section{The Rostovtsev--Stolbunov key-exchange protocol}
+
+\subsection{Key exchange from abelian Cayley graphs}
 
 Pour présenter l'échange de clés en lui-même, sous forme
-d'algotithmes.  Détailler jusqu'au niveau 'calcul du noyau' et 'test
+d'algorithmes.  Détailler jusqu'au niveau 'calcul du noyau' et 'test
 de la valeur propre', que l'on laisse sans plus de discussion pour
 l'instant.  Mettre l'accent sur les paramètres à notre disposition: le
 corps de base, la courbe initiale, le nombre de pas maximum pour
