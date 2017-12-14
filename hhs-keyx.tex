@@ -1,9 +1,11 @@
 \documentclass{article}
 
-\usepackage{amssymb,amsmath}
+\usepackage{amssymb, amsmath, amsthm}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{tikz}
+\usepackage[ruled, vlined, linesnumbered]{algorithm2e}
+\SetEndCharOfAlgoLine{}
 
 %Shortcuts
 \newcommand{\F}{\mathbb{F}}
@@ -11,13 +13,18 @@
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\Cl}{\mathcal{C}}
+\newcommand{\Graph}{\mathcal{G}}
 \renewcommand{\O}{\mathcal{O}}
+\newcommand{\softO}{\tilde{O}}
 \newcommand{\isom}{\overset{\sim}{\longrightarrow}}
 \newcommand{\from}{\ensuremath{\,:\ }}
 \newcommand{\set}[1]{\left\{#1\right\}}
 \newcommand{\suchthat}{\,|\,}
+\newcommand{\algnamestyle}[1]{\textsc{#1}}
 
-\newtheorem{theorem}{Theorem}
+\newtheorem{theorem}{Theorem}[section]
+\theoremstyle{definition}
+\newtheorem{prob}[theorem]{Problem}
 
 \DeclareMathOperator{\End}{End}
 \DeclareMathOperator{\Ker}{Ker}
@@ -54,6 +61,7 @@ quantique, et des améliorations/accélérations du protocole en
 pratique.  Présentation rapide du plan.
 
 \section{Mathematical background}
+\label{sec:math}
 
 In this paper, we present a key exchange protocol based on the action of
 an abelian group that is related to prime-degree isogenies between ordinary
@@ -67,7 +75,7 @@ We assume the reader to have some familiarity with elliptic curves over
 finite fields and isogenies between them. A well-known reference for these 
 concepts is the book of Silverman \cite{Sil1}. We will call 
 \emph{$\ell$-isogeny} an isogeny of degree $\ell$, where $\ell$ is a prime.
-Here we always assume that $\ell$ is prime to the characteristic;
+We always assume that $\ell$ is prime to the characteristic:
 in particular our $\ell$-isogenies are separable. We will call two isogenies
 \emph{isomorphic} if they differ by postcomposition by an isomorphism.
 
@@ -106,7 +114,9 @@ with coordinates $x, y$. Then the Frobenius of $E$ is
 
 A point on $E$ is $k$-rational if and only if it is invariant under $\pi_E$, 
 and a subgroup of $E(\bar{k})$ is $k$-rational if and only if it is (globally) 
-stable under $\pi_E$. Going back to the description of $E[\ell](\bar{k})$ as a 
+stable under $\pi_E$. More generally, being defined over an extension of $k$
+of degree $r$ is the same as being invariant by the iterated Frobenius $\pi_E^r$.
+Going back to the description of $E[\ell](\bar{k})$ as a 
 vector space over $(\Z/\ell\Z)$, we are saying that an $\ell$-isogeny $\phi$ is 
 $k$-rational if and only if the line $\Ker(\phi)$ is an eigenspace for the 
 endomorphism $\pi_E$ restricted to $E[\ell](\bar{k})$. If $v$ denotes the 
@@ -138,6 +148,11 @@ $\pi_E$ has no eigenvalue at all and there are no rational $\ell$-isogenies.
 Following the tradition dating back to the study of Schoof's algorithm for 
 point counting, we will call such primes \emph{Elkies} and \emph{Atkin} 
 respectively.
+
+Given a line $L$ in $E[\ell](\bar{k})$ on which the Frobenius has eigenvalue $v$,
+we can describe the field of definition of the points on $L$. The degree of this
+field over $k$ is the smallest integer $r$ such that $\pi_E^r$ is the identity
+on $L$: therefore $r$ is simply the multiplicative order of $r$ in $\Z/\ell\Z$.
 
 
 
@@ -310,41 +325,306 @@ points may appear, so that $k$-points on this curve are no longer in bijection
 with geometric data as above. Still, plane equations are useful. For example, 
 one can show that double points of $X_0(\ell)$ in the coordinates $X, Y$ 
 correspond to elliptic curves $E$ that have a nontrivial endomorphism of degree 
-$\ell^2$, and this is easily controlled.
+$\ell^2$, and this is easily controlled: in particular it cannot be the case
+when the discriminant of $\End(E)$ is greater than $\ell^2$.
 
 
 \section{The Rostovtsev--Stolbunov key-exchange protocol}
+\label{sec:keyex}
 
 \subsection{Key exchange from abelian Cayley graphs}
 
-Pour présenter l'échange de clés en lui-même, sous forme
-d'algorithmes.  Détailler jusqu'au niveau 'calcul du noyau' et 'test
-de la valeur propre', que l'on laisse sans plus de discussion pour
-l'instant.  Mettre l'accent sur les paramètres à notre disposition: le
-corps de base, la courbe initiale, le nombre de pas maximum pour
-chaque nombre premier.  Faire la remarque que la taille de l'espace de
-clés dépend surtout du nombre de nombres premiers utilisés
+The Rostovtsev--Stolbunov key-exchange protocol is an instance of a general
+framework of key exchanges using abelian Cayley graphs. This general pattern
+is in turn an example of Couveignes' `Hard Homogeneous Spaces' key echange
+framework. Let us first describe this general
+setting before discussing more specific algorithms used in isogeny computations.
+The public data is
+\begin{itemize}
+\item A finite abelian group $G$;
+\item A finite set $S$ of elements of $G$;
+\item A finite set $X$ on which $G$ acts simply transitively;
+\item A fixed element $x_0\in X$;
+\item For each $s\in S$, an integer $M_s\geq 1$.
+\end{itemize}
+We further ask that the action of $G$ on $X$ be \emph{computable}, in the sense
+ that there is an algorithm \algnamestyle{Step} which, given $s\in S$ and $x\in X$ as
+input, computes the element $s\cdot x$. To explain the name, let $\Graph(G, S, X)$
+be the oriented graph whose vertices are the elements of $X$, and an edge labelled
+by $s\in S$ links $x_1$ to $x_2$ if $s\cdot x_1 = x_2$; then the algorithm
+\algnamestyle{Step} allows us to follow one edge in the graph. The graph $\Graph(G, S, X)$
+may be (at least theoretically, if not computationally) identified with the usual
+Cayley graph associated with the abelian group $G$ and the set $S$ of generators.
 
-(Eventuellement dans une autre section) faire un review rapide des
-algorithmes à notre disposition pour le calcul d'isogénies, en faisant
-référence aux articles pertinents.  Je pense que l'on peut mettre
-l'accent que l'on peut atteindre une complexité quasi-linéaire en l
-pour toutes les étapes (cf Sutherland 'on the evaluation of modular
-equations', bmss, et on a seulement 2 possibilités à tester pour la
-valeur propre).
+As usual, two participants Alice and Bob want to build a common secret while
+communicating over an insecure channel. Using the public data above, they may
+achieve this by computing several walks in the graph $\Graph(G, S, X)$. This is
+described by the algorithms \ref{alg:keyex}, \ref{alg:key} and \ref{alg:walk}.
+
+\begin{algorithm}
+    \caption{\algnamestyle{KeyExchange}: key exchange using an abelian Cayley graph}
+    \label{alg:keyex}
+    \KwIn{Public data as above}
+    \KwOut{A secret $x_S\in X$ shared by Alice and Bob}
+    %		
+    Alice does\\
+			\quad $K_A \gets$ \algnamestyle{KeySample}()\;
+			\quad $x_A \gets$ \algnamestyle{Walk}$(K_A, x_0)$\;
+			\quad \textbf{publish} $x_A$ \;
+		Bob does\\
+			\quad $K_B \gets$ \algnamestyle{KeySample}()\;
+			\quad $x_B \gets$ \algnamestyle{Walk}$(K_B, x_0)$\;
+			\quad \textbf{publish} $x_B$ \;
+		Alice does\\
+			\quad $x_{S, A}$ = \algnamestyle{Walk}$(K_A, x_B)$\;
+		Bob does\\
+			\quad $x_{S, B}$ = \algnamestyle{Walk}$(K_B, x_A)$\;
+		\Return $x_S = x_{S, A} = x_{S, B}$
+\end{algorithm}
+
+\begin{algorithm}
+	\caption{\algnamestyle{KeySample}: construction of an ephemeral key}
+	\label{alg:key}
+	\KwIn{Public data as above}
+	\KwOut{An ephemeral key}
+	%
+	\For{$s\in S$}{
+		$k_s \overset{R}{\gets} [0, M_s]$ \quad (uniformly at random)
+	}
+	\Return{$(k_s)_{s\in S}$}
+\end{algorithm}
+
+\begin{algorithm}
+	\caption{\algnamestyle{Walk}: a walk in the abelian Cayley graph}
+	\label{alg:walk}
+	\KwIn{Public data as above; an ephemeral key $K = (k_s)_{s\in S}$; a point $x_I\in X$}
+	\KwOut{The element $x_F = (\prod_{s\in S} s^{k_s})\cdot x_I$}
+	%
+	$x_F\gets x_I$\;
+	\For{$s\in S$}{
+		\lFor{\(0 \le i < k_s\)}{
+			$x_F\gets$ \algnamestyle{Step}$(s, x_F)$
+		}
+	}
+	\Return $x_F$
+\end{algorithm}
+
+As the reader may see, this key exchange framework is based on the computation
+of several walks in the graph $\Graph(G, S, X)$. Alice and Bob are allowed to
+compute steps in the directions specified by the elements of $S$, and the integers
+$M_s\geq 1$ play the role of the maximal number of steps that will be computed
+for each generator. Of course, when both $s$ and $s^{-1}$ appear in $S$, one
+of $k_s$ and $k_{s^{-1}}$ has to be zero, since the steps would otherwise
+annihilate each other.
+An important remark is that there is no need to represent
+elements of $G$ at all in this protocol, or to compute with them directly,
+outside the algorithm \algnamestyle{Step}.
+
+When designing practical instances of abelian Cayley graph
+protocols, the main degrees of liberty are the choice of the generators themselves,
+and the bounds $M_s$. The cost of the key exchange is a weighted
+sum of the $M_s$, while the key space size is the product of these integers. When
+the number of generators is sufficient, there is therefore an exponential gap
+between the key space size and the cost of the walks.
+
+Of course, in order to be
+cryptographically interesting, the action of the group $G$ on $X$ must in particular
+be difficult to \emph{invert}: $x_1, x_2\in X$ being given, finding a combination
+$g\in G$ of the generators such that $g\cdot x_1 = x_2$. must be a hard problem.
+This is the main reason why this framework cannot usually be used with
+Cayley graphs given by multiplication in the group, since division in $G$ is usually
+a simple operation. To be more precise, the security of this key exchange relies
+on the difficulty of the following Diffie--Hellman-like problems:
+
+\begin{prob}[Group Action Decisional Diffie--Hellman (GADDH) problem] Let $x, y\in X$,
+$a, b\in G$. Given $x,\ y,\ a\cdot x$ and $b\cdot x$, decide whether $(ab)\cdot x = y$.
+\end{prob}
+
+\begin{prob}[Group Action Computational Diffie--Hellman (GACDH) problem] Let $x\in X$,
+$a, b\in G$. Given $x,\ a\cdot x$ and $b\cdot x$, compute $(ab)\cdot x$.
+\end{prob}
+
+For a particular family of group actions, we will call GADDH assumption the assumption
+that the GADDH problem is computationally infeasible, in the sence that the advantage
+given by any polynomial-time algorithm is a negligible function of the security parameter
+$\log|G|$.
+
+\subsection{Presentation of the protocol}
+
+The idea of Rostovtsev and Stolbunov is to instanciate the general framework of
+key exchange based on abelian group actions using isogenies between ordinary elliptic
+curves. Let us fix an ordinary elliptic curve $E_0$ over a finite field $k$, with
+endomorphism ring $\O$. Then the ideal class group of $\O$ will play the role of
+the abelian group $G$, and the set $X$ is the set $\Ell_k(\O)$ of elliptic curves
+with endomorphism ring $\O$.
+
+We also have to describe the set $S$ of generators used. Let $L$ be a list of
+small Elkies primes for the curve $E_0$, as defined in section \ref{sec:math}.
+Then for each $\ell\in L$, there exists two ideals in $\O$ of norm $\ell$, which
+are inverses of each other. These ideal classes will be the elements of $S$. According to
+the discussion in section \ref{sec:math}, we may identify these ideal classes with
+pairs $(\ell, v)$, where $v$ is one of the two Frobenius eigenvalues modulo $\ell$.
+
+Now the description of the algorithm \algnamestyle{Step} (algorithm \ref{alg:step}) is a direct consequence of
+the previous discussions. The subroutine \algnamestyle{IsogenyKernel}$(E, \ell, j_1)$
+is an algorithm which computes the kernel of an isogeny from $E$ to an elliptic curve
+with $j$-invariant $j_1$, and that we will discuss in the following section.
+As before, we identify isomorphism classes of curves with
+$j$-invariants.
+
+\begin{algorithm}
+	\caption{\algnamestyle{Step}: a step in an ordinaty isogeny graph}
+	\label{alg:step}
+	\KwIn{A generator $(\ell, v)$; an isomorphism class $j_I\in \Ell_k(\O)$; a curve $E_I$
+		such that $j(E_I) = j_I$; the classical
+		modular polynomial $\Phi_\ell(X, Y)$}
+	\KwOut{The isomorphism class $j_F$ given by the action of $(\ell, v)$ on $j_I$}
+	%
+  $P\gets \Phi_\ell(j_I, Y)$\;
+	$j_1, j_2 \gets$ \algnamestyle{Roots}$(P, k)$\;
+	$K_1\gets $ \algnamestyle{IsogenyKernel}$(E_I, \ell, j_1)$\;
+	\lIf{\algnamestyle{HasFrobeniusEigenvalue}$(K_1, v)$}{\Return $j_1$}
+	\lElse{\Return $j_2$}
+\end{algorithm}
+
+According to section \ref{sec:math}, this algorithm is valid if the discriminant
+of $\O$ is larger than $\ell^2$.
+Note that in algorithm \ref{alg:step}, there is no need to know the endomorphism
+ring $\O$, to compute directly with ideals or to be able to compute the set
+$\Ell_k(\O)$. In order to use this
+protocol, one only has to know which primes are Elkies for the curve $E_0$,
+and this is easy once we know the Frobenius characteristic equation on $E_0$.
+This is equivalent to computing the cardinality of $E_0$, which is
+done in polynomial time using Schoof's algorithm. If we replace $v$ with the other
+Frobenius eigenvalue modulo $\ell$ in algorithm \ref{alg:step}, we will compute
+a step in the direction specified by the other ideal of norm $\ell$: therefore
+we are able to use both of them as generators.
+
+According to section \ref{sec:math}, we may give another version for the
+algorithm \algnamestyle{Step}, described in algorithm \ref{alg:steptors}.
+
+\begin{algorithm}
+	\caption{\algnamestyle{Step2}: another way of computing a step in the isogeny graph}
+	\label{alg:steptors}
+	\KwIn{A generator $(\ell, v)$; an isomorphism class $j_I\in \Ell_k(\O)$; a curve $E_I$
+		such that $j(E_I) = j_I$; the classical
+		modular polynomial $\Phi_\ell(X, Y)$}
+	\KwOut{The isomorphism class $j_F$ given by the action of $(\ell, v)$ on $j_I$}
+	%
+	$r\gets$ \algnamestyle{MultiplicativeOrder}$(v, \F_\ell)$\;
+	$k_{ext}\gets$ \algnamestyle{Extension}$(k, r)$\;
+	$P_{ext}\gets$ \algnamestyle{TorsionPoint}$(E_I, \ell, k_{ext})$\;
+	$K\gets$ \algnamestyle{Subgroup}$(P_{ext})$\;
+	$E_F\gets$ \algnamestyle{Quotient}$(E_I, K)$\;
+	\Return $j(E_F)$
+\end{algorithm}
+
+Algorithm \ref{alg:steptors} is valid when the Frobenius eigenspace with eigenvalue $v$ is
+the only line in $E[\ell](\bar{k})$ whose points are defined over the degree $r$ extension
+$k_{ext}$ of $k$. In other words, it is valid when the multiplicative order of $v$ in
+$\F_\ell$ is strictly smaller than the multiplicative order of the second eigenvalue.
+In any case, only one of the two ideals of norm $\ell$ can be eligible for algorithm
+\ref{alg:steptors}.
+
+Let us now describe the primitives about isogeny computations used in algorithms
+\ref{alg:step} and \ref{alg:steptors}. This will allow us to compare the merits
+of these two algorithms, which is directly related to the choice of the public
+parameters.
+
 
 \section{Algorithms and parameter selection}
+
+We keep the notations of sections \ref{sec:math}
+and \ref{sec:keyex}. In order to analyse the costs of various parts of the
+algorithm, we make some complexity estimates in terms of operations in the
+base field $k$, where $\ell$ and $\log q$ are thought of as variables.
+We will use the soft-$O$ notation: a cost $\softO(f(\ell, \log q))$ means
+$O(f(\ell, \log q)^{O(1)})$. These complexity estimates will also
+allow us to discuss the relative costs of algorithms \ref{alg:step} and
+\ref{alg:steptors}, and guide us in the later choice of the primes $\ell$
+and bounds $M_\ell$ for the number of steps that we will finally propose.
+
+\subsection{Description of the subroutines}
+
+
+The reader will agree that the purpose of the subroutines \algnamestyle{Roots}
+and \algnamestyle{MultiplicativeOrder} is clear. Remember that the
+prime $\ell$ is very small compared to the order of $k$. Therefore we use the
+well-known Cantor--Zassenhaus method in \algnamestyle{Roots}:
+given a polynomial $P$,
+we compute $F = X^q \mod P$ using a fast exponentiation method, and then the polynomial
+$\gcd(F - X, P)$ is the product of irreducible factors of degree one in $P$
+in $k[X]$. In our setting the modular equation has two roots: therefore we only need
+to compute square roots to complete the \algnamestyle{Roots} algorithm, which is
+done using the Tonnelli--Shanks algorithm. The cost is dominated
+by that of computing $F$: when $P$ is a modular equation
+of level $\ell$, hence degree $\ell + 1$, this costs $\softO(\ell\log q)$ operations in $k$
+using asymptotically fast methods for polynomial arithmetic. As for \algnamestyle{MultiplicativeOrder},
+any version of it will do, including the really naive one consisting in computing
+all the powers of $v$ until one is equal to 1.
+
+Algorithm \algnamestyle{HasFrobeniusEigenvalue}
+involves computing the Frobenius on the kernel: more precisely, one computes $(X^q, Y^q)$
+where $q$ is the order of $k$ in the quotient ring
+\[
+k[X, Y]/(K(X),\ Y^2 - X^3 - aX - b)
+\]
+where $a, b$ are given by the curve equation $y^2 = x^3 + ax + b$. Here, the polynomial
+$K(X)$ is the degree $\frac{\ell-1}{2}$ polynomial whose roots are the $x$-coordinates of the elements
+in the subgroup of order $\ell$. One then checks whether it is equal to $v$ times the generic
+point $(X, Y)$ which is computed using the addition law on the curve. In fact, computing
+in the double quotient ring above is not even needed. The two quantities we want to compute,
+$(X^q, Y^q)$ and $[v](X, Y)$, have a $Y$ factor only in their second coordinate. Thus one
+can only store univariate polynomials in $X$ and multiply by the square of $Y$, that is
+$X^3 + aX + b$, at appropriate places in the addition algorithm on the curve. Thus the
+computations are really done in the ring $k[X]/K(X)$.
+
+There is one last subroutine in algorithm \ref{alg:step} that is important to discuss,
+namely the evaluation (and the storage) of the bivariate polynomial $\Phi_\ell$. It is a bivariate
+polynomial of degree $\ell + 1$ in both variables, which is not sparse and whose coefficients
+grow quickly. Therefore in first approximation, even its storage could cost as much as
+$\O(\ell^2 \log q)$ when the coefficients are reduced in $k$. However, it is in practice a negligible
+part of the algorithm: when the classical modular polynomials become too cumbersome to store, we
+switch to Atkin modular polynomials. If one wants to use modular equations of yet higher levels,
+one can compute directly the classical modular polynomial evaluated at an element in $k$,
+with a cost that is linear in the level. However, using such methods is not mandatory in
+the context of the Rostovtsev--Stolbunov key exchange.
+
+\subsection{Isogeny computations}
+
+The algorithms \algnamestyle{IsogenyKernel} and \algnamestyle{Quotient} appearing in
+algorithms \ref{alg:step} and \ref{alg:steptors} are well-known primitives in isogeny
+computations. Computing a quotient is easy, whereas the problem of computing the
+kernel of an isogeny given its domain, degree and image is a somewhat more difficult
+problem. A rich literature exists on this subject, so that we will content ourselves
+with the larger picture.
+
+The \algnamestyle{Quotient} algorithm directly uses Vélu's formulas, which are
+summarised in the following theorem.
+\begin{theorem}[Vélu]
+
+\end{theorem}
+
+-------
+
+faire un review rapide des
+algorithmes à notre disposition pour le calcul d'isogénies, en faisant
+référence aux articles pertinents.
+
+\subsection{Cost analysis}
 
 Faire une première remarque qu'il est plus efficace d'utiliser des
 courbes qui ont plus de petits nombres premiers d'Elkies.
 
-Présenter la deuxième version de l'algorithme de calcul de pas qui
-utilise des points rationnels (ou qui vivent dans une petite
-extension). Cette deuxième version est plus efficace si la valeur
-propre a un plus petit ordre multiplicatif.
+Analyse du coût de l'algorithme \ref{alg:steptors}.
 
 Cela amène à vouloir chercher des courbes dont la trace mod l a de
-bonnes propriétés pour de petits l. Présenter la stratégie de
+bonnes propriétés pour de petits l.
+
+
+\subsection{Looking for a good initial curve}
+
+Présenter la stratégie de
 recherche SEA--early-abort. Cela vaut-il la peine de parler de la
 sélection de candidats à l'aide d'une courbe modulaire, vu le peu que
 cela fait gagner à la fin ? Je trouve que c'est intéressant, mais
@@ -361,22 +641,12 @@ premiers...), et une minoration explicite du nombre de classes.
 Proposer aussi le nombre de pas à effectuer pour chaque nombre premier
 d'Elkies.
 
-Je devrais travailler le code pour pouvoir atteindre un échange de clé
-complet, et être capable de dire: tant de temps a été dépensé en
+Indiquer l'existence du paquet Julia avec un exemple complet d'échange
+de clés. dire: tant de temps a été dépensé en
 calculs de Frobenius, tant de temps en multiplications scalaires, etc.
 
-Indiquer l'existence du paquet Julia en préparation.
-
-(Je remarque d'ailleurs que dans le papier SIDH, on mentionne une
-performance de 229 secondes pour l'échange de clés au niveau de 128
-bits de sécurité, que je n'atteins pas même avec les meilleures
-courbes que j'ai trouvées...)
-
 Faire aussi des commentaires sur la sécurité quantique de ces
-paramètres, en fonction de la discussion précédente.  On peut faire
-des remarques sur l'implem: dire que l'on utilise une version de BMSS
-pour le calcul du noyau, et que l'on peut encore stocker des équations
-modulaires pour les niveaux que l'on regarde.
+paramètres, en fonction de la discussion précédente. 
 
 \section{Security}
 
