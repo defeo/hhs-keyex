@@ -3,7 +3,9 @@
 \usepackage{amssymb, amsmath, amsthm}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{unicode}
 \usepackage{tikz}
+\usepackage{hyperref}
 \usepackage[ruled, vlined, linesnumbered]{algorithm2e}
 \SetEndCharOfAlgoLine{}
 
@@ -42,76 +44,108 @@
 \maketitle
 
 \begin{abstract}
-  
 \end{abstract}
 
 \section{Introduction}
+\label{sec:introduction}
 
-C'est un exemple de cryptosystème à base d'isogénies, analogue de SIDH
-mais en utilisant des courbes ordinaires (d'où le titre, je ne sais
-pas ce que vous en pensez).  La structure des isogénies est
-différente, ici on est dans le cadre des 'hard homogeneous spaces'
-Citer Couveignes, Rostovtsev-Stolbunov Résumer les caractéristiques
-principales du cryptosystème: il n'est pas compétitif en pratique, il
-existe une attaque quantique sous-exponentielle (en citant les papiers
-adéquats).  Dire pourquoi on s'y intéresse tout de même ? (Cela peut
-donner une sécurité post-quantique même en présence d'une attaque
-sous-exponentielle, on peut chercher à estimer cette sécurité...?) Par
-exemple parce qu'on ne sait pas générer des courbes supersingulières
-pour SIDH à partir d'autre chose que le j-invariant 0, qui est cassé ?
--> D'où l'objectif de ce papier: une analyse plus fine de la sécurité
-quantique, et des améliorations/accélérations du protocole en
-pratique.  Présentation rapide du plan.
+A recent trend in cryptography is the development of quantum-safe
+cryptosystems: protocols based on mathematical problems not known to
+be solvable in polynomial time by quantum computers. With Shor's
+algorithm~\cite{shor1994algorithms} ruling out systems based on
+integer factorization or discrete logarithms, NIST has launched a
+process to standardize the next generation of \emph{post-quantum}
+public key cryptosystems~\cite{NIST2016}. In response, NIST has
+received 69 proposals, most of them belonging to the three more
+popular post-quantum families: lattice-based systems, code-based
+systems, and multivariate systems. Among the youngest and least
+explored families, \emph{isogeny-based} cryptography features only one
+proposal to the NIST competition: the Supersingular Isogeny Key
+Encapsulation (SIKE)~\cite{SIKE}.
 
-\section{Mathematical background}
+SIKE is based upon the key-exchange protocol by Jao and De
+Feo~\cite{jao+defeo2011}, known as SIDH, itself inspired by earlier
+key-exchange constructions by Couveignes~\cite{cryptoeprint:2006:291}
+and Rostovtsev and
+Stolbunov~\cite{rostovtsev+stolbunov06,stolbunov-red,Stol}. The
+origins of isogeny-based cryptography can be traced back to
+Couveignes' seminal work ``Hard Homogeneous Spaces'' (HHS), that went
+unpublished for ten years before appearing
+in~\cite{cryptoeprint:2006:291}. Couveignes viewed HHS more as a
+general framework, encompassing various flavors of Diffie-Hellman-like
+systems, rather than as one particular protocol. Among the possible
+instantiations of HHS, he suggested a new construction based on the
+theory of complex multiplication of elliptic curves. It is however
+Rostovtsev and Stolbunov who first gave
+in~\cite{rostovtsev+stolbunov06} a concrete and detailed realization
+of Couveignes' idea.
+
+Rostovtsev and Stolbunov advertised their system as a potential
+post-quantum candidate, leading Childs, Jao and Soukharev to introduce
+the first sub-exponential quantum algorithm capable of breaking
+it~\cite{childs2014constructing}. Hence, being already slow enough to
+be unpractical in a classical security setting, the
+Rostovtsev-Stolbunov system became even more unusable in a quantum
+security setting. This led Jao and De Feo to create the SIDH
+key-exchange protocol~\cite{jao+defeo2011}, which to the present day
+is not victim to any sub-exponential attack.
+
+The aim of the present paper is to improve and modernize the
+Couveignes-Rostovtsev-Stolbunov construction, borrowing techniques
+from SIDH and point-counting algorithms, to the point of making it
+usable in a post-quantum setting. Although the final result is far
+from being practical, we believe it constitutes progress in the
+direction of having a valid isogeny-based alternative to SIDH.
+Furthermore, our proposed scheme presents some distinct advantages
+over SIDH, that we shall discuss in Section~\ref{todo}. While
+preparing this paper we were informed of
+% todo: say something on CSIDH
+
+The paper is structured as follows.
+% todo
+
+\section{Isogenies and complex multiplication}
 \label{sec:math}
 
-In this paper, we present a key exchange protocol based on the action of
-an abelian group that is related to prime-degree isogenies between ordinary
-elliptic curves. In this section, we briefly present standard results that
-we will use in the sequel. We will denote by $\Card(S)$ the cardinality of
-a finite set $S$; and if $E$ is an elliptic curve (or a subgroup of an
-elliptic curve), and $k$ is a field, we will denote by $E(k)$ the set of
-points on $E$ that are defined over $k$. Of course, this makes sense only
-when $k$ is an extension of the field of definition of $E$.
+We recall here basic facts on isogenies of elliptic curves defined
+over finite fields. For an in depth introduction to these concepts, we
+refer the reader to~\cite{silverman:elliptic}, and for a general
+overview of isogenies and their use in cryptography we
+suggest~\cite{defeo2017isogenybased}.
 
-In this theoretical section, one may assume that our elliptic curves are
-written in the standard Weierstrass form:
-\[
-E\ :\ y^2 = x^3 + a x + b,\quad 4a^3 - 27b^2 \neq 0.
-\]
-In practice, we also use other models that have a more efficient group law.
+Let $E$ and $E'$ be elliptic curves defined over a finite field
+$\F_q$. An isogeny $ϕ:E→E'$ is a non-constant algebraic map defined
+over $\F_q$ mapping the point at infinity of $E$ to the point at
+infinity of $E'$; it is also a group morphism from $E(\bar\F_q)$ to
+$E'(\bar\F_q)$~\cite[III.4]{silverman:elliptic}. The degree of an
+isogeny is its degree as an algebraic map; we will often write
+$ℓ$-isogeny as a shorthand for ``isogeny of degree $ℓ$''. An isogeny
+for a curve $E$ to itself is called an \emph{endomorphism}.
 
-\subsection{Isogenies and the Frobenius endomorphism}
+Any isogeny can be factored as a composition of a \emph{separable} and
+a \emph{purely inseparable} isogeny. \emph{Purely inseparable}
+isogenies have trivial kernel, and degree a power of the
+characteristic of $\F_q$. \emph{Separable} isogenies are in one-to-one
+correspondence with their kernels: for any finite subgroup $G⊂E$ of
+order $ℓ$ there is a unique elliptic curve $E'$ up to isomorphism, and
+a unique $ℓ$-isogeny $ϕ:E→E'$ up to composition by the same
+isomorphism, such that $\kerϕ=G$. All isogenies of degree not
+divisible by the characteristic of $\F_q$ are separable. It follows
+that any isogeny of degree greater than $1$ can be factored as a
+composition of isogenies of prime degree.
+
+For any $ℓ$-isogeny $ϕ:E→E'$, there is a unique $ℓ$-isogeny
+$\hat{ϕ}:E'→E$ such that the compositions $ϕ∘\hat{ϕ}$ and $\hat{ϕ}∘ϕ$
+are equal to the multiplication-by-$ℓ$ maps on $E'$ and $E$
+respectively. $\hat{ϕ}$ is called the \emph{dual isogeny} to $ϕ$.
 
 
-We assume the reader to have some familiarity with elliptic curves over 
-finite fields and isogenies between them. A well-known reference for these 
-concepts is the book of Silverman \cite{Sil1}. We will call 
-\emph{$\ell$-isogeny} an isogeny of degree $\ell$, where $\ell$ is a prime.
-We always assume that $\ell$ is prime to the characteristic:
-in particular our $\ell$-isogenies are separable. We will call two isogenies
-\emph{isomorphic} if they differ by postcomposition by an isomorphism.
+\subsection{Isogeny graphs}
 
-Let $\phi\from E\to E'$ be an $\ell$-isogeny over a finite field $k$. Then 
-$\phi$ has a \emph{kernel}, which can be described as the set of $\bar{k}$-
-points on $E$ mapped by $\phi$ to the neutral element of $E'$. It satisfies
-\[
-\Card(\Ker(\phi)) = \ell.
-\]
-Therefore, the points in $\Ker(\phi)$ are $\ell$-torsion points on the curve 
-$E$, that is, we have the inclusion
-\[
-\Ker(\phi) \subset E[\ell](\bar{k}).
-\]
 
 Standard theory tells us that $E[\ell](\bar{k})$ is isomorphic to $(\Z/\ell\Z)^2$
 as a group. We may thus view it as a vector space of dimension two over the 
 finite field $\Z/\ell\Z$ in which $\Ker(\phi)$ is a subspace of dimension one. 
-This correspondence between $\ell$-isogenies and subgroups of order $\ell$ is 
-one-to-one in the following sense: if $G$ is a subgroup of $E(\bar{k})$ of order $\ell$, then there 
-exists an isogeny $\phi\from E\to E'$ with kernel $G$, and $\phi$ is uniquely 
-determined up to isomorphism. In this case we write $E' = E/G$.
 
 Call an isogeny $\phi$ \emph{$k$-rational} if it can be written as rational 
 fractions with coefficients in $k$. One can show that $\phi$ is $k$-rational if 
@@ -909,4 +943,9 @@ envisage ?
 - Ce protocole a-t-il finalement un intérêt dans le cadre de la crypto post-quantique ?
 
 
+\bibliographystyle{plain}
+\bibliography{refs}
+
 \end{document}
+
+%  LocalWords:  Rostovtsev Stolbunov isogenies morphism isogeny
