@@ -591,7 +591,14 @@ the only line in $E[\ell](\bar{k})$ whose points are defined over the degree $r$
 $k_{ext}$ of $k$. In other words, it is valid when the multiplicative order of $v$ in
 $\F_\ell$ is strictly smaller than the multiplicative order of the second eigenvalue.
 In any case, only one of the two ideals of norm $\ell$ can be eligible for algorithm
-\ref{alg:steptors} as it stands.
+\ref{alg:steptors} as it stands. This disadvantage can be avoided in some cases by
+using the \emph{twisted} elliptic curve: while this operation does not change the
+isomorphism class of the curve, Frobenius eigenvalues are turned into their opposites,
+which may change their multiplicative orders in $\Z/\ell\Z$
+and allow walking in the other direction in the graph. For example, if
+$p = -1\mod\ell$, and $v = 1$ is a Frobenius eigenvalue for $E$, then the
+other eigenvalue is $-1$ and one can use algorithm \algstyle{Step2} in both
+directions with $r=1$.
 
 Let us now describe the primitives about isogeny computations used in algorithms
 \ref{alg:step} and \ref{alg:steptors}. This will allow us to compare the merits
@@ -745,6 +752,12 @@ w &= 10 (\sigma_1^3 - 3 \sigma_1\sigma_2 + 3\sigma_3) + 6 a\sigma_1 + 4bn.
 As one can see, algorithm \algstyle{Quotient} only costs a constant number
 of operations in $k$ (not even in $k_{ext}$, as the polynomial $K$ has
 coefficients in $k$ although it was built from its roots in $k_{ext}$).
+
+In algorithm~\ref{alg:steptors}, the most costly step is usually the
+scalar multiplication. As a consequence, it is interesting in practice
+to use other models for curves such as Montgomery curves~\cite{}.
+An analogue of Vélu's formulas also exist for this model~\cite{}.
+
 \v
 
 As the reader can see, computing a quotient is easy. On the other hand,
@@ -879,29 +892,109 @@ series that satisfy a related differential equation: see \cite{}.
 
 \subsection{Seeking a good initial curve}
 
-Présenter la stratégie de
-recherche SEA--early-abort. Cela vaut-il la peine de parler de la
-sélection de candidats à l'aide d'une courbe modulaire, vu le peu que
-cela fait gagner à la fin ? Je trouve que c'est intéressant, mais
-l'intérêt est plutôt théorique je dirais.
+According to section~\ref{todo}, the global performances of our protocol
+critically depends of the possibility of using algorithm~\ref{alg:steptors}
+instead of algorithm~\ref{alg:step} during walks in the isogeny graph.
+In turn, this depends on the ability to generate an initial elliptic curve
+$E_0$ whose cardinality satisfies certain congruence conditions modulo
+small primes. Even without using algorithm~\ref{alg:step5}, the scheme is
+more efficient when the curve $E_0$ has many small Elkies primes, and this
+property also depends on its cardinality.
+
+In the case of ordinary curves, in contrast with supersingular ones,
+generating curves with prescribed cardinality is a difficult problem~\cite{todo}.
+In this section, we describe how to use the Schoof--Elkies--Atkin (SEA) point counting
+algorithm with early abort, combined with the use of certain modular curves,
+to construct curves whose cardinality satisfies some of these constraints.
+This is faster than choosing curves at random and computing their cardinalities
+completely until a convenient one is found, but still does not allow us
+to use the full power of algorithm~\ref{alg:steptors}.
+
+The SEA algorithm~\cite{todo:refsSEA} is a polynomial-time algorithm for
+point counting on elliptic curves over a finite field. In order to compute
+$C = \Card E(\F_p)$, it computes the value of $C\mod\ell$ modulo a series
+of small primes $\ell$: it is a \emph{multimodular algorithm}.
+Usually, cryptographers are interested in generating elliptic curves of
+prime or nearly prime order. In this case, one uses an \emph{early-abort}
+mechanism: when $C = 0\mod\ell$ for some $\ell$, the algorithm is aborted
+and a new curve is chosen.
+
+Here, the situation is the opposite: we rather want elliptic curves
+whose cardinality has lots of small factors. To fix ideas, let us choose
+\[
+p = 7 \left(\prod_{2\leq\ell\leq 380,\ \ell \text{ prime}} \ell\right) - 1
+\]
+which is a 512-bit prime. Then, algorithm~\ref{alg:steptors} can be used
+for $\ell$-isogenies with $r=1$ in both directions if and only if
+$C_0 = \Card E_0(\F_p)$ satisfies $C=0\mod\ell$.
+
+We now proceed as follows:
+\begin{itemize}
+\item Choose a smoothness bound $B$ (we used $B = 13$).
+\item Choose size bounds $L_1$ and $L_2$: primes $\ell\leq L_1$
+will be considered in algorithm \algstyle{Step2},
+while only primes $\ell\leq L_2$ will be considered in algorithm
+\algstyle{Step} (one could use $L_1 = 2000$ and $L_2 = 300$).
+\item Pick elliptic curves at random in $\F_p$, and use the SEA
+algorithm, aborting when any $\ell\leq B$ with $C\mod\ell\neq 0$
+is found.
+\item Among the curves which passed the tests, compute a \emph{score}
+taking into account all other primes $\ell\leq L$ for which
+$C = 0\mod\ell$, and the number of Elkies primes below $L_2$.
+\end{itemize}
+The highest-scored curves are now good candidates for the curve $E_0$.
+
+Considering the efficiency of this procedure, it is important to remark
+that very few curves will pass the early-abort tests. The bound $B$ is
+chosen to balance the overall cost of the first few tests with that of
+the complete SEA algorithm for the curves which pass them. Therefore,
+its value is somewhat implementation-dependant. In practice, one also
+incorporates the test of existence of a Montgomery model for the
+elliptic curve~\cite{todo:refMontgomery}.
+
+Since we are looking for curves with smooth cardinalities, another
+improvement to this procedure is available: instead of using elliptic
+curves uniformly chosen at random, we pick random candidates using
+an equation for the modular curve $X_1(N)$~\cite{todo:refSutherland}.
+This way, one guarantees the existence of a rational $N$-torsion point
+on the elliptic curve without any further computation. In our
+implementation, we used $N = 17$. This idea is used, for example,
+in the procedure of selecting elliptic curves in the ECM integer
+factoring method~\cite{todo:refECM}.
+
+We implemented this research using the Sage computer algebra system.
+After 17,000 hours of CPU time, we found the elliptic curve
+\[
+	E : y^2 = x^3 + ax + b
+\]
+over $\F_p$ where the prime $p$ is given above, and
+\[
+\begin{aligned}
+a =\ & 111164648488639530154045798728826155824357214700727018080372266722366593581458 \\
+&61235530764279830938006566253824939581765595814774014481950202045501019370057,\\
+b =\ & 79299948324245435156826219405909019495910509940412398234989651750360146055419 \\
+&69152503725727477980546149790133670177545414851226849642510122057033563808087.
+\end{aligned}
+\]
+It admits $\ell$-torsion rational points for each
+$\ell\in\{3, 5, 7, 11, 13, 17, 103, 523, 821, 947, 1723\}$,
+and its cardinality is
+\[
+\begin{aligned}
+&120373407382088450343833839782228011370920294512701979230713977354082515866700 \\
+&85481138030088461790938201874171652771344144043268298219947026188471598838060.
+\end{aligned}
+\]
+
+In the sequel, we will argue that using this curve brings a 128-bit security level
+in the classical as well as quantum setting, and we give running times of the whole
+scheme in our implementation.
 
 \section{Experimental results}
-
-On présente des paramètres pour viser à 128 bits de sécurité
-classique.  Donner le corps de base choisi, et la meilleure courbe
-obtenue par la recherche ci-dessus, la trace du Frobenius et le
-discriminant de l'ordre maximal (qu'il faudra calculer avec ECM par
-exemple, car on peut espérer qu'il n'a pas deux grands facteurs
-premiers...), et une minoration explicite du nombre de classes.
-Proposer aussi le nombre de pas à effectuer pour chaque nombre premier
-d'Elkies.
 
 Indiquer l'existence du paquet Julia avec un exemple complet d'échange
 de clés. dire: tant de temps a été dépensé en
 calculs de Frobenius, tant de temps en multiplications scalaires, etc.
-
-Faire aussi des commentaires sur la sécurité quantique de ces
-paramètres, en fonction de la discussion précédente. 
 
 \section{Security}
 
