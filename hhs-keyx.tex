@@ -164,8 +164,11 @@ points over $\F_q$.
 In isogeny-based cryptography one is mostly interested in
 \emph{isogeny graphs}, i.e.\ (multi)-graphs which vertices are
 elliptic curves up to isomorphism, and which edges are isogenies
-between them. Because of the dual isogeny theorem, isogeny graphs are
-typically considered undirected.
+between them. The study of isogeny graphs was initiated by
+Kohel~\cite{kohel} and continued by many
+authors~\cite{Gal,fouquet+morain02,GHS,MiretMSTV06,jao+miller+venkatesan09}.
+Because of the dual isogeny theorem, isogeny graphs are typically
+considered undirected.
 
 We denote by $E[ℓ]$ the subgroup of $ℓ$-torsion points of
 $E(\bar\F_q)$.  If $ℓ$ is coprime to $p$, then $E[ℓ]$ is isomorphic to
@@ -197,16 +200,16 @@ $X^2-tX+q\mod ℓ$. We then have four possibilities:
 \item[(1.2)] $π$ has one eigenvalue of multiplicity two, i.e.\ it acts
   like a scalar matrix
   $\left(\begin{smallmatrix}λ&0\\0&λ\end{smallmatrix}\right)$; then
-  there are $ℓ+1$ isogenies of degree $ℓ$.
+  there are $ℓ+1$ isogenies of degree $ℓ$ from $E$.
 \item[(2)] $π$ has two eigenvalues, i.e.\ it is conjugate to a
   diagonal matrix
-  $\left(\begin{smallmatrix}λ&0\\μ&0\end{smallmatrix}\right)$; then
+  $\left(\begin{smallmatrix}λ&0\\0&μ\end{smallmatrix}\right)$; then
   there are two isogenies from $E$.
 \end{itemize}
 
-If we denote by $d_π=t^2-4q$ the discriminant of the characteristic
+If we denote by $Δ_π=t^2-4q$ the discriminant of the characteristic
 equation of $π$, we see that the cases~(1.x) are only possible if $ℓ$
-divides $d_π$.  For ordinary curves $d_π≠0$, thus only a finite number
+divides $Δ_π$.  For ordinary curves $Δ_π≠0$, thus only a finite number
 of primes $ℓ$ will fall in these cases, and they will be mostly
 irrelevant to our cryptosystem. Following the literature on the SEA
 point-counting algorithm~\cite{schoof95,todo}, if $ℓ$ falls into
@@ -215,55 +218,45 @@ case~(2) it will be called an \emph{Elkies prime}.
 
 We will chiefly be interested in Elkies primes. Since all curves in
 the same isogeny class over $\F_q$ have the same number of points,
-they also have the same trace $t$ and discriminant $d_π$. It follows
-that, if $ℓ$ is an Elkies prime for a curve $E$, the connected
-component of $E$ in the graph of $ℓ$-isogenies is a finite $2$-regular
-graph, i.e.\ a cycle. In the next subsection we introduce a group
-action on this cycle, and determine its size.
+they also have the same trace $t$ and discriminant $d_π$.
+% todo: do we frown upon bold emphasis?
+\textbf{It follows that, if $ℓ$ is an Elkies prime for a curve $E$,
+  the connected component of $E$ in the graph of $ℓ$-isogenies is a
+  finite $2$-regular graph, i.e.\ a cycle.} In the next subsection we
+introduce a group action on this cycle, and determine its size.
 
 
-\subsection{Ordinary elliptic curves and the theory of complex multiplication}
+\subsection{Complex multiplication}
 
-An elliptic curve $E/k$ is called \emph{ordinary} when its endomorphism ring $
-\End(E)$ is an order in a quadratic imaginary field (other curves are called 
-\emph{supersingular} and their endomorphism rings are orders in a quaternion 
-algebra). Here, an \emph{order} is a subring which is a $\Z$-module of maximal 
-rank. 
+In this subsection we exclusively focus on ordinary elliptic
+curves. If $E$ is an ordinary curve with Frobenius map $π$, its
+endomorphism ring $\End(E)$ is isomorphic to an
+\emph{order}\footnote{Here, an \emph{order} is a subring which is a
+  $ℤ$-module of rank $2$.} in the quadratic imaginary field
+$K=ℚ(\sqrt{Δ_π})$ (see~\cite[III.9]{silverman:elliptic}).  Denote by
+$\O_K$ the ring of integers of $K$, it is its \emph{maximal order},
+i.e.\ it contains any other order of $K$.  Hence $ℤ[π]⊂\End(E)⊂\O_K$,
+and there is only a finite number of possible orders for $\End(E)$:
+write $Δ_π=d^2Δ_K$, where $Δ_K$ is the discriminant of $\O_K$, then
+the index $[\O_K:\End(E)]$ must divide $d=[\O_K:ℤ[π]]$.
 
-From now on we will restrict attention to ordinary curves and rational 
-isogenies. For example, we will call two curves $E$ and $E'$ \emph{isogenous} 
-if there exists a rational isogeny from $E$ to $E'$. This is an equivalence 
-relation: according to a theorem of Tate, $E$ and $E'$ are isogenous if and 
-only if they have the same number of points over $k$. Hasse's theory then 
-implies that the rings $\Z[\pi_E]$ and $\Z[\pi_{E'}]$ are naturally isomorphic 
-(the endomorphism
-$\pi_{E'}$ being the image of $\pi_{E}$): indeed we have for any curve
-\[
-\pi_E^2 - t_E\pi_E + q = 0
-\]
-where $t_E$ is an integer such that
-\[
-\Card(E(k)) = p + 1 - t_E.
-\]
-These rings are of finite index in the endomorphism rings, and as a consequence 
-$\End(E)$ and $\End(E')$ can be viewed as orders in the \emph{same} quadratic 
-imaginary field $K = \Z[\pi_E]\otimes\Q$. Furthermore, these isomorphisms can 
-be made coherent across an isogeny class in the sense that the Frobenius 
-endomorphism always corresponds to the same element of $K$, as we will assume
-from now on.
-
-If $\phi\from E\to E'$ is an $\ell$-isogeny, then the orders $\End(E)$ and $\End
-(E')$ are very close to each other. One has the following classification: either
-\[
-\begin{aligned}[l]
-&\End(E) = \End(E'),
-&\qquad\text{$\phi$ is then called \emph{horizontal}, or} &\\
-&[\End(E):\End(E')] = \ell,
-&\qquad\text{$\phi$ is then called \emph{descending}, or} &\\
-&[\End(E'):\End(E)] = \ell,
-&\qquad\text{$\phi$ is then called \emph{ascending}.} &
-\end{aligned}
-\]
+It turns out isogenies allow us to \emph{navigate} the various
+orders. If $ϕ:E→E'$ is an $\ell$-isogeny, then one of the following
+holds (\cite[Prop.~21]{kohel}):
+\begin{itemize}
+\item $\End(E) = \End(E')$, then $ϕ$ is said to be
+  \emph{horizontal};
+\item $[\End(E):\End(E')] = ℓ$, then $ϕ$ is said to be
+  \emph{descending};
+\item $[\End(E'):\End(E)] = ℓ$, then $ϕ$ is said to be
+  \emph{ascending}.
+\end{itemize}
+Notice that the last two cases can only happen if $ℓ$ divides
+$d=\sqrt{Δ_π/Δ_K}$, and thus correspond to cases (1.x) in the previous
+subsection.
+% todo: do we frown upon bold emphasis?
+\textbf{If $ℓ$ does not divide $Δ_π$, then $ϕ$ is necessarily
+  horizontal.}
 
 We now present the group action used in the Rostovtsev--Stolbunov key exchange 
 protocol. Let $\frak a$ be an ideal in $\End(E)$. Then we have a natural \emph
