@@ -113,95 +113,113 @@ refer the reader to~\cite{silverman:elliptic}, and for a general
 overview of isogenies and their use in cryptography we
 suggest~\cite{defeo2017isogenybased}.
 
-Let $E$ and $E'$ be elliptic curves defined over a finite field
-$\F_q$. An isogeny $ϕ:E→E'$ is a non-constant algebraic map defined
-over $\F_q$ mapping the point at infinity of $E$ to the point at
-infinity of $E'$; it is also a group morphism from $E(\bar\F_q)$ to
-$E'(\bar\F_q)$~\cite[III.4]{silverman:elliptic}. The degree of an
-isogeny is its degree as an algebraic map; we will often write
-$ℓ$-isogeny as a shorthand for ``isogeny of degree $ℓ$''. An isogeny
-for a curve $E$ to itself is called an \emph{endomorphism}.
+In what follows $\F_q$ is a finite field of characteristic $p$ with
+$q$ elements, with an algebraic closure $\bar\F_q$. Let $E$ and $E'$
+be elliptic curves defined over $\F_q$, an isogeny $ϕ:E→E'$ is a
+non-constant algebraic map, mapping the point at infinity of $E$ to
+the point at infinity of $E'$; it is also a group morphism from
+$E(\bar\F_q)$ to $E'(\bar\F_q)$~\cite[III.4]{silverman:elliptic}. The
+degree of an isogeny is its degree as an algebraic map; we will call
+$ℓ$-isogeny an isogeny of degree $ℓ$.
+
+An isogeny from a curve $E$ to itself is called an
+\emph{endomorphism}.  Endomorphisms with the operations of addition
+and composition form a ring, called the \emph{endomorphism ring} of
+$E$ and denoted by $\End(E)$. Besides scalar multiplications, the
+simplest example of endomorphism is the \emph{Frobenius map}
+\begin{align*}
+  π : E &→ E,\\
+  (x,y) &↦ (x^q,y^q).
+\end{align*}
+As an element of $\End(E)$, it satisfies a quadratic equation
+$π^2 + q = tπ$, where the integer $t$, called the \emph{trace} of $π$,
+fully determines the order of $E$ as $\#E(\F_q)=q+1-t$. A curve is
+called \emph{supersingular} if $p$ divides $t$, \emph{ordinary}
+otherwise.
 
 Any isogeny can be factored as a composition of a \emph{separable} and
 a \emph{purely inseparable} isogeny. \emph{Purely inseparable}
-isogenies have trivial kernel, and degree a power of the
-characteristic of $\F_q$. \emph{Separable} isogenies are in one-to-one
-correspondence with their kernels: for any finite subgroup $G⊂E$ of
-order $ℓ$ there is a unique elliptic curve $E'$ up to isomorphism, and
-a unique $ℓ$-isogeny $ϕ:E→E'$ up to composition by the same
-isomorphism, such that $\kerϕ=G$. All isogenies of degree not
-divisible by the characteristic of $\F_q$ are separable. It follows
-that any isogeny of degree greater than $1$ can be factored as a
-composition of isogenies of prime degree.
+isogenies have trivial kernel, and degree a power of
+$p$. \emph{Separable} isogenies are in one-to-one correspondence with
+their kernels: for any finite subgroup $G⊂E$ of order $ℓ$ there is a
+unique elliptic curve $E'$ up to isomorphism, and a unique $ℓ$-isogeny
+$ϕ:E→E'$ up to composition by the same isomorphism, such that
+$\kerϕ=G$. All isogenies of degree coprime to $p$ are separable. A
+\emph{cyclic isogeny} is one such that $\ker ϕ$ is a cyclic group. It
+follows that any isogeny of degree greater than $1$ can be factored as
+a composition of cyclic isogenies of prime degree.
 
 For any $ℓ$-isogeny $ϕ:E→E'$, there is a unique $ℓ$-isogeny
 $\hat{ϕ}:E'→E$ such that the compositions $ϕ∘\hat{ϕ}$ and $\hat{ϕ}∘ϕ$
 are equal to the multiplication-by-$ℓ$ maps on $E'$ and $E$
-respectively. $\hat{ϕ}$ is called the \emph{dual isogeny} to $ϕ$.
+respectively. $\hat{ϕ}$ is called the \emph{dual isogeny} to $ϕ$. This
+shows that being \emph{$\ell$-isogenous} is an equivalence
+relation. Further, a theorem of Tate states that two curves are
+isogenous over $\F_q$ if and only if they have the same number of
+points over $\F_q$.
 
 
 \subsection{Isogeny graphs}
 
+In isogeny-based cryptography one is mostly interested in
+\emph{isogeny graphs}, i.e.\ (multi)-graphs which vertices are
+elliptic curves up to isomorphism, and which edges are isogenies
+between them. Because of the dual isogeny theorem, isogeny graphs are
+typically considered undirected.
 
-Standard theory tells us that $E[\ell](\bar{k})$ is isomorphic to $(\Z/\ell\Z)^2$
-as a group. We may thus view it as a vector space of dimension two over the 
-finite field $\Z/\ell\Z$ in which $\Ker(\phi)$ is a subspace of dimension one. 
+We denote by $E[ℓ]$ the subgroup of $ℓ$-torsion points of
+$E(\bar\F_q)$.  If $ℓ$ is coprime to $p$, then $E[ℓ]$ is isomorphic to
+$(ℤ/ℓℤ)^2$.  Furthermore, if $ℓ$ is prime $E[ℓ]$ contains exactly
+$ℓ+1$ cyclic subgroups of order $ℓ$; it follows that, over $\bar\F_q$,
+there are exactly $ℓ+1$ distinct (separable) $ℓ$-isogenies starting
+from $E$.  Generically, a connected component of the isogeny graph of
+$ℓ$-isogenies over $\bar\F_q$ will be an infinite $(ℓ+1)$-regular
+graph; a notable exception is the finite connected component of
+\emph{supersingular} curves, used in SIDH and related protocols.
 
-Call an isogeny $\phi$ \emph{$k$-rational} if it can be written as rational 
-fractions with coefficients in $k$. One can show that $\phi$ is $k$-rational if 
-and only if $\Ker(\phi)$ is.
-Rationality is related to the Frobenius endomorphism of the curve $E$, which is 
-defined as follows. Let $q$ be the order of $k$, and write $E$ as a plane curve 
-with coordinates $x, y$. Then the Frobenius of $E$ is
-\[
-\begin{aligned}
-\pi_E \from E &\to E \\
- (x, y) &\mapsto (x^q, y^q).
-\end{aligned}
-\]
+If one restricts to isogenies \emph{defined over $\F_q$}, the picture
+becomes more complex.  By definition, an isogeny $ϕ:E→E'$ is
+\emph{defined over} $\F_q$ if and only if the Frobenius endomorphism
+$π$ stabilizes $\ker ϕ$. If $ϕ$ is cyclic, this is equivalent to
+saying that $π$ acts like a scalar on the points of $\ker ϕ$.  Thus,
+for any prime $ℓ≠p$, the number of outgoing $ℓ$-isogenies from $E$ is
+totally understood by looking at how $π$ acts on $E[ℓ]$. Since $E[ℓ]$
+is a $ℤ/ℓℤ$-module of rank $2$, the action of $π$ is represented by a
+$2×2$ matrix with entries in $ℤ/ℓℤ$ and characteristic polynomial
+$X^2-tX+q\mod ℓ$. We then have four possibilities:
+\begin{itemize}
+\item[(0)] $π$ has no eigenvalues in $ℤ/ℓℤ$, i.e.\ $X^2-tX+q$ is
+  irreducible modulo $ℓ$; then $E$ has no $ℓ$-isogenies.
+\item[(1.1)] $π$ has one eigenvalue of (geometric) multiplicity one,
+  i.e.\ it is conjugate to a non-diagonal matrix
+  $\left(\begin{smallmatrix}λ&*\\0&λ\end{smallmatrix}\right)$; then
+  there is one $ℓ$-isogeny from $E$.
+\item[(1.2)] $π$ has one eigenvalue of multiplicity two, i.e.\ it acts
+  like a scalar matrix
+  $\left(\begin{smallmatrix}λ&0\\0&λ\end{smallmatrix}\right)$; then
+  there are $ℓ+1$ isogenies of degree $ℓ$.
+\item[(2)] $π$ has two eigenvalues, i.e.\ it is conjugate to a
+  diagonal matrix
+  $\left(\begin{smallmatrix}λ&0\\μ&0\end{smallmatrix}\right)$; then
+  there are two isogenies from $E$.
+\end{itemize}
 
-A point on $E$ is $k$-rational if and only if it is invariant under $\pi_E$, 
-and a subgroup of $E(\bar{k})$ is $k$-rational if and only if it is (globally) 
-stable under $\pi_E$. More generally, being defined over an extension of $k$
-of degree $r$ is the same as being invariant by the iterated Frobenius $\pi_E^r$.
-Going back to the description of $E[\ell](\bar{k})$ as a 
-vector space over $(\Z/\ell\Z)$, we are saying that an $\ell$-isogeny $\phi$ is 
-$k$-rational if and only if the line $\Ker(\phi)$ is an eigenspace for the 
-endomorphism $\pi_E$ restricted to $E[\ell](\bar{k})$. If $v$ denotes the 
-eigenvalue of $\pi_E$ on this subspace, we will say that $\phi$ has \emph{
-direction $v$}.
+If we denote by $d_π=t^2-4q$ the discriminant of the characteristic
+equation of $π$, we see that the cases~(1.x) are only possible if $ℓ$
+divides $d_π$.  For ordinary curves $d_π≠0$, thus only a finite number
+of primes $ℓ$ will fall in these cases, and they will be mostly
+irrelevant to our cryptosystem. Following the literature on the SEA
+point-counting algorithm~\cite{schoof95,todo}, if $ℓ$ falls into
+case~(0) it will be called an \emph{Atkin prime}, if it falls into
+case~(2) it will be called an \emph{Elkies prime}.
 
-
-The number of rational isogenies from $E$ to another curve is then related to 
-the behaviour of $\pi_E$ as an endomorphism of $E[\ell](\bar{k})$. If it acts 
-as a scalar matrix, all $\ell+1$ lines are left stable, so $\ell+1$ rational 
-isogenies exist; while if it acts as
-\[
-\left(
-\begin{matrix}
-\alpha & * \\
-0 & \alpha
-\end{matrix}
-\right)
-\quad
-\text{(with $\alpha$ and $*$ nonzero in $\Z/\ell\Z$)}
-\]
-there is only one stable line, hence only one rational isogeny. In these cases, 
-we say that $\pi_E$ has a \emph{double eigenvalue} modulo $\ell$, or that $\ell$
- is \emph{ramified}.
-
-Two other situations can arise: either $\pi_E$ has two distinct eigenvalues 
-modulo $\ell$ and there are two rational $\ell$-isogenies starting from $E$, or 
-$\pi_E$ has no eigenvalue at all and there are no rational $\ell$-isogenies. 
-Following the tradition dating back to the study of Schoof's algorithm for 
-point counting, we will call such primes \emph{Elkies} and \emph{Atkin} 
-respectively.
-
-Given a line $L$ in $E[\ell](\bar{k})$ on which the Frobenius has eigenvalue $v$,
-we can describe the field of definition of the points on $L$. The degree of this
-field over $k$ is the smallest integer $r$ such that $\pi_E^r$ is the identity
-on $L$: therefore $r$ is simply the multiplicative order of $v$ in $\Z/\ell\Z$.
-
+We will chiefly be interested in Elkies primes. Since all curves in
+the same isogeny class over $\F_q$ have the same number of points,
+they also have the same trace $t$ and discriminant $d_π$. It follows
+that, if $ℓ$ is an Elkies prime for a curve $E$, the connected
+component of $E$ in the graph of $ℓ$-isogenies is a finite $2$-regular
+graph, i.e.\ a cycle. In the next subsection we introduce a group
+action on this cycle, and determine its size.
 
 
 \subsection{Ordinary elliptic curves and the theory of complex multiplication}
@@ -949,3 +967,5 @@ envisage ?
 \end{document}
 
 %  LocalWords:  Rostovtsev Stolbunov isogenies morphism isogeny
+%  LocalWords:  isomorphism coprime isogenous endomorphism
+%  LocalWords:  Endomorphisms cryptosystem
