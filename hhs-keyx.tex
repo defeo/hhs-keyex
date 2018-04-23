@@ -123,7 +123,9 @@ non-constant algebraic map, mapping the point at infinity of $E$ to
 the point at infinity of $E'$; it is also a group morphism from
 $E(\bar\F_q)$ to $E'(\bar\F_q)$~\cite[III.4]{silverman:elliptic}. The
 degree of an isogeny is its degree as an algebraic map; we will call
-$ℓ$-isogeny an isogeny of degree $ℓ$.
+$ℓ$-isogeny an isogeny of degree $ℓ$. The kernel of an isogeny,
+denoted by $\ker ϕ$, is the set of points of $E(\bar\F_q)$ that is
+sent to the identity point of $E'$.
 
 An isogeny from a curve $E$ to itself is called an
 \emph{endomorphism}.  Endomorphisms with the operations of addition
@@ -145,12 +147,13 @@ a \emph{purely inseparable} isogeny. \emph{Purely inseparable}
 isogenies have trivial kernel, and degree a power of
 $p$. \emph{Separable} isogenies are in one-to-one correspondence with
 their kernels: for any finite subgroup $G⊂E$ of order $ℓ$ there is a
-unique elliptic curve $E'$ up to isomorphism, and a unique $ℓ$-isogeny
-$ϕ:E→E'$ up to composition by the same isomorphism, such that
-$\kerϕ=G$. All isogenies of degree coprime to $p$ are separable. A
-\emph{cyclic isogeny} is one such that $\ker ϕ$ is a cyclic group. It
-follows that any isogeny of degree greater than $1$ can be factored as
-a composition of cyclic isogenies of prime degree.
+unique elliptic curve up to isomorphism, denoted by $E/G$, and a
+unique $ℓ$-isogeny $ϕ:E→E/G$ up to composition by the same
+isomorphism, such that $\kerϕ=G$. In particular $\deg ϕ=\#\ker ϕ$. All
+isogenies of degree coprime to $p$ are separable. A \emph{cyclic
+  isogeny} is one such that $\ker ϕ$ is a cyclic group. It follows
+that any isogeny of degree greater than $1$ can be factored as a
+composition of cyclic isogenies of prime degree.
 
 For any $ℓ$-isogeny $ϕ:E→E'$, there is a unique $ℓ$-isogeny
 $\hat{ϕ}:E'→E$ such that the compositions $ϕ∘\hat{ϕ}$ and $\hat{ϕ}∘ϕ$
@@ -236,12 +239,18 @@ curves. If $E$ is an ordinary curve with Frobenius map $π$, its
 endomorphism ring $\End(E)$ is isomorphic to an
 \emph{order}\footnote{Here, an \emph{order} is a subring which is a
   $ℤ$-module of rank $2$.} in the quadratic imaginary field
-$K=ℚ(\sqrt{Δ_π})$ (see~\cite[III.9]{silverman:elliptic}).  Denote by
-$\O_K$ the ring of integers of $K$, it is its \emph{maximal order},
-i.e.\ it contains any other order of $K$.  Hence $ℤ[π]⊂\End(E)⊂\O_K$,
-and there is only a finite number of possible orders for $\End(E)$:
-write $Δ_π=d^2Δ_K$, where $Δ_K$ is the discriminant of $\O_K$, then
-the index $[\O_K:\End(E)]$ must divide $d=[\O_K:ℤ[π]]$.
+$ℚ(\sqrt{Δ_π})$ (see~\cite[III.9]{silverman:elliptic}).  A curve such
+that it endomorphism ring is isomorphic to some order $\O$ is said to
+have \emph{complex multiplication by $\O$}.  For a detailed treatment
+of the theory of complex multiplication,
+see~\cite{lang1987elliptic,silverman:advanced}.
+
+Denote by $\O_K$ the ring of integers of $K=ℚ(\sqrt{Δ_π})$, it is its
+\emph{maximal order}, i.e.\ it contains any other order of $K$.  Hence
+$ℤ[π]⊂\End(E)⊂\O_K$, and there is only a finite number of possible
+choices for $\End(E)$: write $Δ_π=d^2Δ_K$, where $Δ_K$ is the
+discriminant of $\O_K$, then the index $[\O_K:\End(E)]$ must divide
+$d=[\O_K:ℤ[π]]$.
 
 It turns out isogenies allow us to \emph{navigate} the various
 orders. If $ϕ:E→E'$ is an $\ell$-isogeny, then one of the following
@@ -255,43 +264,41 @@ holds (\cite[Prop.~21]{kohel}):
   \emph{ascending}.
 \end{itemize}
 Notice that the last two cases can only happen if $ℓ$ divides
-$d=\sqrt{Δ_π/Δ_K}$, and thus correspond to cases (1.x) in the previous
+$d^2=Δ_π/Δ_K$, and thus correspond to cases (1.x) in the previous
 subsection.
 % todo: do we frown upon bold emphasis?
 \textbf{If $ℓ$ does not divide $Δ_π$, then $ϕ$ is necessarily
   horizontal.}
 
-We now present the group action used in the Rostovtsev--Stolbunov key exchange 
-protocol. Let $\frak a$ be an ideal in $\End(E)$. Then we have a natural \emph
-{${\frak a}$-torsion} subgroup of $E$ to look at, namely the subgroup of points
-that are killed by the endomorphisms belonging to $\frak a$:
+We now present a group action on the set of all curves having complex
+multiplication by a fixed order $\O$; the key exchange protocol of
+Section~\ref{sec:keyex} will be built on this action. Let $\frak a$ be
+% todo: shall we say "invertible" ideal?
+an ideal in $\End(E)≃\O$, and define the
+\emph{${\frak a}$-torsion} subgroup of $E$ as
 \[
-E[\frak a](\bar{k}) = \set{P\in E(\bar{k}) \suchthat \sigma(P) = 0\ 
-\forall\sigma\in\frak a}.
+E[\frak a] = \set{P\in E(\bar\F_q) \suchthat \sigma(P) = 0\ 
+\text{ for all }\sigma\in\frak a}.
 \]
-This subgroup is the kernel of a rational isogeny $\phi_{\frak a}$ that is
-well-defined up to postcomposition by an isomorphism, hence the codomain of
-$\phi_{\frak a}$ is well-defined up to isomorphism over $\bar{k}$.
-We will call this 
-codomain $\frak a\cdot E$, in other words
-\[
-\frak a\cdot E = E/E[\frak a].
-\]
+This subgroup is the kernel of an isogeny $\phi_{\frak a}$, defined up
+to composition by an isomorphism, hence the codomain of
+$\phi_{\frak a}$ is well-defined up to isomorphism.  We denote this
+codomain by $\frak a\cdot E$, in other words
+$\frak a\cdot E = E/E[\frak a]$.  The isogeny $\phi_{\frak a}$ is
+always horizontal (i.e.\ $\End(\frak a \cdot E) = \End(E)$), and its
+degree is the \emph{norm} of $\frak a$ as an ideal of $\End(E)$.
 
-The isogeny $\phi_{\frak a}$ is always horizontal (which means $\End(\frak a
-\cdot E) = \End(E))$, and its degree is the \emph{norm} of $\frak a$ as an ideal 
-of $\End(E)$.
-Let us call $\Ell_k(\O)$ the set of isomorphism classes over $\bar{k}$ of 
-curves whose endomorphism ring is isomorphic to $\O$. It turns out that the 
-construction above may be extended into a group action: namely, the group of 
-fractional ideals of $\End(E)$ acts on the set $\Ell_k(\End(E))$. Furthermore, 
-principal ideals act trivially, so that this action factorises as an action of 
-the \emph{ideal class group} $\Cl(\End(E))$ on the set $\Ell_k(\End(E))$.
-
-The main theorem of complex multiplication \cite{} states that this action is \emph{
-simply transitive}; in other terms, $\Ell_k(\End(E))$ is a principal 
-homogeneous space under the group $\Cl(\End(E))$. If we fix a curve $E$ as a 
-base point, we thus have a bijection
+Write $\Ell_q(\O)$ for the set of isomorphism classes over $\bar\F_q$
+of curves with complex multiplication by $\O$, and assume it is
+non-empty. It turns out that the construction above may be extended
+into a group action: namely, the group of fractional ideals of
+$\End(\O)$ acts on $\Ell_q(\O)$. Furthermore, principal ideals act
+trivially, so that the action factors as an action of the \emph{ideal
+  class group} $\Cl(\O)$ on $\Ell_q(\O)$.  The main theorem of complex
+multiplication states that this action is \emph{simply transitive}. In
+other terms, $\Ell_q(\End(E))$ is a \emph{principal homogeneous space}
+under the group $\Cl(\End(E))$: if we fix a curve $E$ as base point,
+we have a bijection
 \[
 \begin{aligned}
 \Cl(\End(E)) &\to \Ell_k(\End(E)) \\
@@ -299,44 +306,43 @@ base point, we thus have a bijection
 \end{aligned}
 \]
 
-Remember that the Frobenius characteristic equation \eqref{charfrob}
-of discriminant $\Delta_E$ is a defining equation for the field $K = \End(E)
-\otimes\Q$. 
-Let $\ell$ be an odd prime, prime to the characteristic.
-Equation \eqref{charfrob} is also the characteristic
-equation for the endomorphism $\pi_E$ of $E[\ell](\bar{k})$.
-Hence, we can summarize the previous discussion 
-in the following way: either
-\begin{enumerate}
-\item $\Delta_E$ is not a square modulo $\ell$. Then $\ell$ is Atkin, the Frobenius
-characteristic equation has no root in $\Z/\ell\Z$ and so there 
-are no rational $\ell$-isogenies starting from $E$. The prime $\ell$ is inert 
-in $K$, so that there are no ideals of norm $\ell$ in $\End(E)$.
-\item $\Delta_E$ is nonzero and a square modulo $\ell$. Then $\ell$ is Elkies, 
-and there are exactly two $\ell$-isogenies starting from $E$ whose directions 
-are the two Frobenius eigenvalues modulo $\ell$ (i.e. the two roots of the
-characteristic equation in $\Z/\ell\Z$). They are horizontal since $\ell
-$ is prime to $\Delta_E$. The prime $\ell$ splits in $K$, and there are two 
-ideals of norm $\ell$ in $\End(E)$ that are complex conjugates of each other, $
-\frak a_\ell$ and $\frak a_\ell^{-1}$. One can show that the action of the 
-ideal $\frak a_\ell$ in always given by $\ell$-isogenies in the same direction $
-v$, which satisfies
-\[
-\pi_E = v \mod \frak a_\ell.
-\]
-Of course, the same is true for $\frak a_\ell^{-1}$. Since the eigenvalues are 
-distinct, we may safely label the ideal $\frak a_\ell$ with the pair $(\ell, 
-v)$.
-\item $\Delta_E$ is zero modulo $\ell$. Then $\ell$ is ramified. The situation 
-is more complicated: there can be either zero or one ideal of norm $\ell$ in $
-\End(E)$, depending on its conductor, and there may be non-horizontal 
-isogenies. In any case, all these isogenies are associated with the same 
-Frobenius eigenvalue.
+Let now $ℓ$ be an Elkies prime for $E$, so far we have seen that the
+connected component of $E$ in the $ℓ$-isogeny graph is a cycle of
+horizontal isogenies. Complex multiplication tells us more. The
+restriction of the Frobenius to $E[ℓ]$ has two eigenvalues $λ≠μ$, to
+which we associate the prime ideals $\frak a=(π-λ,ℓ)$ and
+$\hat{\frak a}=(π-μ,ℓ)$, both of norm $ℓ$. We see then that
+$E[\frak a]$ is the eigenspace of $λ$, defining an isogeny
+$ϕ_{\frak{a}}$ of degree $ℓ$. Furthermore
+$\frak a\hat{\frak a} = \hat{\frak a}\frak a = (ℓ)$, implying that
+$\frak a$ and $\hat{\frak a}$ are the inverse of one another in
+$\Cl(\End(E))$, thus the isogeny $ϕ_{\hat{\frak a}}:\frak a·E→E$ of
+kernel $(\frak a·E)[\hat{\frak a}]$ is the dual of $ϕ_{\frak a}$ (up
+to isomorphism). Hence, 
+% todo: more bold
+\textbf{the eigenvalues $λ$ and $μ$ define two opposite
+  \emph{directions} on the isogeny cycle, independently of the
+  starting curve}, as shown in Figure~\ref{fig:cycle}.  Finally, the
+size of the cycle is the order of $(π-λ,ℓ)$ in $\Cl(\End(E))$, thus
+partitioning the set $\Ell_q(\End(E))$ into cycles of equal size.
 
-\end{enumerate}
-
-As we will see, only the Elkies primes for a given curve can be used in the
-Rostovtsev--Stolbunov scheme.
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}
+    \def\crater{7}
+    \foreach \i in {1,...,\crater} {
+      \draw[fill] (360/\crater*\i:2cm) circle (2pt);
+      \begin{scope}[shorten >=0.1cm,->]
+        \draw[blue] (360/\crater*\i : 1.95cm) -- (360/\crater*\i+360/\crater : 1.95cm);
+        \draw[red] (360/\crater*\i+360/\crater : 2.05cm) -- (360/\crater*\i : 2.05cm);
+      \end{scope}
+      \draw[blue] (360/\crater*\i+180/\crater:1.6cm) node {\small$λ$};
+      \draw[red] (360/\crater*\i+180/\crater:2cm) node {\small$μ$};
+    }
+  \end{tikzpicture}
+  \caption{Isogeny cycle for an Elkies prime $ℓ$, with \emph{directions} associated to the Frobenius eigenvalues $λ$ and $μ$.}
+  \label{fig:cycle}
+\end{figure}
 
 \subsection{Modular curves}
 
@@ -345,24 +351,24 @@ additional structure) can be naturally identified to \emph{points} on a
 mathematical object called a \emph{modular curve}. Constructing modular curves 
 in general is not easy, and we will simply recall here some well-known 
 properties. As above, let $\ell$ be a prime distinct from the characteristic of 
-$k$. 
-Then there exists a smooth curve $X_0(\ell)$ defined over $k$ with the 
+$\F_q$. 
+Then there exists a smooth curve $X_0(\ell)$ defined over $\F_q$ with the 
 following property: there is a bijection
 \[
-X_0(\ell)(k) \isom \set{
+X_0(\ell)(\F_q) \isom \set{
 \begin{matrix}
-\text{Isomorphism classes over $\bar{k}$ of pairs $(E, G)$}\\
-\text{where $G$ is a subgroup of order $\ell$ defined over $k$.}
+\text{Isomorphism classes over $\bar\F_q$ of pairs $(E, G)$}\\
+\text{where $G$ is a subgroup of order $\ell$ defined over $\F_q$.}
 \end{matrix}
 }
 \]
 
-Of course, this is not a mere bijection: it is functorial in $k$, and either
+Of course, this is not a mere bijection: it is functorial in $\F_q$, and either
 side can be deduced from the other by algebraic means.
 In this work, we use modular curves presented as \emph{plane curves} up to 
 birational equivalence, i.e. given as an equation of the form
 $\Phi(X, Y) = 0.$
-In order to find such an equation, it is enough to find to functions $X$ and $Y$
+In order to find such an equation, it is enough to find two functions $X$ and $Y$
  on the curve that generate its function field. One can obtain an equation for $
 X_0(\ell)$ using the two functions
 \[
@@ -379,8 +385,8 @@ They are linked by a polynomial equation
 where $\Phi_\ell$ is called the \emph{classical modular polynomial} of level $
 \ell$, and has coefficients in $\Z$. The polynomial $\Phi_\ell$ can be
 obtained in several ways \cite{};
-from a practical point of view, it is enough to have
-computed it once and store it for further use.
+from a practical point of view, it is enough to
+compute it once and store it for further use.
 
 These polynomials quickly become very large, hence one uses different 
 functions on $X_0(\ell)$ when $\ell$ grows, giving rise to the 
@@ -391,7 +397,7 @@ curves linked to $E$ by an $\ell$-isogeny. Here one sees modular
 equations can be used in the context of isogeny computations.
 
 In general, the curve $\Phi(X, Y) = 0$ is no longer smooth: for example, double 
-points may appear, so that $k$-points on this curve are no longer in bijection 
+points may appear, so that $\F_q$-points on this curve are no longer in bijection 
 with geometric data (elliptic curves with some structure up to isomorphism)
 as above. Still, plane equations are useful. For example, 
 one can show that double points of $X_0(\ell)$ in the coordinates $X, Y$ 
@@ -1199,5 +1205,5 @@ Quel temps pour une courbe optimale ?
 \end{document}
 
 %  LocalWords:  Rostovtsev Stolbunov isogenies morphism isogeny
-%  LocalWords:  isomorphism coprime isogenous endomorphism
-%  LocalWords:  Endomorphisms cryptosystem
+%  LocalWords:  isomorphism coprime isogenous endomorphism bijection
+%  LocalWords:  Endomorphisms cryptosystem Elkies Frobenius
