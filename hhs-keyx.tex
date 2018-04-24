@@ -1185,12 +1185,106 @@ might be weaker than the average.
 \section{Experimental results}
 \label{sec:exp}
 
-Indiquer l'existence du paquet Julia avec un exemple complet d'échange
-de clés. dire: tant de temps a été dépensé en
-calculs de Frobenius, tant de temps en multiplications scalaires, etc.
+In order to demonstrate that our key-exchange protocol is usable
+at standard security levels, we implemented it in the Julia
+programming language with the help of the computer algebra package
+Nemo~\cite{todo:Nemo}. In this occasion, we developed a small
+Julia package built upon Nemo that handles basic functionalities
+regarding elliptic curves over finite fields~\cite{todo:package}.
 
-Quel temps pour une courbe optimale ?
+We use the public parameters as given in
+section~\ref{sec:initcurve}.
+In this unoptimized implementation, we obtain
+the following times to perform a scalar multiplication over $\F_{q^r}$:
+%todo: on which gear ?
 
+\begin{center}
+\begin{tabular}{c|ccccccc}
+$r$ & 1 & 3 & 4 & 5 & 7 & 8 & 9 \\
+\hline
+$t\ (s)$ & 0.02 & 0.10 & 0.15 & 0.24 & 0.8 & 1.15 & 1.3
+\end{tabular}
+\end{center}
+
+and the approximate time needed to factor the modular equation of level $\ell$
+is $0.017 * \ell$ seconds.
+
+Using such data, one can propose a maximal number of steps to be
+computed for each prime. In the upper table of figure~\ref{fig:steps}, we
+list the primes for which algorithm~\ref{alg:steptors} is used, with
+the corresponding extension degree $r$, and a star if the twisted curve
+allows to use both directions in the isogeny graph. In the lower table,
+we list other Elkies primes for which we apply algorithm~\ref{alg:step}.
+
+\begin{figure}
+\centering
+\begin{tabular}{cclc}
+$r$ & $M_\ell$ & Primes \\
+\hline
+1* & 409 & \{3, 5, 7, 11, 13, 17, 103\} \\
+1 & 409 & \{523, 821, 947, 1723\} \\
+3 & 81 & \{19, 661\} \\
+4 & 54 & \{1013, 1181\} \\
+5 & 34 & \{31, 61, 1321\} \\
+7 & 10 & \{547\} \\
+8 & 7 & \{881\} \\
+9 & 6 & \{1693\}
+\end{tabular}
+\vfill
+\begin{tabular}{cl}
+$M_\ell$ & Primes \\
+\hline
+20 & \{23\} \\
+16 & \{29\} \\
+12 & \{37\} \\
+11 & \{41\} \\
+10 & \{43\} \\
+9 & \{47\} \\
+6 & \{71,73\} \\
+5 & \{89\} \\
+4 & \{107,109,113\} \\
+3 & \{131,151\} \\
+2 & \{157,163,167,191,
+  193,
+  197,
+  223,
+  229\} \\
+1 & \{241,
+  251,
+  257,
+  277,
+  283,
+  293,
+  307,
+  317,
+  349,
+  359,
+  373,
+	\\ &
+  383,
+  401,
+  421,
+  431,
+  433,
+  439,
+  443,
+  449,
+  457,
+  467\} \\
+\end{tabular}
+\caption{\label{fig:steps} A proposal for the bounds $M_\ell$}
+\end{figure}
+
+These numbers were found using the following procedure: given a maximum time
+$T$ that one is willing to spend for each prime, one can compute the
+associated key space size using the timing estimations above. Simply keep
+increasing $T$ until a sufficiently big key space size is reached.
+Using this data, we estimate the cost of a single walk in the
+isogeny graph to be approximately ... seconds, bringing the global
+key-exchange cost to ... seconds. We stress the fact that this implementation
+is \emph{not} optimised: in particular, using an optimised C library
+for the computation of $X^q$ modulo a polynomial could instantly bring a
+gain by a factor at least 2.
 
 
 \section{Conclusion}
