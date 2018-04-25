@@ -10,6 +10,7 @@
 \SetEndCharOfAlgoLine{}
 \SetKwInput{Params}{Public parameters}
 \SetKwInput{Key}{Shared key}
+\SetKwInput{Input}{Input}
 \SetKwBlock{Alice}{Alice}{}
 \SetKwBlock{Bob}{Bob}{}
 \SetKw{Samples}{samples}
@@ -396,68 +397,6 @@ partitioning the set $\Ell_q(\End(E))$ into cycles of equal size.
   \end{minipage}
 \end{figure}
 
-\subsection{Modular curves}
-
-Elliptic curves equipped with $\ell$-isogenies (or, more generally, some 
-additional structure) can be naturally identified to \emph{points} on a 
-mathematical object called a \emph{modular curve}. Constructing modular curves 
-in general is not easy, and we will simply recall here some well-known 
-properties. As above, let $\ell$ be a prime distinct from the characteristic of 
-$\F_q$. 
-Then there exists a smooth curve $X_0(\ell)$ defined over $\F_q$ with the 
-following property: there is a bijection
-\[
-X_0(\ell)(\F_q) \isom \set{
-\begin{matrix}
-\text{Isomorphism classes over $\bar\F_q$ of pairs $(E, G)$}\\
-\text{where $G$ is a subgroup of order $\ell$ defined over $\F_q$.}
-\end{matrix}
-}
-\]
-
-Of course, this is not a mere bijection: it is functorial in $\F_q$, and either
-side can be deduced from the other by algebraic means.
-In this work, we use modular curves presented as \emph{plane curves} up to 
-birational equivalence, i.e. given as an equation of the form
-$\Phi(X, Y) = 0.$
-In order to find such an equation, it is enough to find two functions $X$ and $Y$
- on the curve that generate its function field. One can obtain an equation for $
-X_0(\ell)$ using the two functions
-\[
-\begin{aligned}
-X(E, G) &= j(E), \\
-Y(E, G) &= j(E/G)
-\end{aligned}
-\]
-where $j(E)$ denotes the $j$-invariant of the elliptic curve $E$.
-They are linked by a polynomial equation
-\[
-\Phi_\ell(X, Y) = 0
-\]
-where $\Phi_\ell$ is called the \emph{classical modular polynomial} of level $
-\ell$, and has coefficients in $\Z$. The polynomial $\Phi_\ell$ can be
-obtained in several ways \cite{};
-from a practical point of view, it is enough to
-compute it once and store it for further use.
-
-These polynomials quickly become very large, hence one uses different 
-functions on $X_0(\ell)$ when $\ell$ grows, giving rise to the 
-so-called \emph{Atkin} modular polynomials \cite{}. The classical polynomial $\Phi_\ell$ 
-is still arguably the simplest to use, since one only has to solve the 
-polynomial equation $\Phi_\ell(j(E), Y) = 0$ to find the $j$-invariants of 
-curves linked to $E$ by an $\ell$-isogeny. Here one sees modular
-equations can be used in the context of isogeny computations.
-
-In general, the curve $\Phi(X, Y) = 0$ is no longer smooth: for example, double 
-points may appear, so that $\F_q$-points on this curve are no longer in bijection 
-with geometric data (elliptic curves with some structure up to isomorphism)
-as above. Still, plane equations are useful. For example, 
-one can show that double points of $X_0(\ell)$ in the coordinates $X, Y$ 
-correspond to elliptic curves $E$ that have a nontrivial endomorphism of degree 
-$\ell^2$, and this is easily controlled: in particular it cannot be the case
-when the discriminant of $\End(E)$ is greater than $4\ell^2$.
-
-
 \section{Key exchange from isogeny graphs}
 \label{sec:keyex}
 
@@ -578,399 +517,206 @@ special instances of the latter protocol, differing essentially in the
 way walks are sampled and evaluated. In the next subsection, we
 describe our own take on the protocol.
 
-\subsection{Presentation of the protocol}
+\subsection{Sampling and evaluating isogeny walks}
 
-Let us fix an ordinary elliptic curve $E_0$ over a finite field $k$, with
-endomorphism ring $\O$. Then the ideal class group of $\O$ will play the role of
-the abelian group $G$, and the set $X$ is the set $\Ell_k(\O)$ of elliptic curves
-with endomorphism ring $\O$.
-
-We also have to describe the set $S$ of generators used. Let $L$ be a list of
-small Elkies primes for the curve $E_0$, as defined in section \ref{sec:math}.
-Then for each $\ell\in L$, there exists two ideals in $\O$ of norm $\ell$, which
-are inverses of each other. These ideal classes will be the elements of $S$. According to
-the discussion in section \ref{sec:math}, we may identify these ideal classes with
-pairs $(\ell, v)$, where $v$ is one of the two Frobenius eigenvalues modulo $\ell$.
-
-Now the description of algorithm \algstyle{Step} (algorithm \ref{alg:step}) is a direct consequence of
-the previous discussions. The subroutine \algstyle{IsogenyKernel}$(E, \ell, j_1)$
-is an algorithm which computes the kernel of an isogeny from $E$ to an elliptic curve
-with $j$-invariant $j_1$, and that we will discuss in the following section.
-Here, we identify isomorphism classes of curves with
-$j$-invariants.
-
-\begin{algorithm}
-	\caption{\algstyle{Step}: a step in an ordinary isogeny graph}
-	\label{alg:step}
-	\KwIn{A generator $(\ell, v)$; an isomorphism class $j_I\in \Ell_k(\O)$; a curve $E_I$
-		such that $j(E_I) = j_I$; the classical
-		modular polynomial $\Phi_\ell(X, Y)$}
-	\KwOut{The isomorphism class $j_F$ given by the action of $(\ell, v)$ on $j_I$}
-	%
-  $P\gets \Phi_\ell(j_I, Y)$\;
-	$j_1, j_2 \gets$ \algstyle{Roots}$(P, k)$\;
-	$K_1\gets $ \algstyle{IsogenyKernel}$(E_I, \ell, j_1)$\;
-	\lIf{\algstyle{HasFrobeniusEigenvalue}$(K_1, v)$}{\Return $j_1$}
-	\lElse{\Return $j_2$}
-\end{algorithm}
-
-According to section \ref{sec:math}, this algorithm is valid if the discriminant
-of $\O$ is larger than $4\ell^2$.
-Note that in algorithm \ref{alg:step}, there is no need to know the endomorphism
-ring $\O$, to compute directly with ideals or to be able to compute the set
-$\Ell_k(\O)$. In order to use this
-protocol, one only has to know which primes are Elkies for the curve $E_0$,
-and this is easy once we know the Frobenius characteristic equation on $E_0$.
-This is equivalent to computing the cardinality of $E_0$, which is
-done in polynomial time using Schoof's algorithm \cite{}.
-If we replace $v$ with the other
-Frobenius eigenvalue modulo $\ell$ in algorithm \ref{alg:step}, we will compute
-a step in the direction specified by the other ideal of norm $\ell$:
-we are therefore able to use both of them as generators.
-
-According to section \ref{sec:math}, we may give another version for the
-algorithm \algstyle{Step}, described in algorithm \ref{alg:steptors}.
-
-\begin{algorithm}
-	\caption{\algstyle{Step2}: another way of computing a step in the isogeny graph}
-	\label{alg:steptors}
-	\KwIn{A generator $(\ell, v)$; an isomorphism class $j_I\in \Ell_k(\O)$; a curve $E_I$
-		such that $j(E_I) = j_I$; the classical
-		modular polynomial $\Phi_\ell(X, Y)$}
-	\KwOut{The isomorphism class $j_F$ given by the action of $(\ell, v)$ on $j_I$}
-	%
-	$r\gets$ \algstyle{MultiplicativeOrder}$(v, \F_\ell)$\;
-	$k_{ext}\gets$ \algstyle{Extension}$(k, r)$\;
-	$P_{ext}\gets$ \algstyle{TorsionPoint}$(E_I, \ell, k_{ext})$\;
-	$K\gets$ \algstyle{Subgroup}$(P_{ext})$\;
-	$E_F\gets$ \algstyle{Quotient}$(E_I, K)$\;
-	\Return $j(E_F)$
-\end{algorithm}
-
-Algorithm \ref{alg:steptors} is valid when the Frobenius eigenspace with eigenvalue $v$ is
-the only line in $E[\ell](\bar{k})$ whose points are defined over the degree $r$ extension
-$k_{ext}$ of $k$. In other words, it is valid when the multiplicative order of $v$ in
-$\F_\ell$ is strictly smaller than the multiplicative order of the second eigenvalue.
-In any case, only one of the two ideals of norm $\ell$ can be eligible for algorithm
-\ref{alg:steptors} as it stands. This disadvantage can be avoided in some cases by
-using the \emph{twisted} elliptic curve: while this operation does not change the
-isomorphism class of the curve, Frobenius eigenvalues are turned into their opposites,
-which may change their multiplicative orders in $\Z/\ell\Z$
-and allow walking in the other direction in the graph. For example, if
-$p = -1\mod\ell$, and $v = 1$ is a Frobenius eigenvalue for $E$, then the
-other eigenvalue is $-1$ and one can use algorithm \algstyle{Step2} in both
-directions with $r=1$.
-
-Let us now describe the primitives about isogeny computations used in algorithms
-\ref{alg:step} and \ref{alg:steptors}. This will allow us to compare the merits
-of these two algorithms, which directly influence the choice of the public
-parameters.
-
-
-\section{Algorithms and parameter selection}
-\label{sec:alg}
-
-We keep the notations of sections \ref{sec:math}
-and \ref{sec:keyex}. In order to analyse the costs of various parts of the
-algorithm, we make complexity estimates in terms of operations in the
-base field $k$ of order $q$.
-We will use the soft-$O$ notation: a cost $\softO(f(\ell, \log q))$ means
-$O(f(\ell, \log q)^{O(1)})$. These complexity estimates will
-allow us to discuss the relative costs of algorithms \ref{alg:step} and
-\ref{alg:steptors}, and guide us in the later choice of the primes $\ell$
-and bounds $M_\ell$ for the number of steps that we will finally propose.
-
-\subsection{Description of the subroutines}
-
-In this paragraph, we turn on to algorithms appearing in algorithms \ref{alg:step}
-and \ref{alg:steptors} that are somewhat specific to the Rostovtsev-Stolbunov
-scheme; generic isogeny computation as in \algstyle{Quotient} will be discussed
-in the following paragraph.
-\v
-
-Let us first delve into algorithm \ref{alg:step}.
-The reader will agree that the purpose of the subroutines \algstyle{Roots}
-and \algstyle{MultiplicativeOrder} is clear. Since $\ell\ll\Card(k)$,
-we use the well-known Cantor--Zassenhaus method \cite{} in \algstyle{Roots}:
-given a polynomial $P$,
-we compute $F = X^q \mod P$ using a fast exponentiation method, and then the polynomial
-$\gcd(F - X, P)$ is the product of irreducible factors of degree one in $P$
-in $k[X]$. In our setting the modular equation has two roots: therefore we only need
-to compute square roots to complete \algstyle{Roots}, which can be
-done using the Tonnelli--Shanks algorithm \cite{}. The cost is dominated
-by that of computing $F$: when $P$ is a modular equation
-of level $\ell$, hence degree $\ell + 1$, this costs $\softO(\ell\log q)$ operations in $k$
-using asymptotically fast methods for polynomial arithmetic \cite{}.
-As for \algstyle{MultiplicativeOrder},
-any version of it will do, including the really naive one consisting in computing
-all the powers of $v$ until one is equal to 1.
-
-Algorithm \algstyle{HasFrobeniusEigenvalue}
-involves computing the Frobenius on the kernel: more precisely, one computes $(X^q, Y^q)$
-where $q$ is the order of $k$ in the quotient ring
-\[
-k[X, Y]/(K(X),\ Y^2 - X^3 - aX - b)
-\]
-where $a, b$ are given by the curve equation $y^2 = x^3 + ax + b$. Here, the polynomial
-$K(X)$ is the degree $\frac{\ell-1}{2}$ polynomial whose roots are the $x$-coordinates of the elements
-in the subgroup of order $\ell$. One then checks whether it is equal to $v$ times the generic
-point $(X, Y)$ which is computed using the addition law on the curve. In fact, computing
-in the double quotient ring above is not even needed. The two quantities we want to compute,
-$(X^q, Y^q)$ and $[v](X, Y)$, have a $Y$ factor only in their second coordinate. Thus one
-can only store univariate polynomials in $X$ and multiply by the square of $Y$, that is
-$X^3 + aX + b$, at appropriate places in the addition algorithm on the curve. Thus the
-computations are really done in the ring $k[X]/K(X)$. An addition of points in this
-quotient ring amounts to a constant number of multiplications and additions of degree $\ell$
-polynomials, which can be done in $\softO(\ell)$ field operations.
-The cost for the scalar multiplication is therefore also
-$\softO(\ell)$ using a binary exponentiation process. However, the cost of computing
-$(X^q, Y^q)$ is $\softO(\ell\log q)$ as in the Cantor--Zassenhaus algorithm above.
-
-There is one last subroutine in algorithm \ref{alg:step} that is important to discuss,
-namely the evaluation (and storage) of the bivariate polynomial $\Phi_\ell$. It is a bivariate
-polynomial of degree $\ell + 1$ in both variables, which is not sparse and whose coefficients
-grow quickly \cite{}. Therefore in first approximation, even its storage could cost as much as
-$\O(\ell^2 \log q)$ when the coefficients are reduced in $k$. However, it is in practice a negligible
-part of the algorithm if one uses Atkin modular polynomials
-when the classical modular polynomials become too cumbersome to store.
-\v
-
-As for algorithm \algstyle{Step2}, the algorithm \algstyle{Torsion} works as follows.
-The cardinality $C_{ext}$ of $E(k_{ext})$ is easily computed from $\Card(E(k))$
-and the degree of the extension using Hasse's theory \cite{}.
-Then, pick a random point $Q_{ext}$ on the curve defined over $k_{ext}$ and compute
-\[
-P_{ext} = \left[\frac{C_{ext}}{\ell}\right]Q_{ext}
-\]
-until $P_{ext}$ is nonzero. Then $P_{ext}$ is a correct answer.
-In general, very few scalar multiplications have to be computed (usually one),
-but they involve points defined over $k_{ext}$. If $r$ denotes the degree of
-this field over $k$, then all coordinates are written as polynomials of degree
-$r$. The size of $C_{ext}$ is roughly that of $q^r$, so that the amount of $k$-operations
- involved is $\softO(r^2\log q)$ using a binary scalar multiplication mechanism.
-
-Once this torsion point $P_{ext}$ is computed, \algstyle{Subgroup} computes its
-multiples $[i]P_{ext}$ for every $1\leq i\leq \frac{\ell - 1}{2}$ and collects
-their abscissas. This is done using $\softO(r\ell)$ operations in $k$, as
-these points are again defined over $k_{ext}$.
-
-When $r$ is very small (for example $r = 1$), algorithm \algstyle{Step2} is
-critically faster than algorithm \algstyle{Step}, since we save a factor $\log q$.
-The value of $r$ depends on the Frobenius characteristic equation, so depends on
-the cardinality of the initial elliptic curve $E_0$. Therefore, constructing
-ordinary elliptic curves with cardinality constraints becomes critical to allowing
-better cryptosystem performances.
-
-\subsection{Isogeny computations}
-
-The algorithms \algstyle{IsogenyKernel} and \algstyle{Quotient} appearing in
-algorithms \ref{alg:step} and \ref{alg:steptors} are well-known primitives in isogeny
-computations \cite{}. We briefly report on these algorithms
-for the reader's convenience. 
-
-In general, the case of even-degree isogenies is
-more complicated than that of odd-degree isogenies. Since we are only
-interested in prime-degree isogenies and the prime 2 is never Elkies, we
-will content ourselves with the odd-degree case.
-
-The \algstyle{Quotient} algorithm directly uses Vélu's formulas, which are
-summarised in the following theorem \cite{}.
-\begin{theorem}[Vélu]
-Let $E$ be an elliptic curve in short Weierstrass form
-\[
-E\ :\ y^2 = x^3 + a x + b
-\]
-and $\ell$ be an odd prime. Let $K(X)$ be a polynomial representing a subgroup $G$
-of order $\ell$ on $E$, in the sense that $K(X)$ is the monic polynomial of degree
-$n = \frac{\ell - 1}{2}$ whose roots are the $x$-coordinates of the points in $G$.
-We write
-\[
-K(X) = X^n - \sigma_1 X^{n-1} + \cdots + (-1)^n \sigma_n.
-\]
-($\sigma_i = 0$ if $i>n$).
-Then the curve $E/G$ has (up to isomorphism) the following equation:
-\[
-E/G\ :\ y^2 = x^3 + a' x + b'
-\]
-with
-\[
-\begin{aligned}
-a' &= a - 5t,\\
-b' &= b - 7w
-\end{aligned}
-\]
-where we define
-\[
-\begin{aligned}
-t &= 6 (\sigma_1^2 - 2\sigma_2) + 2 a n,\\
-w &= 10 (\sigma_1^3 - 3 \sigma_1\sigma_2 + 3\sigma_3) + 6 a\sigma_1 + 4bn.
-\end{aligned}
-\]
-
-
-\end{theorem}
-
-As one can see, algorithm \algstyle{Quotient} only costs a constant number
-of operations in $k$ (not even in $k_{ext}$, as the polynomial $K$ has
-coefficients in $k$ although it was built from its roots in $k_{ext}$).
-
-In algorithm~\ref{alg:steptors}, the most costly step is usually the
-scalar multiplication. As a consequence, it is interesting in practice
-to use other models for curves such as Montgomery curves~\cite{}.
-An analogue of Vélu's formulas also exist for this model~\cite{}.
-
-\v
-
-As the reader can see, computing a quotient is easy. On the other hand,
-computing the kernel of an isogeny given its domain, degree and image is a
-somewhat more difficult problem. Here we concentrate on the large
-characteristic case ($p\gg\ell$) and suppose that $\ell$ is odd.
-We will follow Elkies' document \cite{}, which studies
-this problem in the context of the SEA algorithm for point couting on
-elliptic curves. It is not the asymptotically fastest algorithm available
-(see for example \cite{}),
-but using it does not lead to any significant slowdown in our range of applications.
-
-To describe this algorithm, it is convenient to describe isogenies as
-rational fractions of the coordinates $x$ and $y$ on the curve. In fact, these
-rational fractions can be written in a simple way \cite{}:
-
-\begin{prop}
-Let $\phi$ be an $\ell$-isogeny between two elliptic curves written in
-Weierstrass form
-\[
-E\ :\ y^2 = x^3 + ax + b, \quad E_1\ :\ y^2 = x^3 + a_1x + b_1.
-\]
-Then there exists polynomials $N$ and $D$ of degrees $\ell$ and $\ell-1$,
-and a constant $c\in k^*$, such that $D$ is monic and
-\[
-\phi(x, y) = \left(\frac{N(x)}{D(x)}, cy\left(\frac{N}{D}\right)'(x)\right).
-\]
-The polynomial $D$ is the square of the kernel polynomial of $\phi$, as defined
-above. Denoting by $\phi_x$ the rational fraction $\frac{N}{D}$,
-the following differential equation holds:
-\[
-c(x^3 + ax + b)\phi_x'^2(x) = \phi_x^3 + a_1\phi_x + b_1,
-\]
-whence
-\begin{equation}
-\label{diffeq}
-2c(x^3 + ax + b)\phi_x'' + c(3x^2 + a)\phi_x' =
- 3\phi_x^2 + a_1.
-\end{equation}
-\end{prop}
-
-We will call $\phi$ \emph{normalised} if the coefficient $c$ is equal to 1.
-This property is not intrinsic: it depends on the particular model chosen
-for $E$ and $E_1$.
-
-Elkies' strategy for algorithm \algstyle{IsogenyKernel}$(E, \ell, j(E_1))$ can now be described
-as follows:
+In order to specialize algorithm~\ref{proto:cayley} to isogeny graphs,
+Rostovtsev and Stolbunov avoid computing the order $\O$, the set $\Ell_q(\O)$
+or performing arithmetic operations on ideal classes. Instead, they only
+manipulate isogenies between elliptic curves. We retain this idea here.
+Given an ideal $\frak s = (\pi-\lambda, \ell)$, we will compute $\phi_{\frak s}:E\to E'$
+using one of two different algorithms:
 \begin{itemize}
-\item Determine an equation for $E_1$ from the equation of $E$, $\ell$ and
- $j(E_1)$ such that the $\ell$-isogeny $\phi$ is normalised.
-\item Solve equation \ref{diffeq} in the world of power series in $x^{-1}$ over $k$, up to
- some precision $N$: that is, write
-\[
-\frac{N(x)}{D(x)} = x + c_0 + c_1 x^{-1} + \cdots + c_N x^{-N} + O(x^{-N-1}).
-\]
-\item Recover $D$ and the kernel polynomial from $\phi_x$ using rational
- fraction reconstruction.
+\item Algorithm~\algstyle{Step1} that uses
+	\emph{modular equations}, and works with any $\frak s$;
+\item Algorithm~\algstyle{Step2} that
+	uses \emph{torsion points} on $E$, and is only used when
+	$\lambda$ satisfies certain properties.
 \end{itemize}
 
-Since we want to determine a polynomial of degree $\ell-1$, choosing a precision $N = 2\ell$
-is sufficient when using standard rational reconstruction algorithms such as Berlekamp--Massey \cite{}.
+Rostovtsev and Stolbunov only used an analogue of~\algstyle{Step1}. Using
+algorithm~\algstyle{Step2}, that is inspired from the SIDH cryptosystem and
+related protocols, and analyzing its consequences on the choice of public
+parameters (see section~\ref{sec:initcurve}), is the main contribution of our work.
 
-Let us first describe how equation \ref{diffeq} is solved. One readily
-has the following relations between the coefficients $c_k$: for all $k\geq 2$,
-\begin{equation}
-\label{eq:rec}
- (k-1)(2k+5)c_{k+1} = 3\sum_{i=1}^{k-1}c_i c_{k-i}
-	- (2k-1)(k-1)a c_{k-1} - (2k-2)(k-2)b c_{k-2}.
-\end{equation}
-This relation gives $c_{k+1}$ in terms of the previous coefficients provided $k-1$
-and $2k+5$ are invertible.
+The cost of computing an isogeny step given by $\frak s$
+varies heavily according to which algorithm is used and the values of $\lambda$
+and $\ell$. Therefore, we choose to \emph{weight} the isogeny walks as
+follows: for each $\frak s = (\pi-\lambda,\ell)\in S$,
+we define a bound $M_\ell$ for the number of times $\frak s$
+appears in the random walk given as an element of $S^*$.
+For convenience, we partition the set $S$
+into its symmetric part $S_{sym}$, containing those ideals $\frak s$ such that
+$\frak s^{-1}\in S$, and an assymmmetric part $S_{asym}$. Looking back at
+figure~\ref{fig:cycle}, if $\frak s\in S_{sym}$ then both directions
+$\lambda,\mu$ are used, while if $\frak s\in S_{asym}$ then only one is
+available. In practice, the existence of $S_{asym}$ is connected with the use of
+algorithm~\algstyle{Step2}.
 
-This recursion is initialised using the following remark: since $\phi$
-is normalized,
-it is the isogeny given by Vélu's formulas starting from its kernel. Thus
-one has
-\[
-c_0 = 0,\quad c_1 = \frac{a - a_1}{5},\quad c_2 = \frac{b - b_1}{7}.
-\]
-This leads to an algorithm which costs $O(\ell^2)$ operations in $k$, since each
-application of equation \ref{eq:rec} has a linear cost, and one as to compute
-$c_k$ for all $k\leq 2\ell$.
+Algorithm~\ref{alg:keyex} rephrases the generic key exchange~\ref{proto:cayley}
+in our particular setting. Using the same public parameters, procedure
+\algstyle{KeySample} generates a list $(k_\ell)$ with $-M_\ell\leq k_\ell\leq M_\ell$
+for each $(\ell, \lambda, \mu, i)\in S_{sym}$, and $0\leq k_\ell\leq M_\ell$ for
+each $(\ell, \lambda)\in S_{asym}$. Procedure \algstyle{Walk} simply performs
+a sequence of isogeny steps as detailed in algorithm~\ref{alg:walk}.
 
-Let us now describe how to compute an equation for $E_1$ such that the isogeny
-is normalised. One also uses modular polynomials for this task:
+\begin{algorithm}
+  \caption{Key exchange from an isogeny graph}
+  \label{alg:keyex}
+  \Params{
+		\begin{itemize}
+		\itemsep0em
+		\item A prime power $q$ 
+		\item An ordinary elliptic curve $E_0/\F_q$ with Frobenius trace $t$ 
+		\item $S_{sym}$ given as a list of $(\ell, \lambda, \mu, i)$ with $i\in\{1,2\}$ 
+		\item $S_{asym}$ given as a list of $(\ell, \lambda)$ 
+		\item Bounds $M_\ell$
+		\end{itemize}
+	}
+  \Alice{
+    \Samples $k_A = \algstyle{KeySample}$()\;
+    \Sends $E_A = \algstyle{Walk}(k_A, E_0)$ to Bob}
+  \Bob{
+    \Samples $k_B = \algstyle{KeySample}$()\;
+    \Sends $E_B = \algstyle{Walk}(k_B, E_0)$ to Alice}
+  \Key{$\algstyle{Walk}(k_A, E_B) = \algstyle{Walk}(k_B, E_A)$}
+\end{algorithm}
 
-\begin{prop}
-Let $E\ :\ y^2 = x^3 + ax + b$ be an elliptic curve over $k$
- and $\ell$ be an odd prime number. Let $j = j(E)$ and $j_1$
-be a root of the equation
-\[
-\Phi_\ell(j, Y) = 0
-\]
-where $\Phi_\ell$ is the classical modular polynomial of level $\ell$.
-Define
-\begin{equation}
-\label{eq:norm}
-\begin{aligned}
-\lambda &= 18 j \ell \frac{b}{a}\ 
-	\frac{\frac{\partial \Phi_\ell}{\partial X}(j, j_1)}
-			 {\frac{\partial \Phi_\ell}{\partial Y}(j, j_1)},\\
-a_1 &= -\frac{\lambda^2}{48 j_1(j_1 - 1728)},\\
-b_1 &= \frac{\lambda^3}{864 j_1^2(j_1 - 1728)}.
-\end{aligned}
-\end{equation}
-Then the elliptic curve $E_1\ :\ y^2 = x^3 + a_1x + b_1$ has $j$-invariant $j_1$,
-and there is a normalised isogeny from $E$ to $E_1$.
-\end{prop}
+\begin{algorithm}
+	\caption{\algstyle{Walk}: an isogeny walk}
+	\label{alg:walk}
+	\Input{An ephemeral key $k = (k_\ell)$; an initial curve $E_I$; \newline
+	public data $S_{sym}, S_{asym}$}
+	$E \gets E_I$\;
+	\For{$(\ell, \lambda, \mu, i)\in S_{sym}$}{
+		\If{$k_\ell\geq 0$}{
+			\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{Step}i(E, \ell, \lambda)$}
+		}
+		\Else{
+			\lFor{$1\leq j \leq |k_\ell|$}{$E\gets \algstyle{Step}i(E, \ell, \mu)$}
+		}
+	}
+	\For{$(\ell,\lambda)\in S_{asym}$}{
+		\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{Step2}(E, \ell, \lambda)$}
+	}
+\end{algorithm}
 
-These formulas can be proved over the field $\C$ of complex numbers using
-modular forms, just as the properties relating $\Phi_\ell$ to $\ell$-isogenies.
-They cannot be applied if $j$ is equal to zero, or $j_1$ is equal to 0
-or 1728. In practice, it is easy to detect curves that are isogenous
-to one of these failure cases, since their cardinality can be predicted
-using the theory of complex multiplication \cite{}.
-We discard these from the beginning.
+We now describe how isogeny steps are computed. Let $E$ be an elliptic
+curve over $\F_q$ and $\ell$ an Elkies prime for $E$, with Frobenius
+eigenvalues $\lambda,\mu$. We would like to compute an $\ell$-isogeny
+step from $E$ in direction $\lambda$, i.e. the isogeny $\phi_{\frak s}$
+for $\frak s = (\pi-\lambda, \ell)$.
 
-\v
-To end this section, let us mention that these computations can be extended to
-other models for elliptic curves, and also to other types of modular polynomials.
-See \cite{} for the use of Atkin modular polynomials in this context, and \cite{}
-for an analogue of Vélu's formulas using Montgomery equations for curves.
+\paragraph{Algorithm~\algstyle{Step1}.} This classical algorithm makes use
+of so-called modular equations to compute isogenies between elliptic
+curves. More specifically, we use the \emph{classical modular polynomial}
+$\Phi_\ell(X, Y)$~\cite{todo:classicalmodpoly}.
+This bivariate polynomial with integer coefficients has
+the following property: a cyclic $\ell$-isogeny exists between two elliptic
+curves $E$ and $E'$ if and only if $\Phi_\ell(j(E), j(E')$ = 0,
+where $j$ denotes the $j$-invariant. Thus, the roots
+of the polynomial equation $\Phi_\ell(j(E), X)=0$ give the two neighbors
+of $E$ in the cycle of $\ell$-isogenies. The degree of this equation
+is $\ell+1$.
 
-Several optimisations are available to the algorithm \algstyle{IsogenyKernel}
-as sketched here. First, one can avoid the rational reconstruction step and
-find the coefficients of the kernel polynomial directly from the $c_k$'s,
-and an additional quantity that can be computed using the modular equation.
-This is how Elkies originally presented this method. Second, one can avoid
-the quadratic step \ref{eq:rec} by performing Newton iterations on power
-series that satisfy a related differential equation: see \cite{}.
+Using this idea, when one picks a new prime $\ell$ and starts a sequence
+of isogeny steps in direction $\lambda$, only one of the two neighbors is
+correct. To determine which, choose one of them at random and
+compute the \emph{kernel} $K$ of the corresponding $\ell$-isogeny. Several
+algorithms have been designed for this purpose~\cite{todo:isogkernel}.
+We then check whether the eigenvalue of $\pi$ on $K$ is indeed $\lambda$
+by performing a scalar multiplication on the ``generic'' point of $K$.
+This computation is only necessary for the \emph{first} $\ell$-isogeny
+step, since no return on the isogeny cycle is allowed.
+
+In practice, we store modular equations with coefficients already reduced
+in $\F_q$. Several publicly available databases of modular polynomials
+exist~\cite{todo:modulardatabases}. The size of the classical modular polynomial
+$\Phi_\ell$ mentioned above grows quickly with $\ell$, hence it is convenient
+to use other types of modular equations when $\ell$ grows, such as the so-called
+Atkin modular equations~\cite{todo:atkinmodpoly}. One then has to
+modify the kernel computation accordingly~\cite{todo:isogkernelatkin}.
+
+The costly step in algorithm~\algstyle{Step1} is computing the roots
+of the polynomial $\Phi_\ell(j(E), X)$. Using a Cantor--Zassenhaus-type
+algorithm~\cite{todo:canzass}, this amounts to computing $X^q$ modulo
+this polynomial. Using asymptotically fast methods for polynomial
+arithmetic, the cost is $\softO(\ell\log q)$ field operations.
+
+\paragraph{Algorithm \algstyle{Step2}.} This algorithm, very different
+in spirit from algorithm~\algstyle{Step1}, is given by the following
+pattern:
+\begin{itemize}
+\item Find a nonzero $Q\in \ker \phi_{\frak s}$,
+\item Recover $\ker \phi_{\frak s}$ entirely by enumerating the multiples of $Q$,
+\item Compute the image of $\phi_{\frak s}$ from its kernel using
+Vélu's formulas~\cite{todo:velu}.
+\end{itemize}
+In order to find a nonzero element in $\ker\phi_{\frak s}$, we make the
+following hypothesis: \emph{the multiplicative order of $\lambda$ in
+$\Z/\ell\Z$ is $r$, and the multiplicative order of $\mu$ does not
+divide $r$}. Then, $\ker\phi_{\frak s}$ is exactly the set of $\ell$-torsion
+points on $E$ that are defined over $\F_{q^r}$. Let $C_{ext}$ be the
+order of $E(\F_{q^r})$, which can be quickly computed from the
+Frobenius trace $t$~\cite{todo:hasseext}.
+We proceed as follows:
+\begin{itemize}
+\item Pick a random point $P\in E(\F_{q^r})$,
+\item Compute $Q = \left[\frac{C_{ext}}{\ell}\right]P$,
+\item If $Q = 0$ restart, else return $Q$.
+\end{itemize}
+The probability that more than one scalar multiplication will be computed
+is only $\frac{1}{\ell}$.
+
+When $\ell$ is not too large, the cost is dominated by that of the scalar
+multiplication. Using asymptotically fast arithmetic operations,
+the overall cost is $\softO(r^2\log q)$ field operations, as $C_{ext}$
+has the same order of magnitude as $q^r$. Since the scalar
+multiplication dominates, algorithm~\algstyle{Step2} can be improved
+by using elliptic curve models with more efficient arithmetic~\cite{todo:curvearith}.
+
+Note that when $r = 1$
+(i.e. $\lambda = 1$), we saved a factor $\ell$ over algorithm \algstyle{Step1},
+in addition with much better constant factors. As a general rule,
+algorithm \algstyle{Step2} is more efficient when $r$ is small, while
+for generic values of $r$ (typically $O(\ell))$ algorithm~\algstyle{Step1}
+should be preferred.
 
 
-\subsection{Seeking a good initial curve}
+
+Even if the multiplicative orders of $\lambda$ divides that of $\mu$,
+we can still try to use algorithm \algstyle{Step2} in both directions.
+The trick is to use the \emph{twisted} curve of $E$. While this does not
+change the isomorphism class of the curve, the Frobenius eigenvalues
+become $-\lambda$ and $-\mu$. For example, if
+$p = -1\mod\ell$ and $\lambda = 1$, then $\mu=-1$ and algorithm
+\algstyle{Step2} can be used in both directions with $r=1$.
+
+
+It is now evident that the choice of public parameters, especially
+the initial curve $E_0$, has heavy impact on the execution time:
+smaller Elkies primes,
+and smaller multiplicative orders of the Frobenius eigenvalues, will
+lead to better practical performances. Since all this information
+is contained in the value of $\# E(\F_q)$, we now face the problem
+of constructing ordinary elliptic curves with prescribed
+order, or more precisely with prescribed order \emph{modulo small
+primes}. Unfortunately, and in contrast with the case of
+supersingular curves, no polynomial-time method to achieve this 
+is known in general.
+In the next section, we present our methods to find the best possible
+public parameters in reasonable time.
+
+\section{Public parameter selection}
 \label{sec:initcurve}
 
-According to section~\ref{sec:alg}, the global performances of our protocol
-critically depends of the possibility of using algorithm~\ref{alg:steptors}
-instead of algorithm~\ref{alg:step} during walks in the isogeny graph.
-In turn, this depends on the ability to generate an initial elliptic curve
-$E_0$ whose cardinality satisfies certain congruence conditions modulo
-small primes. Even without using algorithm~\ref{alg:steptors}, the scheme is
-more efficient when the curve $E_0$ has many small Elkies primes, and this
-property also depends on its cardinality.
 
-In the case of ordinary curves, in contrast with supersingular ones,
-generating curves with prescribed cardinality is a difficult problem~\cite{todo}.
 In this section, we describe how to use the Schoof--Elkies--Atkin (SEA) point counting
 algorithm with early abort, combined with the use of certain modular curves,
-to construct curves whose cardinality satisfies some of these constraints.
+to construct curves whose cardinality satisfies some constraints
+modulo small prime.
 This is faster than choosing curves at random and computing their cardinalities
 completely until a convenient one is found, but still does not allow us
-to use the full power of algorithm~\ref{alg:steptors}.
+to use the full power of algorithm~\algstyle{Step2}.
 
 The SEA algorithm~\cite{schoof95,todo} is a polynomial-time algorithm for
 point counting on elliptic curves over a finite field. In order to compute
@@ -986,7 +732,7 @@ whose cardinality has lots of small factors. To fix ideas, let us choose
 \[
 p = 7 \left(\prod_{2\leq\ell\leq 380,\ \ell \text{ prime}} \ell\right) - 1
 \]
-which is a 512-bit prime. Then, algorithm~\ref{alg:steptors} can be used
+which is a 512-bit prime. Then, algorithm~\algstyle{Step2} can be used
 for $\ell$-isogenies with $r=1$ in both directions if and only if
 $C_0 = \# E_0(\F_p)$ satisfies $C=0\mod\ell$.
 
@@ -1201,7 +947,7 @@ walks and the uniform distribution, although lengthening the
 random walks along the lines of~\cite[Theorem ...]{todo:expanders}
 would be sufficient. Second, the walks we consider are not fully random
 walks, because smaller degree isogenies are used more frequently
-(as well as degrees for which we apply algorithm~\ref{alg:steptors}),
+(as well as degrees for which we apply algorithm~\algstyle{Step2}),
 and the number of steps is bounded for each degree. Most
 importantly, this result is likely too weak: in~\cite[7.2]{jao+miller+venkatesan09},
 it is asked whether an analogue of the previous theorem would
@@ -1281,10 +1027,10 @@ is $0.017 * \ell$ seconds.
 
 Using such data, one can propose a maximal number of steps to be
 computed for each prime. In the upper table of figure~\ref{fig:steps}, we
-list the primes for which algorithm~\ref{alg:steptors} is used, with
+list the primes for which algorithm~\algstyle{Step2} is used, with
 the corresponding extension degree $r$, and a star if the twisted curve
 allows to use both directions in the isogeny graph. In the lower table,
-we list other Elkies primes for which we apply algorithm~\ref{alg:step}.
+we list other Elkies primes for which we apply algorithm~\algstyle{Step1}.
 
 \begin{figure}
 \centering
