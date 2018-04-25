@@ -140,14 +140,15 @@ suggest~\cite{defeo2017isogenybased}.
 
 In what follows $\F_q$ is a finite field of characteristic $p$ with
 $q$ elements, with an algebraic closure $\bar\F_q$. Let $E$ and $E'$
-be elliptic curves defined over $\F_q$, an isogeny $ϕ:E→E'$ is a
+be elliptic curves defined over $\F_q$. An isogeny $ϕ:E→E'$ is a
 non-constant algebraic map, mapping the point at infinity of $E$ to
 the point at infinity of $E'$; it is also a group morphism from
 $E(\bar\F_q)$ to $E'(\bar\F_q)$~\cite[III.4]{silverman:elliptic}. The
 degree of an isogeny is its degree as an algebraic map; we will call
 $ℓ$-isogeny an isogeny of degree $ℓ$. The kernel of an isogeny,
 denoted by $\ker ϕ$, is the set of points of $E(\bar\F_q)$ that is
-sent to the identity point of $E'$.
+sent to the identity point of $E'$. A \emph{cyclic
+  isogeny} is one such that $\ker ϕ$ is a cyclic group.
 
 An isogeny from a curve $E$ to itself is called an
 \emph{endomorphism}.  Endomorphisms with the operations of addition
@@ -167,13 +168,13 @@ otherwise.
 Any isogeny can be factored as a composition of a \emph{separable} and
 a \emph{purely inseparable} isogeny. \emph{Purely inseparable}
 isogenies have trivial kernel, and degree a power of
-$p$. \emph{Separable} isogenies are in one-to-one correspondence with
+$p$. \emph{Separable} isogenies contain all
+isogenies of degree coprime to $p$, and
+are in one-to-one correspondence with
 their kernels: for any finite subgroup $G⊂E$ of order $ℓ$ there is a
 unique elliptic curve up to isomorphism, denoted by $E/G$, and a
 unique $ℓ$-isogeny $ϕ:E→E/G$ up to composition by the same
-isomorphism, such that $\kerϕ=G$. In particular $\deg ϕ=\#\ker ϕ$. All
-isogenies of degree coprime to $p$ are separable. A \emph{cyclic
-  isogeny} is one such that $\ker ϕ$ is a cyclic group. It follows
+isomorphism, such that $\kerϕ=G$. In particular $\deg ϕ=\#\ker ϕ$. It follows
 that any isogeny of degree greater than $1$ can be factored as a
 composition of cyclic isogenies of prime degree.
 
@@ -229,9 +230,10 @@ $X^2-tX+q\mod ℓ$. We then have four possibilities:
   like a scalar matrix
   $\left(\begin{smallmatrix}λ&0\\0&λ\end{smallmatrix}\right)$; then
   there are $ℓ+1$ isogenies of degree $ℓ$ from $E$.
-\item[(2)] $π$ has two eigenvalues, i.e.\ it is conjugate to a
+\item[(2)] $π$ has two distinct eigenvalues, i.e.\ it is conjugate to a
   diagonal matrix
-  $\left(\begin{smallmatrix}λ&0\\0&μ\end{smallmatrix}\right)$; then
+  $\left(\begin{smallmatrix}λ&0\\0&μ\end{smallmatrix}\right)$
+	with $\lambda\neq\mu$; then
   there are two isogenies from $E$.
 \end{itemize}
 
@@ -267,14 +269,14 @@ have \emph{complex multiplication by $\O$}.  For a detailed treatment
 of the theory of complex multiplication,
 see~\cite{lang1987elliptic,silverman:advanced}.
 
-Denote by $\O_K$ the ring of integers of $K=ℚ(\sqrt{Δ_π})$, it is its
+The ring of integers $\O_K$ of $K=ℚ(\sqrt{Δ_π})$ is its
 \emph{maximal order}, i.e.\ it contains any other order of $K$.  Hence
 $ℤ[π]⊂\End(E)⊂\O_K$, and there is only a finite number of possible
 choices for $\End(E)$: write $Δ_π=d^2Δ_K$, where $Δ_K$ is the
 discriminant of $\O_K$, then the index $[\O_K:\End(E)]$ must divide
 $d=[\O_K:ℤ[π]]$.
 
-It turns out isogenies allow us to \emph{navigate} the various
+It turns out that isogenies allow us to \emph{navigate} the various
 orders. If $ϕ:E→E'$ is an $\ell$-isogeny, then one of the following
 holds~\cite[Prop.~21]{kohel}:
 \begin{itemize}
@@ -318,12 +320,12 @@ $\End(\O)$ acts on $\Ell_q(\O)$. Furthermore, principal ideals act
 trivially, so that the action factors as an action of the \emph{ideal
   class group} $\Cl(\O)$ on $\Ell_q(\O)$.  The main theorem of complex
 multiplication states that this action is \emph{simply transitive}. In
-other terms, $\Ell_q(\End(E))$ is a \emph{principal homogeneous space}
-under the group $\Cl(\End(E))$: if we fix a curve $E$ as base point,
+other terms, $\Ell_q(\O)$ is a \emph{principal homogeneous space}
+under the group $\Cl(\O)$: if we fix a curve $E$ as base point,
 we have a bijection
 \[
 \begin{aligned}
-\Cl(\End(E)) &\to \Ell_k(\End(E)) \\
+\Cl(\O) &\to \Ell_q(\O) \\
 \text{Ideal class of }\frak a &\mapsto \text{Isomorphism class of }\frak a\cdot E.
 \end{aligned}
 \]
@@ -426,7 +428,7 @@ be used to construct a key exchange as follows:
 If $X$ is a cyclic group $〈x〉$ of order $p$, and $G=ℤ/pℤ$ acting on
 $X$ by $g·x=x^g$, then this is simply the Diffie-Hellman key exchange:
 security is based on the difficulty of the discrete logarithm problem
-in $G$.
+in $G$. %todo: in X?
 
 More generally, if $X$ is a \emph{hard homogeneous space}, i.e.\ one
 such that given $x,y∈X$ it is hard to find $g∈G$ such that $g·x=y$,
@@ -509,7 +511,7 @@ an ideal $\frak s=(π-λ,ℓ)$ on an elliptic curve $E∈\Ell_q(\O)$ will be
 evaluated by computing the unique isogeny $ϕ_{\frak s}:E→E'$ such that
 $π(P)=λP$ for all $P∈\ker ϕ$; algorithms for this operation are given
 in the next subsection. The action of an isogeny walk $(\frak s_i)_i$
-will be simply evaluated as the composition of each isogeny step
+will be simply evaluated as the sequence of isogeny steps
 $ϕ_{\frak s_i}$.
 
 Both Couveignes' and Rostovtsev and Stolbunov's cryptosystems are
@@ -546,7 +548,7 @@ we define a bound $M_\ell$ for the number of times $\frak s$
 appears in the random walk given as an element of $S^*$.
 For convenience, we partition the set $S$
 into its symmetric part $S_{sym}$, containing those ideals $\frak s$ such that
-$\frak s^{-1}\in S$, and an assymmmetric part $S_{asym}$. Looking back at
+$\frak s^{-1}\in S$, and an assymmetric part $S_{asym}$. Looking back at
 figure~\ref{fig:cycle}, if $\frak s\in S_{sym}$ then both directions
 $\lambda,\mu$ are used, while if $\frak s\in S_{asym}$ then only one is
 available. In practice, the existence of $S_{asym}$ is connected with the use of
@@ -702,7 +704,8 @@ of constructing ordinary elliptic curves with prescribed
 order, or more precisely with prescribed order \emph{modulo small
 primes}. Unfortunately, and in contrast with the case of
 supersingular curves, no polynomial-time method to achieve this 
-is known in general.
+is known in general (we will see in section~\ref{sec:sec} why
+we cannot use the CM method).
 In the next section, we present our methods to find the best possible
 public parameters in reasonable time.
 
@@ -795,6 +798,7 @@ as well as a Montgomery model, and its cardinality is
 \end{aligned}
 \]
 
+Other proposals for public parameters are given in~\cite{todo:memoire}.
 In the sequel, we will argue that using this curve brings a 128-bit security level
 in the classical as well as quantum setting, and we give running times of the whole
 scheme in our implementation.
@@ -889,7 +893,10 @@ provided that $E$ and $E'$ have the same endomorphism ring: one simply
 skips Stage 1 of~\cite{Gal}.
 Therefore, in order to avoid polynomial-time attacks, it is important
 to ensure that the class number $h$ has exponential size. In fact, the
-time complexity of this attack is $\softO(\sqrt{h})$.
+time complexity of this attack is $\softO(\sqrt{h})$. As a consequence,
+the CM method~\cite{todo:CMmethod}, that constructs elliptic curves
+with prescribed cardinalities using \emph{small} class numbers,
+must be discarded in our setting.
 
 
 In the quantum setting, a subexponential algorithm exists as mentioned
@@ -928,7 +935,8 @@ We quote the following result from~\cite{jao+miller+venkatesan09}:
 Fix an elliptic curve $E$ over $\F_q$ and consider the graph $\Graph$
 whose vertices are isomorphism classes of elliptic curves over $\F_q$
 with endomorphism ring $\End(E)$, and two vertices are joined by an edge
-if there exists an isogeny of degree at most $\log(4q)^B$ between them.
+if there exists an isogeny of degree at most $\log(4q)^B$ between them
+for some $B>2$.
 
 Assuming GRH, $\Graph$ is an expander graph in the following sense:
 there is a constant $C$, depending only on $B$, such that any random
@@ -981,7 +989,8 @@ given by the following prime factorization:
 hence the fundamental discriminant of $\End(E)$ is a 511-bit integer.
 According to approximate formulas like~\cite{todo:classnumbers},
 the class number $h$ of the maximal order containing $\End(E)$ should
-be at the very least a 250-bit integer. Unfortunately,
+be at the very least a 250-bit integer with overwhelming
+probability. Unfortunately,
 no currently available algorithm can compute class numbers for such values
 in reasonable time. As seen above, this value guarantees security
 in both the classical and quantum settings once the walks in
@@ -1007,6 +1016,8 @@ programming language with the help of the computer algebra package
 Nemo~\cite{todo:Nemo}. In this occasion, we developed a small
 Julia package built upon Nemo that handles basic functionalities
 regarding elliptic curves over finite fields~\cite{todo:package}.
+We used the Bostan--Morain--Salvy--Schost~\cite{todo:BMSS} for
+isogeny computations.
 
 We use the public parameters as given in
 section~\ref{sec:initcurve}.
