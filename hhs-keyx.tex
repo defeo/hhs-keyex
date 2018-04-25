@@ -8,6 +8,12 @@
 \usepackage{hyperref}
 \usepackage[ruled, vlined, linesnumbered]{algorithm2e}
 \SetEndCharOfAlgoLine{}
+\SetKwInput{Params}{Public parameters}
+\SetKwInput{Key}{Shared key}
+\SetKwBlock{Alice}{Alice}{}
+\SetKwBlock{Bob}{Bob}{}
+\SetKw{Samples}{samples}
+\SetKw{Sends}{sends}
 
 %Shortcuts
 \newcommand{\F}{\mathbb{F}}
@@ -72,16 +78,31 @@ key-exchange constructions by Couveignes~\cite{cryptoeprint:2006:291}
 and Rostovtsev and
 Stolbunov~\cite{rostovtsev+stolbunov06,stolbunov-red,Stol}. The
 origins of isogeny-based cryptography can be traced back to
-Couveignes' seminal work ``Hard Homogeneous Spaces'' (HHS), that went
+Couveignes' seminal work ``Hard Homogeneous Spaces'', that went
 unpublished for ten years before appearing
-in~\cite{cryptoeprint:2006:291}. Couveignes viewed HHS more as a
-general framework, encompassing various flavors of Diffie-Hellman-like
-systems, rather than as one particular protocol. Among the possible
-instantiations of HHS, he suggested a new construction based on the
-theory of complex multiplication of elliptic curves. It is however
-Rostovtsev and Stolbunov who first gave
-in~\cite{rostovtsev+stolbunov06} a concrete and detailed realization
-of Couveignes' idea.
+in~\cite{cryptoeprint:2006:291}. Let $G$ be a group, a \emph{principal
+  homogeneous space} or \emph{torsor} for $G$ is a set $X$ with an
+action of $G$ on $X$ such that for any $x∈X$ the map $φ_x:g↦g·x$ is an
+isomorphism between $G$ and $X$. Intuitively, one can think of $X$ as
+a \emph{copy} (or, rather, \emph{many different copies}) of $G$ where
+the information on the identity element has been forgotten. Couveignes
+calls \emph{hard homogeneous space} (HHS) any torsor where computing
+the action of $G$ on $X$ is computationally feasible, but inverting
+the isomorphism $φ_x$ is computationally hard for any $x$. Given a
+HHS, it is immediate to build a Diffie-Hellman type of key exchange
+where the elements of $X$ are used as \emph{labels} to \emph{mask} the
+group elements; then, the security of the scheme relies not (only) on
+the discrete logarithm problem of $G$, but rather on the hardness of
+inverting the isomorphisms $φ_x$.
+
+Couveignes viewed HHS chiefly as a general framework, encompassing
+various flavors of Diffie-Hellman-like systems. Nevertheless, he
+suggested using a specific HHS based on the theory of complex
+multiplication of elliptic curves, in a sense generalizing to the HHS
+framework the class-group-based Diffie-Hellman key exchange of
+Buchmann and Williams~\cite{Buchmann1988}. It is however Rostovtsev
+and Stolbunov who first gave in~\cite{rostovtsev+stolbunov06} a
+concrete and detailed realization of Couveignes' idea.
 
 Rostovtsev and Stolbunov advertised their system as a potential
 post-quantum candidate, leading Childs, Jao and Soukharev to introduce
@@ -254,7 +275,7 @@ $d=[\O_K:ℤ[π]]$.
 
 It turns out isogenies allow us to \emph{navigate} the various
 orders. If $ϕ:E→E'$ is an $\ell$-isogeny, then one of the following
-holds (\cite[Prop.~21]{kohel}):
+holds~\cite[Prop.~21]{kohel}:
 \begin{itemize}
 \item $\End(E) = \End(E')$, then $ϕ$ is said to be
   \emph{horizontal};
@@ -327,21 +348,52 @@ size of the cycle is the order of $(π-λ,ℓ)$ in $\Cl(\End(E))$, thus
 partitioning the set $\Ell_q(\End(E))$ into cycles of equal size.
 
 \begin{figure}[t]
-  \centering
-  \begin{tikzpicture}
-    \def\crater{7}
-    \foreach \i in {1,...,\crater} {
-      \draw[fill] (360/\crater*\i:2cm) circle (2pt);
-      \begin{scope}[shorten >=0.1cm,->]
-        \draw[blue] (360/\crater*\i : 1.95cm) -- (360/\crater*\i+360/\crater : 1.95cm);
-        \draw[red] (360/\crater*\i+360/\crater : 2.05cm) -- (360/\crater*\i : 2.05cm);
-      \end{scope}
-      \draw[blue] (360/\crater*\i+180/\crater:1.6cm) node {\small$λ$};
-      \draw[red] (360/\crater*\i+180/\crater:2cm) node {\small$μ$};
-    }
-  \end{tikzpicture}
-  \caption{Isogeny cycle for an Elkies prime $ℓ$, with \emph{directions} associated to the Frobenius eigenvalues $λ$ and $μ$.}
-  \label{fig:cycle}
+  \begin{minipage}{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \def\crater{7}
+      \foreach \i in {1,...,\crater} {
+        \begin{scope}[shorten >=0.1cm,->]
+          \draw[blue!60!black] (360/\crater*\i : 1.95cm) -- (360/\crater*\i+360/\crater : 1.95cm);
+          \draw[blue!60!white] (360/\crater*\i+360/\crater : 2.05cm) -- (360/\crater*\i : 2.05cm);
+        \end{scope}
+        \draw[blue!60!black] (360/\crater*\i+180/\crater:1.6cm) node {\small$λ$};
+        \draw[blue!60!white] (360/\crater*\i+180/\crater:2cm) node {\small$μ$};
+      }
+      \foreach \i in {1,...,\crater} {
+        \draw[fill] (360/\crater*\i:2cm) circle (2pt);
+      }
+    \end{tikzpicture}
+    \caption{Isogeny cycle for an Elkies prime $ℓ$, with \emph{directions} associated to the Frobenius eigenvalues $λ$ and $μ$.}
+    \label{fig:cycle}
+  \end{minipage}
+  \hfill
+  \begin{minipage}{0.45\textwidth}
+    \centering
+    \begin{tikzpicture}
+      \def\crater{12}
+      \def\jumpa{-8}
+      \def\jumpb{9}
+      \def\diam{2cm}
+
+      \foreach \i in {1,...,\crater} {
+        \draw[blue] (360/\crater*\i : \diam) to[bend right] (360/\crater*\i+360/\crater : \diam);
+        \draw[red] (360/\crater*\i : \diam) to[bend right] (360/\crater*\i+\jumpa*360/\crater : \diam);
+        \draw[green] (360/\crater*\i : \diam) to[bend right=50] (360/\crater*\i+\jumpb*360/\crater : \diam);
+      }
+      \foreach \i in {1,...,\crater} {
+        \pgfmathparse{int(mod(2^\i,13))}
+        \let\exp\pgfmathresult
+        \draw[fill] (360/\crater*\i: \diam) circle (2pt) +(360/\crater*\i: 0.4) node{$x^{\exp}$};
+      }
+    \end{tikzpicture}
+    \caption{Schreier graph on a group $〈x〉$ of order $13$, acted
+      upon by $(ℤ/13ℤ)^*$, generated by $S=\{2,3,5\}$ (respectively
+      blue, red and green edges). Notice that $5$ has order $4$ modulo
+      $13$, thus partitioning $G\setminus\{1\}$ into $3$ cycles of
+      length $4$.}
+    \label{fig:cayley}
+  \end{minipage}
 \end{figure}
 
 \subsection{Modular curves}
@@ -406,135 +458,128 @@ $\ell^2$, and this is easily controlled: in particular it cannot be the case
 when the discriminant of $\End(E)$ is greater than $4\ell^2$.
 
 
-\section{The Couveignes--Rostovtsev--Stolbunov key exchange protocol}
+\section{Key exchange from isogeny graphs}
 \label{sec:keyex}
 
-\subsection{Key exchange from abelian Cayley graphs}
+In this section, following Couveignes~\cite{cryptoeprint:2006:291} and
+Rostovtsev and Stolbunov~\cite{rostovtsev+stolbunov06}, we describe a
+key exchange protocol based on the action of a class group on an
+isogeny graph.  This is essentially the Rostovtsev-Stolbunov key
+exchange protocol, with the twist of taking advantage of specially
+selected parameters to improve efficiency.
 
-The Couveignes--Rostovtsev--Stolbunov key exchange protocol \cite{}
-is an instance of a general
-framework of key exchanges using abelian Cayley graphs. This general pattern
-is in turn an example of Couveignes' `Hard Homogeneous Spaces' key echange
-framework \cite{}.
+Any principal homogeneous space $X$ for a finite Abelian group $G$ can
+be used to construct a key exchange as follows:
 
-Let us first describe this general
-setting before discussing more specific algorithms used in isogeny computations.
-The public data is
+\begin{algorithm}
+  \caption{Generic key exchange from a hard homogeneous space}
+  \label{proto:hhs}
+  \Params{A \emph{base point} $x_0∈X$}
+  \Alice{
+    \Samples a random element $a∈G$\;
+    \Sends $x_a = a·x_0$ to Bob}
+  \Bob{
+    \Samples a random element $b∈G$\;
+    \Sends $x_b = b·x_0$ to Alice}
+  \Key{$a·x_b = b·x_a = ab·x_0$}
+\end{algorithm}
+
+If $X$ is a cyclic group $〈x〉$ of order $p$, and $G=ℤ/pℤ$ acting on
+$X$ by $g·x=x^g$, then this is simply the Diffie-Hellman key exchange:
+security is based solely on the difficulty of the discrete logarithm
+problem in $G$.
+
+However, if $X$ is a hard homogeneous space, i.e.\ one such that given
+$x,y∈X$ it is hard to find $g∈G$ such that $g·x=y$, then the security
+of the protocol relies on a new assumption. Similar ideas have
+repeatedly appeared in the literature under different
+flavors~\cite{10.1007/3-540-44598-6_10,monico2007}.
+
+We would like to apply this idea to the principal homogeneous space
+$\Ell_q(\O)$ for the class group $\Cl(\O)$, for some well chosen order
+$\O$ in a quadratic imaginary field. However, given a generic element
+of $\Cl(\O)$, the best algorithm~\cite{jao+soukharev10} to evaluate
+its action on $\Ell_q(\O)$ has subexponential complexity in $q$,
+making the approach sketched above infeasible. The solution is to use
+a special \emph{smooth} representation for the elements of $\Cl(\O)$,
+that is best explained by looking at Cayley graphs.
+
+
+\subsection{Key exchange from Abelian Cayley graphs}
+
+Let $G$ be a group, $S⊂G$ a subset, and $X$ a principal homogeneous
+space for $G$. We define $\Graph(G, S, X)$ as the oriented graph which
+vertices are the elements of $X$, and where an edge labelled by $s∈S$
+links $x_1$ to $x_2$ if and only if $s\cdot x_1 = x_2$.  If is $S$ is
+symmetric (i.e.\ $S^{-1}=S$), we associate the same label to $s$ and
+$s^{-1}$, and make the graph an undirected one. Such a graph is
+isomorphic to the Cayley graph of $G$ generated by $S$, and is
+sometimes called a \emph{Schreier graph}.  Figure~\ref{fig:cayley}
+shows an example of Schreier graph where $G=(ℤ/13ℤ)^*$, $S=T∪T^{-1}$
+where $T=\{2,3,5\}$, and $X$ is a cyclic group of order $13$ generated
+by an element $x$, minus the identity element; the action of $G$ on
+$X$ is given by exponentiation: $g·x=x^g$.
+
+A \emph{walk} in a graph $\Graph(G,S,X)$ is a finite sequence
+$(s_i)_{1≤i≤n}∈S^*$ of \emph{steps} in $S$. We extend the action of
+$G$ on $X$ to an action of $S^*$ on $X$ by defining
+\[(s_i)_i·x = \left(\prod_i s_i\right)·x.\] %
+Note that if $G$ is Abelian the order of the steps in $(s_i)_i$ does
+not matter.
+
+If we have a Schreier graph where $G$ is finite and Abelian, and the
+action $G$ on $X$ is efficiently computable, we can define a key
+exchange protocol as follows:
+
+\begin{algorithm}
+  \caption{Generic key exchange from a Cayley graph}
+  \label{proto:cayley}
+  \Params{A \emph{base point} $x_0∈X$}
+  \Alice{
+    \Samples a \emph{random walk} $(a_i)_i$ in $\Graph(G,S,X)$\;
+    \Sends $x_a = (a_i)_i·x_0$ to Bob}
+  \Bob{
+    \Samples a random walk $(b_i)_i$ in $\Graph(G,S,X)$\;
+    \Sends $x_b = (b_i)_i·x_0$ to Alice}
+  \Key{$(a_i)_i·x_b = (b_i)_i·x_a$}
+\end{algorithm}
+
+If Alice and Bob ensure that the random walks induce a distribution on
+$X$ close to uniform (in particular, the set $S$ must generate $G$),
+then this protocol is essentially equivalent to
+Algorithm~\ref{proto:hhs}. In particular, following the example of
+Figure~\ref{fig:cayley}, if $X$ is a cyclic group $〈x〉$ of order
+$p$, acted upon by $G=(ℤ/pℤ)^*$, then this protocol is equivalent to
+the Diffie-Hellman protocol on $X$.
+
+The specialization to isogeny graphs is now evident. We take:
 \begin{itemize}
-\item A finite abelian group $G$;
-\item A finite set $S$ of elements of $G$;
-\item A finite set $X$ on which $G$ acts simply transitively;
-\item A fixed element $x_0\in X$;
-\item For each $s\in S$, an integer $M_s\geq 1$.
+\item $X=\Ell_q(\O)$ as vertex set, for well chosen $q$ and $\O$;
+\item $G=\Cl(\O)$ as group acting on $X$;
+\item $S$ a set of ideals of the form $(π-λ,ℓ)$, where $ℓ$ is an
+  Elkies prime for the isogeny class $\Ell_q(\O)$, and $λ$ is a
+  Frobenius eigenvalue for $E[ℓ]$ (i.e.\ an integer in $ℤ/ℓℤ$).
 \end{itemize}
-We further ask that the action of $G$ on $X$ be \emph{computable}, in the sense
- that there is an algorithm \algstyle{Step} which, given $s\in S$ and $x\in X$ as
-input, computes the element $s\cdot x$. To explain the name, let $\Graph(G, S, X)$
-be the oriented graph whose vertices are the elements of $X$, and an edge labelled
-by $s\in S$ links $x_1$ to $x_2$ if $s\cdot x_1 = x_2$; then the algorithm
-\algstyle{Step} allows us to follow one edge in the graph. The graph $\Graph(G, S, X)$
-may be (at least theoretically, if not computationally) identified with the usual
-Cayley graph associated with the abelian group $G$ and the set $S$ of generators.
-Indeed we will see that the security of such schemes relies on the infeasibility
-of this identification.
+The graph $\Graph(G,S,X)$ is thus an isogeny graph, composed of many
+isogeny cycles superimposed on the same vertex set $\Ell_q(\O)$,
+isomorphic to a Cayley graph of $\Cl(\O)$, connected if $S$ generates
+$\Cl(\O)$, looking exactly like the one in Figure~\ref{fig:cayley}.
 
-As usual, two participants Alice and Bob want to build a common secret while
-communicating over an insecure channel. They may
-achieve this using the public data above as
-described in algorithms \ref{alg:keyex}, \ref{alg:key} and \ref{alg:walk}.
+We will call \emph{isogeny walk} a walk in this graph. The action of
+an ideal $\frak s=(π-λ,ℓ)$ on an elliptic curve $E∈\Ell_q(\O)$ will be
+evaluated by computing the unique isogeny $ϕ_{\frak s}:E→E'$ such that
+$π(P)=λP$ for all $P∈\ker ϕ$; algorithms for this operation are given
+in the next subsection. The action of an isogeny walk $(\frak s_i)_i$
+will be simply evaluated as the composition of each isogeny step
+$ϕ_{\frak s_i}$.
 
-\begin{algorithm}
-    \caption{\algstyle{KeyExchange}: key exchange using an abelian Cayley graph}
-    \label{alg:keyex}
-    \KwIn{Public data as above}
-    \KwOut{A secret $x_S\in X$ shared by Alice and Bob}
-    %		
-    Alice does\\
-			\quad $K_A \gets$ \algstyle{KeySample}()\;
-			\quad $x_A \gets$ \algstyle{Walk}$(K_A, x_0)$\;
-			\quad \textbf{publish} $x_A$ \;
-		Bob does\\
-			\quad $K_B \gets$ \algstyle{KeySample}()\;
-			\quad $x_B \gets$ \algstyle{Walk}$(K_B, x_0)$\;
-			\quad \textbf{publish} $x_B$ \;
-		Alice does\\
-			\quad $x_{S, A}$ = \algstyle{Walk}$(K_A, x_B)$\;
-		Bob does\\
-			\quad $x_{S, B}$ = \algstyle{Walk}$(K_B, x_A)$\;
-		\Return $x_S = x_{S, A} = x_{S, B}$
-\end{algorithm}
-
-\begin{algorithm}
-	\caption{\algstyle{KeySample}: construction of an ephemeral key}
-	\label{alg:key}
-	\KwIn{Public data as above}
-	\KwOut{An ephemeral key}
-	%
-	\For{$s\in S$}{
-		$k_s \overset{R}{\gets} [0, M_s]$ \quad (uniformly at random)
-	}
-	\Return{$(k_s)_{s\in S}$}
-\end{algorithm}
-
-\begin{algorithm}
-	\caption{\algstyle{Walk}: a walk in the abelian Cayley graph}
-	\label{alg:walk}
-	\KwIn{Public data as above; an ephemeral key $K = (k_s)_{s\in S}$; a point $x_I\in X$}
-	\KwOut{The element $x_F = (\prod_{s\in S} s^{k_s})\cdot x_I$}
-	%
-	$x_F\gets x_I$\;
-	\For{$s\in S$}{
-		\lFor{\(0 \le i < k_s\)}{
-			$x_F\gets$ \algstyle{Step}$(s, x_F)$
-		}
-	}
-	\Return $x_F$
-\end{algorithm}
-
-As the reader may see, this key exchange framework is based on the computation
-of several walks in the graph $\Graph(G, S, X)$. Alice and Bob are allowed to
-compute steps in the directions specified by the elements of $S$, and the integers
-$M_s$ play the role of the maximal number of steps that will be computed
-for each generator. Of course, when both $s$ and $s^{-1}$ appear in $S$, one
-of $k_s$ and $k_{s^{-1}}$ should be zero, since the steps would otherwise
-annihilate each other.
-An important remark is that there is no need to represent
-elements of $G$ at all in this protocol, or to compute with them directly,
-outside the algorithm \algstyle{Step}.
-
-When designing practical instances of abelian Cayley graph
-protocols, the main degrees of liberty are the choice of the generators themselves,
-and the bounds $M_s$. The cost of the key exchange is a weighted
-sum of the $M_s$, while the key space size is the product of these integers. When
-the number of generators is sufficient, there is therefore an exponential gap
-between the key space size and the cost of the walks.
-
-Of course, in order to be
-cryptographically interesting, the action of the group $G$ on $X$ must in particular
-be difficult to \emph{invert}: $x_1, x_2\in X$ being given, finding a combination
-$g\in G$ of the generators such that $g\cdot x_1 = x_2$ must be a hard problem.
-This is the main reason why this framework cannot usually be used with
-Cayley graphs given by multiplication in the group, since division in $G$ is usually
-a simple operation. To be more precise, the security of this key exchange relies
-on the difficulty of the following Diffie--Hellman-like problems:
-
-\begin{prob}[Group Action Decisional Diffie--Hellman (GADDH) problem] Let $x, y\in X$,
-$a, b\in G$. Given $x,\ y,\ a\cdot x$ and $b\cdot x$, decide whether $(ab)\cdot x = y$.
-\end{prob}
-
-\begin{prob}[Group Action Computational Diffie--Hellman (GACDH) problem] Let $x\in X$,
-$a, b\in G$. Given $x,\ a\cdot x$ and $b\cdot x$, compute $(ab)\cdot x$.
-\end{prob}
-
-For a particular family of group actions, we will call GADDH assumption the assumption
-that the GADDH problem is computationally infeasible, in the sence that the advantage
-given by any polynomial-time algorithm is a negligible function of the security parameter
-$\log(\Card(G))$.
+Both Couveignes' and Rostovtsev and Stolbunov's cryptosystems are
+special instances of the latter protocol, differing essentially in the
+way walks are sampled and evaluated. In the next subsection, we
+describe our own take on the protocol.
 
 \subsection{Presentation of the protocol}
 
-The idea of Rostovtsev and Stolbunov is to instanciate this general framework
-using the theory of complex multiplication.
 Let us fix an ordinary elliptic curve $E_0$ over a finite field $k$, with
 endomorphism ring $\O$. Then the ideal class group of $\O$ will play the role of
 the abelian group $G$, and the set $X$ is the set $\Ell_k(\O)$ of elliptic curves
@@ -1011,6 +1056,31 @@ scheme in our implementation.
 \section{Security}
 \label{sec:sec}
 
+% todo: integrate this
+
+% Of course, in order to be
+% cryptographically interesting, the action of the group $G$ on $X$ must in particular
+% be difficult to \emph{invert}: $x_1, x_2\in X$ being given, finding a combination
+% $g\in G$ of the generators such that $g\cdot x_1 = x_2$ must be a hard problem.
+% This is the main reason why this framework cannot usually be used with
+% Cayley graphs given by multiplication in the group, since division in $G$ is usually
+% a simple operation. To be more precise, the security of this key exchange relies
+% on the difficulty of the following Diffie--Hellman-like problems:
+
+% \begin{prob}[Group Action Decisional Diffie--Hellman (GADDH) problem] Let $x, y\in X$,
+% $a, b\in G$. Given $x,\ y,\ a\cdot x$ and $b\cdot x$, decide whether $(ab)\cdot x = y$.
+% \end{prob}
+
+% \begin{prob}[Group Action Computational Diffie--Hellman (GACDH) problem] Let $x\in X$,
+% $a, b\in G$. Given $x,\ a\cdot x$ and $b\cdot x$, compute $(ab)\cdot x$.
+% \end{prob}
+
+% For a particular family of group actions, we will call GADDH assumption the assumption
+% that the GADDH problem is computationally infeasible, in the sence that the advantage
+% given by any polynomial-time algorithm is a negligible function of the security parameter
+% $\log(\Card(G))$.
+
+
 In this section, we study the security offered by our key exchange protocol
 in the classical as well as quantum setting. To be brief, it relies on
 the following assumptions:
@@ -1300,4 +1370,5 @@ gain by a factor at least 2.
 
 %  LocalWords:  Rostovtsev Stolbunov isogenies morphism isogeny
 %  LocalWords:  isomorphism coprime isogenous endomorphism bijection
-%  LocalWords:  Endomorphisms cryptosystem Elkies Frobenius
+%  LocalWords:  Endomorphisms cryptosystem Elkies Frobenius torsor
+%  LocalWords:  Couveignes isomorphisms undirected Schreier
