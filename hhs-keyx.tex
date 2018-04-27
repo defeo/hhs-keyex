@@ -428,7 +428,7 @@ be used to construct a key exchange as follows:
 If $X$ is a cyclic group $〈x〉$ of order $p$, and $G=ℤ/pℤ$ acting on
 $X$ by $g·x=x^g$, then this is simply the Diffie-Hellman key exchange:
 security is based on the difficulty of the discrete logarithm problem
-in $G$. %todo: in X?
+in $X$.
 
 More generally, if $X$ is a \emph{hard homogeneous space}, i.e.\ one
 such that given $x,y∈X$ it is hard to find $g∈G$ such that $g·x=y$,
@@ -806,6 +806,24 @@ scheme in our implementation.
 \section{Security}
 \label{sec:sec}
 
+We now address the security of our proposed scheme, and related
+protocols. Intuitively, these systems rely on two assumptions:
+\begin{enumerate}
+\item Given two elliptic curves $E,E'$ in $\Ell_q(\O)$, it is hard to
+  find a (smooth degree) isogeny $ϕ:E→E'$;
+\item The distribution on $\Ell_q(\O)$ induced by the random walks
+  sampled in Algorithm~\ref{alg:keyex} is computationally
+  undistinguishable from the uniform distribution.
+\end{enumerate}
+
+We start by reviewing the known attacks for the first problem, both in
+the classical and the quantum setting. Then, we formalize security
+assumptions and give security proofs against passive
+adversaries. Finally, we discuss key validation and protection against
+active adversaries.
+
+
+
 % todo: integrate this
 
 % Of course, in order to be
@@ -829,19 +847,6 @@ scheme in our implementation.
 % that the GADDH problem is computationally infeasible, in the sence that the advantage
 % given by any polynomial-time algorithm is a negligible function of the security parameter
 % $\log(\Card(G))$.
-
-
-In this section, we study the security offered by our key exchange protocol
-in the classical as well as quantum setting. To be brief, it relies on
-the following assumptions:
-
-\begin{itemize}
-\item[(1)] The distribution in the isogeny graph of
-end points of random walks (algorithms~\ref{alg:key} and~\ref{alg:walk})
-are computationnally undistinguishable from the uniform distribution;
-\item[(2)] Finding an isogeny path between two random elliptic curves with the
-same cardinality is a difficult problem.
-\end{itemize}
 
 %todo: some kind of security proof (reduction to diffie-hellman-like (2) given (1)) ?
 We first address assertion (2), which has already been well studied and

@@ -154,35 +154,6 @@
   posted-at    = {2012-07-06 21:19:47},
 }
 
-@Electronic{galbraith+stolbunov11,
-  author        = {Galbraith, Steven D. and Stolbunov, Anton},
-  month         = may,
-  year          = {2011},
-  title         = {Improved Algorithm for the Isogeny Problem for Ordinary Elliptic Curves},
-  url           = {http://arxiv.org/abs/1105.6331/},
-  abstract      = {A low storage algorithm for constructing isogenies between ordinary elliptic
-curves was proposed by Galbraith, Hess and Smart ({GHS}). We give an improvement
-of this algorithm by modifying the pseudorandom walk so that lower-degree
-isogenies are used more frequently. This is motivated by the fact that high
-degree isogenies are slower to compute than low degree ones. We analyse the
-running time of the parallel collision search algorithm when the partitioning
-is uneven. We also give experimental results. We conclude that our algorithm is
-around 14 times faster than the {GHS} algorithm when constructing horizontal
-isogenies between random isogenous elliptic curves over a 160-bit prime field.
-
-
-The results apply to generic adding walks and the more general group action
-inverse problem; a speed-up is obtained whenever the cost of computing edges in
-the graph varies significantly.},
-  archiveprefix = {arXiv},
-  comment       = {\url{http://arxiv.org/abs/1105.6331/}},
-  day           = {31},
-  eprint        = {1105.6331},
-  groups        = {Isogenies},
-  keywords      = {elliptic\_curve, isogenies},
-  posted-at     = {2012-07-06 21:19:46},
-}
-
 @Article{Stol,
   author               = {Stolbunov, Anton},
   title                = {Constructing public-key cryptographic schemes based on class group action on a set of isogenous elliptic curves},
@@ -438,11 +409,31 @@ the graph varies significantly.},
   isbn      = {978-3-540-44598-2},
 }
 
-@Article{stolbunov2012cryptographic,
-  author    = {Stolbunov, Anton},
-  title     = {Cryptographic schemes based on isogenies},
-  year      = {2012},
-  publisher = {Norges teknisk-naturvitenskapelige universitet, Fakultet for informasjonsteknologi, matematikk og elektroteknikk, Institutt for telematikk},
+@Thesis{Stolbunov2012,
+  author      = {Stolbunov, Anton},
+  title       = {Cryptographic schemes based on isogenies},
+  year        = {2012},
+  date        = {2012-01},
+  institution = {Norges teknisk-naturvitenskapelige universitet, Fakultet for informasjonsteknologi, matematikk og elektroteknikk, Institutt for telematikk},
+  type        = {phdthesis},
+}
+
+@Article{galbraith+stolbunov11,
+  author   = {Galbraith, Steven and Stolbunov, Anton},
+  title    = {Improved algorithm for the isogeny problem for ordinary elliptic curves},
+  journal  = {Applicable Algebra in Engineering, Communication and Computing},
+  year     = {2013},
+  volume   = {24},
+  number   = {2},
+  pages    = {107--131},
+  month    = {Jun},
+  issn     = {1432-0622},
+  abstract = {A low storage algorithm for constructing isogenies between ordinary elliptic curves was proposed by Galbraith, Hess and Smart (GHS). We give an improvement of this algorithm by modifying the pseudorandom walk so that lower-degree isogenies are used more frequently. This is motivated by the fact that high degree isogenies are slower to compute than low degree ones. We analyse the running time of the parallel collision search algorithm when the partitioning is uneven. We also give experimental results. We conclude that our algorithm is around                                                                           {\$}{\$}14{\$}{\$}                 times faster than the GHS algorithm when constructing horizontal isogenies between random isogenous elliptic curves over a                                                                           {\$}{\$}160{\$}{\$}                -bit prime field. The results apply to generic adding walks and the more general group action inverse problem; a speed-up is obtained whenever the cost of computing edges in the graph varies significantly.},
+  day      = {01},
+  doi      = {10.1007/s00200-013-0185-0},
+  groups   = {Isogenies},
+  keywords = {elliptic\_curve, isogenies},
+  url      = {https://doi.org/10.1007/s00200-013-0185-0},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
