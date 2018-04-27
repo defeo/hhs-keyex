@@ -37,6 +37,7 @@
 \newtheorem{prop}[theorem]{Proposition}
 \theoremstyle{definition}
 \newtheorem{prob}[theorem]{Problem}
+\newtheorem{remark}[theorem]{Remark}
 
 \DeclareMathOperator{\End}{End}
 \DeclareMathOperator{\Ker}{Ker}
@@ -329,6 +330,9 @@ we have a bijection
 \text{Ideal class of }\frak a &\mapsto \text{Isomorphism class of }\frak a\cdot E.
 \end{aligned}
 \]
+The order of $\Cl(\O)$ is called the \emph{class number} of $\O$, and
+denoted by $h(\O)$. An immediate consequence of the theorem is that
+$\#\Ell_q(\O)=h(\O)$.
 
 Let now $ℓ$ be an Elkies prime for $E$, so far we have seen that the
 connected component of $E$ in the $ℓ$-isogeny graph is a cycle of
@@ -428,7 +432,7 @@ be used to construct a key exchange as follows:
 If $X$ is a cyclic group $〈x〉$ of order $p$, and $G=ℤ/pℤ$ acting on
 $X$ by $g·x=x^g$, then this is simply the Diffie-Hellman key exchange:
 security is based on the difficulty of the discrete logarithm problem
-in $G$. %todo: in X?
+in $X$.
 
 More generally, if $X$ is a \emph{hard homogeneous space}, i.e.\ one
 such that given $x,y∈X$ it is hard to find $g∈G$ such that $g·x=y$,
@@ -712,6 +716,7 @@ public parameters in reasonable time.
 \section{Public parameter selection}
 \label{sec:initcurve}
 
+% todo: put here remark on uselessness of complex multiplication method
 
 In this section, we describe how to use the Schoof--Elkies--Atkin (SEA) point counting
 algorithm with early abort, combined with the use of certain modular curves,
@@ -806,6 +811,155 @@ scheme in our implementation.
 \section{Security}
 \label{sec:sec}
 
+We now address the security of our proposed scheme, and related
+protocols. Intuitively, these systems rely on two assumptions:
+\begin{enumerate}
+\item Given two elliptic curves $E,E'$ in $\Ell_q(\O)$, it is hard to
+  find a (smooth degree) isogeny $ϕ:E→E'$;
+\item The distribution on $\Ell_q(\O)$ induced by the random walks
+  sampled in Algorithm~\ref{alg:keyex} is computationally
+  undistinguishable from the uniform distribution.
+\end{enumerate}
+
+We start by reviewing the known attacks for the first problem, both in
+the classical and the quantum setting. Then, we formalize security
+assumptions and give security proofs against passive adversaries.
+Finally, we discuss key validation and protection against active
+adversaries.
+
+\subsection{Attacks}
+\label{sec:attacks}
+
+We start by addressing the following, more general, problem:
+
+\begin{prob}
+  Given two ordinary elliptic curves $E,E'$ defined over a finite
+  field $\F_q$, such that $\#E(\F_q)=\#E'(\F_q)$, find an isogeny walk
+  $(ϕ_i)_{1≤i≤n}$ such that $ϕ_n∘\cdots∘ϕ_1(E)=E'$.
+\end{prob}
+
+This problem has been studied for some time before the emergence of
+isogeny-based cryptography~\cite{Gal,GHS,galbraith+stolbunov11},
+because of its applications to elliptic curve
+cryptography~\cite{GHS,teske06,jao+miller+venkatesan09}.  The
+algorithm with the best asymptotic complexity is due to Galbraith,
+Hess and Smart~\cite{GHS}; it consists of three stages:
+\begin{description}
+\item[Stage 0.] Use \emph{ascending} walks to reduce to the case where
+  $\End(E)=\End(E')$ is the maximal order.
+\item[Stage 1.] Start two random walks from $E$ and $E'$; detect the
+  moment when they collide using a Pollard-rho type of algorithm.
+\item[Stage 2.] Reduce the size of the obtained walk using
+  index-calculs techniques.
+\end{description}
+
+To understand Stage~0, recall that all isogenous elliptic curves have
+the same order, and thus the same trace $t$ of the Frobenius
+endomorphism $π$. Define the Frobenius discriminant $Δ_π=t^2-4q$, then
+$\End(E)$ is contained in the ring of integers $\O_K$ of
+$K=ℚ(\sqrt{Δ_π})$. Write $Δ_π=d^2Δ_K$, where $Δ_K$ is the
+discriminant\footnote{$Δ_K$ is also called a \emph{fundamental
+    discriminant}; it is in $\{0,1\}\bmod 4$, and either $Δ_K$ or
+  $Δ_K/4$ is squarefree.} of $\O_k$, then for any $ℓ\mid d$ the
+$ℓ$-isogeny graph of $E$ contains \emph{ascending} and
+\emph{descending} isogenies and is sometimes referred to as a
+\emph{volcano}~\cite{fouquet+morain02} (see Figure~\ref{fig:volcano}).
+Ascending isogenies go from curves with smaller endomorphism rings to
+curves with larger ones, and take us to a curve with $\End(E)≃\O_K$ in
+$O(\log d)$ steps; they can be computed efficiently using the
+algorithms
+of~\cite{kohel,fouquet+morain02,ionica+joux13,defeo2016explicit},
+thus, assuming $d$ does not contain any large factor, Step~0 can be
+accomplished in time polynomial in $\log q$.
+
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \def\crater{7}
+    \foreach \i in {1,...,\crater} {
+      \draw[fill] (360/\crater*\i:1cm) circle (5pt);
+      \draw (360/\crater*\i : 1cm) -- (360/\crater*\i+360/\crater : 1cm);
+      \foreach \j in {-1,1} {
+        \draw[fill] (360/\crater*\i : 1cm) -- (360/\crater*\i + \j*360/\crater/4 : 2cm) circle (3pt);
+        \foreach \k in {-1,0,1} {
+          \draw[fill] (360/\crater*\i + \j*360/\crater/4 : 2cm) --
+          (360/\crater*\i + + \j*360/\crater/4 + \k*360/\crater/6 : 2.5cm) circle (1pt);
+        }
+      }
+    }
+  \end{tikzpicture}
+  \caption{$3$-isogeny graph (\emph{volcano}) containing the curve
+    with $j(E)=607$ over $\F_{6007}$. A larger vertex denotes a larger
+    endomorphism ring.}
+  \label{fig:volcano}
+\end{figure}
+
+The class $\Ell_q(\O_K)$ is the smallest among all classes
+$\Ell_q(\O)$ for some $\O⊂\O_K$, thus it is always interesting to
+reduce to it. This justifies using curves with maximal endomorphism
+ring in the definition of the protocol in
+Section~\ref{sec:keyex}. Remark that, when $Δ_π$ is square-free $ℤ[π]$
+is the maximal order, hence this condition is automatically satisfied.
+
+The collision search in Stage~1 relies on the birthday paradox, thus
+it has a complexity of $O(\sqrt{h})$, where $h=\#\Ell_q(\O_K)$ is the
+class number of $\O_K$.  It is known that, on average,
+$h(\O_K)≈0.461\dots\sqrt{|Δ_K|}$ (see~\cite[5.10]{Cohen1993}), and,
+assuming the extended Riemann hypothesis, we even have a lower bound
+(see~\cite{littlewood1928class})
+\[h(\O_K) ≥ 0.147\cdots\frac{(1+o(1))\sqrt{|Δ_K|}}{\log\log|Δ|}.\]
+Given that $Δ_K\sim q$, we expect Stage~1 to take time $O(q^{1/4})$,
+thus justifying the choice of a $q$ four times as large as the
+security parameter.  Unfortunately, the class number is notoriously
+difficult to compute, the current record being the computation of
+$h(\O_K)$ for a discriminant of 300
+bits~\cite{10.1007/978-3-642-14081-5_15}. The computation of the class
+number for a discriminant of $\sim 500$ bits seems to be expensive,
+albeit feasible, thus we will only rely on these heuristic arguments
+to justify the security of our proposed parameters.
+% todo: check this is really the latest record
+
+Finally, Stage~2 has a complexity bounded by that of Stage~1, and
+outputs an isogeny walk of size polynomial in $\log q$, it thus has no
+impact on our security estimates.
+
+\begin{remark}
+  The Coehn-Lenstra heuristic~\cite{10.1007/BFb0099440} predicts that
+  the odd part of $\Cl(\O_K)$ is be cyclic with overwhelming
+  probability; and more heuristics~\cite{10.1007/3-540-44448-3_18}
+  indicate that $h(\O_K)$ is likely have a large prime factor.
+  However, there is no known way in which the group structure of
+  $\Cl(\O_K)$ affect the security of our protocol, we can thus
+  disregard this matter.
+\end{remark}
+
+In the quantum setting, a subexponential algorithm exists as mentioned
+in the introduction. The following result is taken
+from~\cite{childs2014constructing}:
+
+\begin{theorem}
+Assuming the Generalized Riemann Hypothesis (GRH), there is
+a quantum algorithm which, given the same input as above,
+computes an isogeny path from $E$ to $E'$ using either
+\begin{itemize}
+\item $O(L_q(\frac{1}{2},\frac{1}{\sqrt{2}}))$ time and
+superpolynomial space,
+\item $O(L_q(\frac{1}{2},\frac{3}{\sqrt{2}}))$ time and
+polynomial space.
+\end{itemize}
+\end{theorem}
+
+Although this subexponential attacks exists, we argue that it brings
+no improvement over the classical one at the 128-bit security
+level. Indeed, superpolynomial quantum space is not likely to be
+feasible~\cite{todo:qubits}, and for $q\simeq 2^{512}$ we have
+$q^{1/4} \ll L_q(\frac{1}{2}, \frac{3}{\sqrt{2}}).$
+
+\subsection{Security proofs}
+\label{sec:proofs}
+
+
 % todo: integrate this
 
 % Of course, in order to be
@@ -830,96 +984,13 @@ scheme in our implementation.
 % given by any polynomial-time algorithm is a negligible function of the security parameter
 % $\log(\Card(G))$.
 
-
-In this section, we study the security offered by our key exchange protocol
-in the classical as well as quantum setting. To be brief, it relies on
-the following assumptions:
-
-\begin{itemize}
-\item[(1)] The distribution in the isogeny graph of
-end points of random walks (algorithms~\ref{alg:key} and~\ref{alg:walk})
-are computationnally undistinguishable from the uniform distribution;
-\item[(2)] Finding an isogeny path between two random elliptic curves with the
-same cardinality is a difficult problem.
-\end{itemize}
-
 %todo: some kind of security proof (reduction to diffie-hellman-like (2) given (1)) ?
 We first address assertion (2), which has already been well studied and
 is used in the vast majority of isogeny-based cryptosystem, before
 assertion (1) which is more specific to our protocol and depends on
 several number-theoretic heuristic hypotheses.
 
-\subsection{Finding isogeny paths}
 
-According to section~\ref{sec:math}, any two elliptic curves $E$
-and $E'$ defined over $\F_q$ with the same number of points are
-linked by an isogeny $\phi: E\to E'$. This isogeny can be
-efficiently represented as a path of cyclic prime-degree isogenies.
-
-No polynomial-time algorithm that computes this path for
-random $E$, $E'$ is known. In the classical setting, the best
-answer at this time is a ``meet-in-the-middle''-type algorithm
-given by~\cite{Gal}:
-
-\begin{theorem}
-Assuming the Riemann Hypothesis for quadratic fields (and
-some other heuristic assumptions),
-there is an algorithm which, given as input $E$, $E'$ with the
-same number of points $q+1-t$ over $\F_q$, computes an isogeny path
-from $E$ to $E'$.
-
-Let $K = \Q(\pi)$ where $\pi^2 - t \pi + q = 0$. Let $h$ be the
-class number of $\O_K$, and $c$ be the conductor of $\Z[\pi]$ in
-$\O_K$.
-\begin{itemize}
-\item[(a)] In the worst case, the algorithm requires $O(q^{3/2}\ln q)$
-time and $O(q\ln q)$ space.
-\item[(b)] If $c$ is $\ln(q)$-smooth, the algorithm requires
-$O(q^{1/4}\ln(q)^{13/2})$ time and $O(q^{1/4})$ space.
-\item[(c)] If $c$ is $\ln(q)$-smooth and $h$ is small
-($h = O(\ln(q)^N)$ for some $N$), then the algorithm runs in
-polynomial time.
-\end{itemize}
-\end{theorem}
-
-This algorithm may be improved to have only polynomial space
-requirement~\cite{GHS, galbraith+stolbunov11}.
-
-The worst case should be discarded in our setting for two reasons.
-First, no reasonable method seems to exist to generate elliptic curves
-whose conductor has a large prime factor. Second, it is easy to see that
-an $\softO(q^{1/4})$ algorithm exists, even if $c$ has large prime factors,
-provided that $E$ and $E'$ have the same endomorphism ring: one simply
-skips Stage 1 of~\cite{Gal}.
-Therefore, in order to avoid polynomial-time attacks, it is important
-to ensure that the class number $h$ has exponential size. In fact, the
-time complexity of this attack is $\softO(\sqrt{h})$. As a consequence,
-the CM method~\cite{todo:CMmethod}, that constructs elliptic curves
-with prescribed cardinalities using \emph{small} class numbers,
-must be discarded in our setting.
-
-
-In the quantum setting, a subexponential algorithm exists as mentioned
-in the introduction. The following result is taken
-from~\cite{childs2014constructing}:
-
-\begin{theorem}
-Assuming the Generalized Riemann Hypothesis (GRH), there is
-a quantum algorithm which, given the same input as above,
-computes an isogeny path from $E$ to $E'$ using either
-\begin{itemize}
-\item $O(L_q(\frac{1}{2},\frac{1}{\sqrt{2}}))$ time and
-superpolynomial space,
-\item $O(L_q(\frac{1}{2},\frac{3}{\sqrt{2}}))$ time and
-polynomial space.
-\end{itemize}
-\end{theorem}
-
-Although this subexponential attacks exists, we argue that
-it brings no improvement over the classical one at the
-128-bit security level. Indeed, superpolynomial quantum space
-is not likely to be feasible~\cite{todo:qubits}, and for $q\simeq 2^{512}$
-we have $q^{1/4} \ll L_q(\frac{1}{2}, \frac{3}{\sqrt{2}}).$
 
 \subsection{The distribution of random walks}
 

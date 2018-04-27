@@ -154,35 +154,6 @@
   posted-at    = {2012-07-06 21:19:47},
 }
 
-@Electronic{galbraith+stolbunov11,
-  author        = {Galbraith, Steven D. and Stolbunov, Anton},
-  month         = may,
-  year          = {2011},
-  title         = {Improved Algorithm for the Isogeny Problem for Ordinary Elliptic Curves},
-  url           = {http://arxiv.org/abs/1105.6331/},
-  abstract      = {A low storage algorithm for constructing isogenies between ordinary elliptic
-curves was proposed by Galbraith, Hess and Smart ({GHS}). We give an improvement
-of this algorithm by modifying the pseudorandom walk so that lower-degree
-isogenies are used more frequently. This is motivated by the fact that high
-degree isogenies are slower to compute than low degree ones. We analyse the
-running time of the parallel collision search algorithm when the partitioning
-is uneven. We also give experimental results. We conclude that our algorithm is
-around 14 times faster than the {GHS} algorithm when constructing horizontal
-isogenies between random isogenous elliptic curves over a 160-bit prime field.
-
-
-The results apply to generic adding walks and the more general group action
-inverse problem; a speed-up is obtained whenever the cost of computing edges in
-the graph varies significantly.},
-  archiveprefix = {arXiv},
-  comment       = {\url{http://arxiv.org/abs/1105.6331/}},
-  day           = {31},
-  eprint        = {1105.6331},
-  groups        = {Isogenies},
-  keywords      = {elliptic\_curve, isogenies},
-  posted-at     = {2012-07-06 21:19:46},
-}
-
 @Article{Stol,
   author               = {Stolbunov, Anton},
   title                = {Constructing public-key cryptographic schemes based on class group action on a set of isogenous elliptic curves},
@@ -438,11 +409,123 @@ the graph varies significantly.},
   isbn      = {978-3-540-44598-2},
 }
 
-@Article{stolbunov2012cryptographic,
-  author    = {Stolbunov, Anton},
-  title     = {Cryptographic schemes based on isogenies},
-  year      = {2012},
-  publisher = {Norges teknisk-naturvitenskapelige universitet, Fakultet for informasjonsteknologi, matematikk og elektroteknikk, Institutt for telematikk},
+@Thesis{Stolbunov2012,
+  author      = {Stolbunov, Anton},
+  title       = {Cryptographic schemes based on isogenies},
+  year        = {2012},
+  date        = {2012-01},
+  institution = {Norges teknisk-naturvitenskapelige universitet, Fakultet for informasjonsteknologi, matematikk og elektroteknikk, Institutt for telematikk},
+  type        = {phdthesis},
+}
+
+@Article{galbraith+stolbunov11,
+  author   = {Galbraith, Steven and Stolbunov, Anton},
+  title    = {Improved algorithm for the isogeny problem for ordinary elliptic curves},
+  journal  = {Applicable Algebra in Engineering, Communication and Computing},
+  year     = {2013},
+  volume   = {24},
+  number   = {2},
+  pages    = {107--131},
+  month    = {Jun},
+  issn     = {1432-0622},
+  abstract = {A low storage algorithm for constructing isogenies between ordinary elliptic curves was proposed by Galbraith, Hess and Smart (GHS). We give an improvement of this algorithm by modifying the pseudorandom walk so that lower-degree isogenies are used more frequently. This is motivated by the fact that high degree isogenies are slower to compute than low degree ones. We analyse the running time of the parallel collision search algorithm when the partitioning is uneven. We also give experimental results. We conclude that our algorithm is around                                                                           {\$}{\$}14{\$}{\$}                 times faster than the GHS algorithm when constructing horizontal isogenies between random isogenous elliptic curves over a                                                                           {\$}{\$}160{\$}{\$}                -bit prime field. The results apply to generic adding walks and the more general group action inverse problem; a speed-up is obtained whenever the cost of computing edges in the graph varies significantly.},
+  day      = {01},
+  doi      = {10.1007/s00200-013-0185-0},
+  groups   = {Isogenies},
+  keywords = {elliptic\_curve, isogenies},
+  url      = {https://doi.org/10.1007/s00200-013-0185-0},
+}
+
+@Article{teske06,
+  author               = {Teske, Edlyn},
+  title                = {An Elliptic Curve Trapdoor System},
+  journal              = {Journal of Cryptology},
+  year                 = {2006},
+  volume               = {19},
+  number               = {1},
+  pages                = {115-133},
+  month                = jan,
+  issn                 = {0933-2790},
+  abstract             = {Abstract\&nbsp;\&nbsp; We propose an elliptic curve trapdoor system which is of interest in key escrow applications. In this system, a pair (Es, Epb) of elliptic curves over F2161 is constructed with the following properties: (i) the {Gaudry-Hess}-Smart Weil descent attack reduces the elliptic curve discrete logarithm problem ({ECDLP}) in {Es(F2161}) to a hyperelliptic curve {DLP} in the Jacobian of a curve of genus 7 or 8, which is computationally feasible, but by far not trivial; (ii) Es is isogenous to Es; (iii) the best attack on the {ECDLP} in {Es(F2161}) is the parallelized Pollard rho method. The curve Es is used just as usual in elliptic curve cryptosystems. The curve Es is submitted to a trusted authority for the purpose of key escrow. The crucial difference from other key escrow scenarios is that the trusted authority has to invest a considerable amount of computation to compromise a user's private key, which makes applications such as widespread wire-tapping impossible.},
+  citeulike-article-id = {7300913},
+  citeulike-linkout-0  = {http://dx.doi.org/10.1007/s00145-004-0328-3},
+  citeulike-linkout-1  = {http://www.springerlink.com/content/l489q503440l6v72},
+  day                  = {6},
+  doi                  = {10.1007/s00145-004-0328-3},
+  groups               = {Isogenies},
+  keywords             = {elliptic\_curve, finite\_field, ghs, isogenies, isogeny\_cycles, weil\_descent},
+  posted-at            = {2010-06-14 19:35:50},
+  url                  = {http://dx.doi.org/10.1007/s00145-004-0328-3},
+}
+
+@Article{defeo2016explicit,
+  author    = {De Feo, Luca and Hugounenq, Cyril and Pl{\^u}t, J{\'e}r{\^o}me and Schost, {\'E}ric},
+  title     = {Explicit isogenies in quadratic time in any characteristic},
+  journal   = {LMS Journal of Computation and Mathematics},
+  year      = {2016},
+  volume    = {19},
+  number    = {A},
+  pages     = {267--282},
+  groups    = {Isogenies},
+  publisher = {London Mathematical Society},
+}
+
+@InProceedings{10.1007/978-3-642-14081-5_15,
+  author    = {Biasse, Jean-Fran{\c{c}}ois and Jacobson, Michael J. and Silvester, Alan K.},
+  title     = {Security Estimates for Quadratic Field Based Cryptosystems},
+  booktitle = {Information Security and Privacy},
+  year      = {2010},
+  editor    = {Steinfeld, Ron and Hawkes, Philip},
+  pages     = {233--247},
+  address   = {Berlin, Heidelberg},
+  publisher = {Springer Berlin Heidelberg},
+  abstract  = {We describe implementations for solving the discrete logarithm problem in the class group of an imaginary quadratic field and in the infrastructure of a real quadratic field. The algorithms used incorporate improvements over previously-used algorithms, and extensive numerical results are presented demonstrating their efficiency. This data is used as the basis for extrapolations, used to provide recommendations for parameter sizes providing approximately the same level of security as block ciphers with 80, 112, 128, 192, and 256-bit symmetric keys.},
+  isbn      = {978-3-642-14081-5},
+}
+
+@InProceedings{10.1007/3-540-44448-3_18,
+  author    = {Hamdy, Safuat and M{\"o}ller, Bodo},
+  title     = {Security of Cryptosystems Based on Class Groups of Imaginary Quadratic Orders},
+  booktitle = {Advances in Cryptology --- ASIACRYPT 2000},
+  year      = {2000},
+  editor    = {Okamoto, Tatsuaki},
+  pages     = {234--247},
+  address   = {Berlin, Heidelberg},
+  publisher = {Springer Berlin Heidelberg},
+  abstract  = {In this work we investigate the dificulty of the discrete logarithm problem in class groups of imaginary quadratic orders.In particular, we discuss several strategies to compute discrete logarithms in those class groups.Based on heuristic reasoning, we give advice for selecting the cryptographic parameter, i.e. the discriminant, such that cryptosystems based on class groups of imaginary quadratic orders would offer a similar security as commonly used cryptosystems.},
+  isbn      = {978-3-540-44448-0},
+}
+
+@Book{Cohen1993,
+  title     = {A Course in Computational Algebraic Number Theory},
+  publisher = {Springer-Verlag New York, Inc.},
+  year      = {1993},
+  author    = {Cohen, Henri},
+  address   = {New York, NY, USA},
+  isbn      = {0-387-55640-0},
+}
+
+@Article{littlewood1928class,
+  author    = {Littlewood, John E},
+  title     = {On the Class-Number of the Corpus $P(\sqrt{k})$},
+  journal   = {Proceedings of the London Mathematical Society},
+  year      = {1928},
+  volume    = {2},
+  number    = {1},
+  pages     = {358--372},
+  publisher = {Wiley Online Library},
+}
+
+@InProceedings{10.1007/BFb0099440,
+  author    = {Cohen, Henri and Lenstra, Hendrik W.},
+  title     = {Heuristics on class groups of number fields},
+  booktitle = {Number Theory Noordwijkerhout 1983},
+  year      = {1984},
+  editor    = {Jager, Hendrik},
+  pages     = {33--62},
+  address   = {Berlin, Heidelberg},
+  publisher = {Springer Berlin Heidelberg},
+  isbn      = {978-3-540-38906-4},
 }
 
 @Comment{jabref-meta: databaseType:bibtex;}
