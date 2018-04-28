@@ -43,6 +43,7 @@
 \DeclareMathOperator{\Ker}{Ker}
 \DeclareMathOperator{\Card}{Card}
 \DeclareMathOperator{\Ell}{Ell}
+\DeclareMathOperator{\poly}{poly}
 
 \title{Towards practical key exchange from ordinary isogeny graphs}
 \author{Luca De Feo, Jean Kieffer, Benjamin Smith}
@@ -830,6 +831,7 @@ adversaries.
 \subsection{Attacks}
 \label{sec:attacks}
 
+\paragraph{Classical attacks.}
 We start by addressing the following, more general, problem:
 
 \begin{prob}
@@ -869,9 +871,10 @@ curves with larger ones, and take us to a curve with $\End(E)≃\O_K$ in
 $O(\log d)$ steps; they can be computed efficiently using the
 algorithms
 of~\cite{kohel,fouquet+morain02,ionica+joux13,defeo2016explicit},
-thus, assuming $d$ does not contain any large factor, Step~0 can be
-accomplished in time polynomial in $\log q$.
-
+thus, Stage~0 can be accomplished\footnote{This statement is assuming
+  that all prime factors of $d$ are in $O(\log q)$, which is typically
+  the case for isogeny-based protocols.}  in time polynomial in
+$\log q$.
 
 \begin{figure}
   \centering
@@ -934,27 +937,62 @@ impact on our security estimates.
   disregard this matter.
 \end{remark}
 
-In the quantum setting, a subexponential algorithm exists as mentioned
-in the introduction. The following result is taken
-from~\cite{childs2014constructing}:
+\paragraph{Quantum attacks.}
+On a quantum computer, an attack with better asymptotic complexity is
+given in~\cite{childs2014constructing}. It consists of two algorithms:
+\begin{enumerate}
+\item A (classical) algorithm that takes as input an elliptic curve
+  $E∈\Ell_q(\O)$ and an ideal $\frak a∈\Cl(\O)$, and outputs the curve
+  $\frak a·E$;
+\item A generic quantum algorithm for the dihedral hidden subgroup
+  problem (dHSP), based upon previous work of Kuperberg~\cite{Kup} and
+  Regev~\cite{regev04}.
+\end{enumerate}
 
-\begin{theorem}
-Assuming the Generalized Riemann Hypothesis (GRH), there is
-a quantum algorithm which, given the same input as above,
-computes an isogeny path from $E$ to $E'$ using either
+The ideal evaluation algorithm has sub-exponential complexity
+$L_q(\frac{1}{2},\frac{\sqrt{3}}{2})$.  The dHSP algorithm uses the
+ideal evaluation algorithm as a (quantum) black box, the number of
+queries depending on the variant:
 \begin{itemize}
-\item $O(L_q(\frac{1}{2},\frac{1}{\sqrt{2}}))$ time and
-superpolynomial space,
-\item $O(L_q(\frac{1}{2},\frac{3}{\sqrt{2}}))$ time and
-polynomial space.
+\item Kuperberg's algorithm uses $O(2^{\sqrt{\log q}})$ queries, and a
+  storage of $O(2^{\sqrt{\log q}})$ qubits;
+\item Regev's algorithm has worse query complexity, using
+  $L_q(\frac{1}{2},1)$ calls to the black box, but only requires a
+  storage of $\poly(\log q)$ qubits.
 \end{itemize}
-\end{theorem}
 
-Although this subexponential attacks exists, we argue that it brings
-no improvement over the classical one at the 128-bit security
-level. Indeed, superpolynomial quantum space is not likely to be
-feasible~\cite{todo:qubits}, and for $q\simeq 2^{512}$ we have
-$q^{1/4} \ll L_q(\frac{1}{2}, \frac{3}{\sqrt{2}}).$
+Based on these estimates, we expect the bit size of $q$ to grow at
+worst like the square of the security parameter. However, given that
+the constants implied in the complexities are not made explicit, it is
+hard to estimate the impact of this attack at concrete security levels
+such as those required by NIST~\cite{NIST2016}. Nevertheless, we
+remark that the weaker version of Kuperberg's algorithm, as described
+in~\cite[§2.1]{regev04}, requires about $2^{\sqrt{8\log q}}$ queries
+to the black box; this number can be taken as a very conservative
+lower bound, given that the described algorithm is specific to
+$h(O_K)=2^n$, and also because Regev's algorithm, with its polynomial
+storage, is a much more realistic candidate to run on a real world
+quantum computer. By taking into account the fact that each black box
+query runs a quantum circuit of subexponential size itself, we
+estimate that the lower bound on the number of quantum gates is at
+least the square of the lower bound on the number of quantum
+queries. Based on these observations, we propose in
+Table~\ref{tab:sizes} parameter sizes matching three of the NIST
+categories~\cite{NIST2016}.
+
+\begin{table}
+  \centering
+  \begin{tabular}{c | c | c | c | c}
+    $\log Δ_π$ & $\log h(\O_k)$ & classical security & quantum queries & NIST category\\
+    \hline
+    $512$  & $256$ & $2^{128}$ & $> 2^{64}$ & 2\\
+    $768$  & $284$ & $2^{192}$ & $> 2^{78}$ & 3\\
+    $1024$ & $512$ & $2^{256}$ & $> 2^{90}$ & 5
+  \end{tabular}
+  \caption{Suggested parameter sizes at different security levels.}
+  \label{tab:sizes}
+\end{table}
+
 
 \subsection{Security proofs}
 \label{sec:proofs}
