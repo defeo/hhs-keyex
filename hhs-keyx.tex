@@ -1130,8 +1130,8 @@ etc.).
 \begin{lemma}
 \label{lem:adv}
   Assuming GRH, for $q$ large enough and for any bound $t$ on running
-  time,
-  \[3\Adv{IW-DDH}(t) ≤ 8\Adv{IWD}(t+\poly(\log q)) + 3\Adv{CGA-DDH}(t).\]
+  time, and for any $\epsilon>0$,
+  \[\Adv{IW-DDH}(t) ≤ 2\Adv{IWD}(t+\poly(\log q, \log\epsilon)) + \Adv{CGA-DDH}(t) + \epsilon.\]
 \end{lemma}
 \begin{proof}[Proof (Sketch)]
   We start with an adversary $A$ for IW-DDH, and we construct two simulators
@@ -1155,20 +1155,26 @@ etc.).
   for the simulator to work. The only way at our disposal to sample
   $E_c$ uniformly would be to sample a uniform $\frak c∈\O$, and take
   $E_c=\frak c·E_0$, but this would be too costly. Instead we
-  use~\cite[Theorem~1.5]{jao+miller+venkatesan09} to sample $E_c$ so
-  that any curve in $\Ell_q(\O)$ is taken with probability at least
+  use~\cite[Theorem~1.5]{jao+miller+venkatesan09},
+	combined with standard results about random walks in
+	expander graphs, to sample $E_c$ so
+  that any curve in $\Ell_q(\O)$ is taken with probability between
   % todo: Jean, you mentioned that you could get closer to the uniform
   % distribution by lengthening the walks?
-  $1/2h(\O)$, using only $\poly(\log q)$ operations.
+  $(1-\epsilon)/h(\O)$ and $(1+\epsilon)/h(\O)$,
+	using only $\poly(\log q, \log\epsilon)$ operations.
+	We can consider this sampling as follows:
+	with probability $1-\epsilon$, sample $E_c$ \emph{uniformly},
+	and with probability $\epsilon$ sample it from
+	an unknown distribution of probability.
 
   Now, if $T$ forwarded $(E_a,E_b,E_{ab})$ untouched, it is immediate
   to see that
-  \[2\Adv[T]{IWD} = \Adv[A]{IW-DDH} - \Adv[S]{CGA-DDH}.\] %
-  If $T$ forwarded $(E_a,E_b,E_c)$, then the advantage is at most
-  divided by $2$, thus
-  \[4\Adv[T]{IWD} = \Adv[A]{IW-DDH} - \Adv[S]{CGA-DDH}.\] %
-  Averaging over the two outcomes gives
-  \[8\Adv[T]{IWD} = 3\Adv[A]{IW-DDH} - 3\Adv[S]{CGA-DDH},\] %
+  \[2\Adv[T]{IWD} = \Adv[A]{IW-DDH} - \Adv[S]{CGA-DDH},\] %
+  while if $T$ forwarded $(E_a,E_b,E_c)$, then we get
+  \[2\Adv[T]{IWD} \geq \Adv[A]{IW-DDH} - (1-\epsilon)\Adv[S]{CGA-DDH} - \epsilon.\] %
+  Averaging over the two outcomes gives in particular
+  \[2\Adv[T]{IWD} \geq \Adv[A]{IW-DDH} - \Adv[S]{CGA-DDH} - \epsilon,\] %
   concluding the proof.
 \end{proof}
 
