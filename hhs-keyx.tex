@@ -18,6 +18,7 @@
 
 %Shortcuts
 \newcommand{\F}{\mathbb{F}}
+\newcommand{\Fbar}{\overline{\mathbb{F}}}
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\C}{\mathbb{C}}
@@ -90,41 +91,42 @@ origins of isogeny-based cryptography can be traced back to
 Couveignes' seminal work ``Hard Homogeneous Spaces'', that went
 unpublished for ten years before appearing
 in~\cite{cryptoeprint:2006:291}. Let $G$ be a group, a \emph{principal
-  homogeneous space} or \emph{torsor} for $G$ is a set $X$ with an
+  homogeneous space} for $G$ is a set $X$ with an
 action of $G$ on $X$ such that for any $x∈X$ the map $φ_x:g↦g·x$ is an
 isomorphism between $G$ and $X$. Intuitively, one can think of $X$ as
 a \emph{copy} (or, rather, \emph{many different copies}) of $G$ where
 the information on the identity element has been forgotten. Couveignes
-calls \emph{hard homogeneous space} (HHS) any torsor where computing
+defines a \emph{hard homogeneous space} (HHS) to be a principal
+homogeneous space where computing
 the action of $G$ on $X$ is computationally feasible, but inverting
-the isomorphism $φ_x$ is computationally hard for any $x$. Given a
-HHS, it is immediate to build a Diffie-Hellman type of key exchange
+the isomorphism $φ_x$ is computationally hard for any $x$. 
+Given a HHS $X$, we can immediately build a Diffie--Hellman type of key exchange
 where the elements of $X$ are used as \emph{labels} to \emph{mask} the
 group elements; then, the security of the scheme relies not (only) on
 the discrete logarithm problem of $G$, but rather on the hardness of
 inverting the isomorphisms $φ_x$.
 
 Couveignes viewed HHS chiefly as a general framework, encompassing
-various flavors of Diffie-Hellman-like systems. Nevertheless, he
+various flavors of Diffie--Hellman-like systems. Nevertheless, he
 suggested using a specific HHS based on the theory of complex
 multiplication of elliptic curves, in a sense generalizing to the HHS
-framework the class-group-based Diffie-Hellman key exchange of
+framework the class-group-based Diffie--Hellman key exchange of
 Buchmann and Williams~\cite{Buchmann1988}. It is however Rostovtsev
 and Stolbunov who first gave in~\cite{rostovtsev+stolbunov06} a
 concrete and detailed realization of Couveignes' idea.
 
 Rostovtsev and Stolbunov advertised their system as a potential
 post-quantum candidate, leading Childs, Jao and Soukharev to introduce
-the first sub-exponential quantum algorithm capable of breaking
+the first subexponential quantum algorithm capable of breaking
 it~\cite{childs2014constructing}. Hence, being already slow enough to
-be unpractical in a classical security setting, the
-Rostovtsev-Stolbunov system became even more unusable in a quantum
+be impractical in a classical security setting, the
+Rostovtsev--Stolbunov system became even more unusable in a quantum
 security setting. This led Jao and De Feo to create the SIDH
 key-exchange protocol~\cite{jao+defeo2011}, which to the present day
-is not victim to any sub-exponential attack.
+is not victim to any subexponential attack.
 
 The aim of the present paper is to improve and modernize the
-Couveignes-Rostovtsev-Stolbunov construction, borrowing techniques
+Couveignes-Rostovtsev--Stolbunov construction, borrowing techniques
 from SIDH and point-counting algorithms, to the point of making it
 usable in a post-quantum setting. Although the final result is far
 from being practical, we believe it constitutes progress in the
@@ -147,22 +149,26 @@ overview of isogenies and their use in cryptography we
 suggest~\cite{defeo2017isogenybased}.
 
 In what follows $\F_q$ is a finite field of characteristic $p$ with
-$q$ elements, with an algebraic closure $\bar\F_q$. Let $E$ and $E'$
+$q$ elements, and $\Fbar_q$ is its algebraic closure. Let $E$ and $E'$
 be elliptic curves defined over $\F_q$. An isogeny $ϕ:E→E'$ is a
-non-constant algebraic map, mapping the point at infinity of $E$ to
-the point at infinity of $E'$; it is also a group morphism from
-$E(\bar\F_q)$ to $E'(\bar\F_q)$~\cite[III.4]{silverman:elliptic}. The
-degree of an isogeny is its degree as an algebraic map; we will call
-$ℓ$-isogeny an isogeny of degree $ℓ$. The kernel of an isogeny,
-denoted by $\ker ϕ$, is the set of points of $E(\bar\F_q)$ that is
-sent to the identity point of $E'$. A \emph{cyclic
-  isogeny} is one such that $\ker ϕ$ is a cyclic group.
+non-constant algebraic map sending the identity point of $E$ to
+the identity point of $E'$; it induces a group homomomorphism from
+$E(\Fbar_q)$ to $E'(\Fbar_q)$~\cite[III.4]{silverman:elliptic}. The
+degree of an isogeny is its degree as an algebraic map; 
+an isogeny of degree $ℓ$ is called an $ℓ$-isogeny.
+The kernel of an isogeny,
+denoted by $\ker ϕ$, is the set of points of $E(\Fbar_q)$ that is
+sent to the identity point of $E'$. 
+An isogeny $ϕ$ is \emph{cyclic} 
+if $\ker ϕ$ is a cyclic group.
 
 An isogeny from a curve $E$ to itself is called an
-\emph{endomorphism}.  Endomorphisms with the operations of addition
+\emph{endomorphism}.
+% FIXME: need to include [0] (...otherwise End(E) isn't a ring!)
+Endomorphisms with the operations of addition
 and composition form a ring, called the \emph{endomorphism ring} of
 $E$ and denoted by $\End(E)$. Besides scalar multiplications, the
-simplest example of endomorphism is the \emph{Frobenius map}
+simplest example of an endomorphism is the \emph{Frobenius map}
 \begin{align*}
   π : E &→ E,\\
   (x,y) &↦ (x^q,y^q).
@@ -199,21 +205,22 @@ points over $\F_q$.
 \subsection{Isogeny graphs}
 
 In isogeny-based cryptography one is mostly interested in
-\emph{isogeny graphs}, i.e.\ (multi)-graphs which vertices are
-elliptic curves up to isomorphism, and which edges are isogenies
-between them. The study of isogeny graphs was initiated by
+\emph{isogeny graphs}: (multi)-graphs whose vertices are
+elliptic curves up to isomorphism, and whose edges are isogenies
+between them (again up to isomorphism).
+The study of isogeny graphs was initiated by
 Kohel~\cite{kohel} and continued by many
 authors~\cite{Gal,fouquet+morain02,GHS,MiretMSTV06,jao+miller+venkatesan09}.
 Because of the dual isogeny theorem, isogeny graphs are typically
 considered undirected.
 
 We denote by $E[ℓ]$ the subgroup of $ℓ$-torsion points of
-$E(\bar\F_q)$.  If $ℓ$ is coprime to $p$, then $E[ℓ]$ is isomorphic to
+$E(\Fbar_q)$.  If $ℓ$ is coprime to $p$, then $E[ℓ]$ is isomorphic to
 $(ℤ/ℓℤ)^2$.  Furthermore, if $ℓ$ is prime $E[ℓ]$ contains exactly
-$ℓ+1$ cyclic subgroups of order $ℓ$; it follows that, over $\bar\F_q$,
+$ℓ+1$ cyclic subgroups of order $ℓ$; it follows that, over $\Fbar_q$,
 there are exactly $ℓ+1$ distinct (separable) $ℓ$-isogenies starting
 from $E$.  Generically, a connected component of the isogeny graph of
-$ℓ$-isogenies over $\bar\F_q$ will be an infinite $(ℓ+1)$-regular
+$ℓ$-isogenies over $\Fbar_q$ will be an infinite $(ℓ+1)$-regular
 graph; a notable exception is the finite connected component of
 \emph{supersingular} curves, used in SIDH and related protocols.
 
@@ -309,7 +316,7 @@ Section~\ref{sec:keyex} will be built on this action. Let $\frak a$ be
 an ideal in $\End(E)≃\O$, and define the
 \emph{${\frak a}$-torsion} subgroup of $E$ as
 \[
-E[\frak a] = \set{P\in E(\bar\F_q) \suchthat \sigma(P) = 0\ 
+E[\frak a] = \set{P\in E(\Fbar_q) \suchthat \sigma(P) = 0\ 
 \text{ for all }\sigma\in\frak a}.
 \]
 This subgroup is the kernel of an isogeny $\phi_{\frak a}$, defined up
@@ -320,7 +327,7 @@ $\frak a\cdot E = E/E[\frak a]$.  The isogeny $\phi_{\frak a}$ is
 always horizontal (i.e.\ $\End(\frak a \cdot E) = \End(E)$), and its
 degree is the \emph{norm} of $\frak a$ as an ideal of $\End(E)$.
 
-Write $\Ell_q(\O)$ for the set of isomorphism classes over $\bar\F_q$
+Write $\Ell_q(\O)$ for the set of isomorphism classes over $\Fbar_q$
 of curves with complex multiplication by $\O$, and assume it is
 non-empty. It turns out that the construction above may be extended
 into a group action: namely, the group of fractional ideals of
@@ -416,7 +423,7 @@ partitioning the set $\Ell_q(\End(E))$ into cycles of equal size.
 In this section, following Couveignes~\cite{cryptoeprint:2006:291} and
 Rostovtsev and Stolbunov~\cite{rostovtsev+stolbunov06}, we describe a
 key exchange protocol based on the action of a class group on an
-isogeny graph.  This is essentially the Rostovtsev-Stolbunov key
+isogeny graph.  This is essentially the Rostovtsev--Stolbunov key
 exchange protocol, with the twist of taking advantage of specially
 selected parameters to improve efficiency.
 
@@ -437,7 +444,7 @@ be used to construct a key exchange as follows:
 \end{algorithm}
 
 If $X$ is a cyclic group $〈x〉$ of order $p$, and $G=ℤ/pℤ$ acting on
-$X$ by $g·x=x^g$, then this is simply the Diffie-Hellman key exchange:
+$X$ by $g·x=x^g$, then this is simply the Diffie--Hellman key exchange:
 security is based on the difficulty of the discrete logarithm problem
 in $X$.
 
@@ -502,7 +509,7 @@ then this protocol is essentially equivalent to
 Algorithm~\ref{proto:hhs}. In particular, following the example of
 Figure~\ref{fig:cayley}, if $X$ is a cyclic group $〈x〉$ of order
 $p$, acted upon by $G=(ℤ/pℤ)^*$, then this protocol is equivalent to
-the Diffie-Hellman protocol on $X$.
+the Diffie--Hellman protocol on $X$.
 
 The specialization to isogeny graphs is now evident. We take:
 \begin{itemize}
@@ -549,7 +556,7 @@ using one of two different algorithms:
 Rostovtsev and Stolbunov only used an analogue of~\algstyle{Step1}. Using
 algorithm~\algstyle{Step2}, that is inspired from the SIDH cryptosystem and
 related protocols, and analyzing its consequences on the choice of public
-parameters (see section~\ref{sec:initcurve}), is the main contribution of our work.
+parameters (see Section~\ref{sec:initcurve}), is the main contribution of our work.
 
 The cost of computing an isogeny step given by $\frak s$
 varies heavily according to which algorithm is used and the values of $\lambda$
@@ -559,8 +566,8 @@ we define a bound $M_\ell$ for the number of times $\frak s$
 appears in the random walk given as an element of $S^*$.
 For convenience, we partition the set $S$
 into its symmetric part $S_{sym}$, containing those ideals $\frak s$ such that
-$\frak s^{-1}\in S$, and an assymmetric part $S_{asym}$. Looking back at
-figure~\ref{fig:cycle}, if $\frak s\in S_{sym}$ then both directions
+$\frak s^{-1}\in S$, and an asymmetric part $S_{asym}$. Looking back at
+Figure~\ref{fig:cycle}, if $\frak s\in S_{sym}$ then both directions
 $\lambda,\mu$ are used, while if $\frak s\in S_{asym}$ then only one is
 available. In practice, the existence of $S_{asym}$ is connected with the use of
 algorithm~\algstyle{Step2}.
@@ -715,7 +722,7 @@ of constructing ordinary elliptic curves with prescribed
 order, or more precisely with prescribed order \emph{modulo small
 primes}. Unfortunately, and in contrast with the case of
 supersingular curves, no polynomial-time method to achieve this 
-is known in general (we will see in section~\ref{sec:sec} why
+is known in general (we will see in Section~\ref{sec:sec} why
 we cannot use the CM method).
 In the next section, we present our methods to find the best possible
 public parameters in reasonable time.
@@ -759,7 +766,7 @@ algorithm, aborting when any $\ell\leq B$ with $C\mod\ell\neq 0$
 is found.
 \item For each curve which passed the tests above, complete the SEA
 algorithm and estimate the key exchange running time using this
-curve as a public parameter (see section~\ref{sec:exp}).
+curve as a public parameter (see Section~\ref{sec:exp}).
 \end{itemize}
 The ``fastest'' curves are now good candidates for the curve $E_0$.
 
@@ -1007,7 +1014,7 @@ categories~\cite{NIST2016}.
 \end{table}
 
 According to this table, the public parameters we proposed
-in section~\ref{sec:initcurve} fit in NIST category 2.
+in Section~\ref{sec:initcurve} fit in NIST category 2.
 Indeed, for this curve, the discriminant $\Delta_\pi$ 
 has the following prime factorization:
 \[
@@ -1025,7 +1032,7 @@ hence $\Delta_K$ is a 511-bit integer.
 We now formalize the assumptions needed to prove the security of the
 key exchange protocol, and other derived protocols such as PKEs and
 KEMs, in various models. Given the similarity with the classical
-Diffie-Hellman protocol on a cyclic group, our assumptions will be
+Diffie--Hellman protocol on a cyclic group, our assumptions will be
 mostly modeled after those used in that context. Here we are
 essentially following the lead of
 Couveignes~\cite{cryptoeprint:2006:291} and
@@ -1051,7 +1058,7 @@ protocol.
 The assumption needed to prove security of the protocols is analogous
 to the classical DDH assumption.
 
-\begin{definition}[Isogeny Walk Decisional Diffie-Hellman (IW-DDH)]
+\begin{definition}[Isogeny Walk Decisional Diffie--Hellman (IW-DDH)]
   Given curves $E_a,E_b,E_{ab}∈\Ell_q(\O)$ sampled with probability
   $\frac{1}{2}$ from one of the following two distributions
   \begin{align*}
@@ -1086,7 +1093,7 @@ actions. It also appears in~\cite{cryptoeprint:2006:291} under the
 name \emph{vectorization}, and in~\cite{Stol,Stolbunov2012} under the
 name DDHAP.
  
-\begin{definition}[Class Group Action Decisional Diffie-Hellman (CGA-DDH)]
+\begin{definition}[Class Group Action Decisional Diffie--Hellman (CGA-DDH)]
   Given curves $E_a,E_b,E_{ab}∈\Ell_q(\O)$ sampled with probability
   $\frac{1}{2}$ from one of the following two distributions
   \begin{align*}
@@ -1256,7 +1263,7 @@ We used the Bostan--Morain--Salvy--Schost~\cite{todo:BMSS} for
 isogeny computations.
 
 We use the public parameters as given in
-section~\ref{sec:initcurve}.
+Section~\ref{sec:initcurve}.
 In this unoptimized implementation, we obtain
 the following times to perform a scalar multiplication over $\F_{q^r}$:
 %todo: on which gear ?
@@ -1273,7 +1280,7 @@ and the approximate time needed to factor the modular equation of level $\ell$
 is $0.017 * \ell$ seconds.
 
 Using such data, one can propose a maximal number of steps to be
-computed for each prime. In the upper table of figure~\ref{fig:steps}, we
+computed for each prime. In the upper table of Figure~\ref{fig:steps}, we
 list the primes for which algorithm~\algstyle{Step2} is used, with
 the corresponding extension degree $r$, and a star if the twisted curve
 allows to use both directions in the isogeny graph. In the lower table,
