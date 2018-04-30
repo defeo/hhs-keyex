@@ -841,6 +841,7 @@ adversaries.
 We start by addressing the following, more general, problem:
 
 \begin{prob}
+\label{prob:isog}
   Given two ordinary elliptic curves $E,E'$ defined over a finite
   field $\F_q$, such that $\#E(\F_q)=\#E'(\F_q)$, find an isogeny walk
   $(ϕ_i)_{1≤i≤n}$ such that $ϕ_n∘\cdots∘ϕ_1(E)=E'$.
@@ -858,7 +859,7 @@ Hess and Smart~\cite{GHS}; it consists of three stages:
 \item[Stage 1.] Start two random walks from $E$ and $E'$; detect the
   moment when they collide using a Pollard-rho type of algorithm.
 \item[Stage 2.] Reduce the size of the obtained walk using
-  index-calculs techniques.
+  index-calculus techniques.
 \end{description}
 
 To understand Stage~0, recall that all isogenous elliptic curves have
@@ -940,7 +941,8 @@ impact on our security estimates.
   indicate that $h(\O_K)$ is likely to have a large prime factor.
   However, there is no known way in which the group structure of
   $\Cl(\O_K)$ affect the security of our protocol, we can thus
-  disregard this matter.
+  disregard this matter. No link between the group structure
+	of $E(\F_q)$ itself and the security is known either.
 \end{remark}
 
 \paragraph{Quantum attacks.}
@@ -990,7 +992,7 @@ categories~\cite{NIST2016}.
   \renewcommand{\arraystretch}{1.4}
   \centering
   \begin{tabular}{c | c | c | c | c | c}
-    $\log Δ_π$ & $\log h(\O_k)$
+    $\log Δ_π$ & $\log h(\O_K)$
     & \parbox{10ex}{\centering classical security}
     & \parbox{10ex}{\centering quantum queries}
     & \parbox{10ex}{\centering quantum security}
@@ -1004,6 +1006,18 @@ categories~\cite{NIST2016}.
   \label{tab:sizes}
 \end{table}
 
+According to this table, the public parameters we proposed
+in section~\ref{sec:initcurve} fit in NIST category 2.
+Indeed, for this curve, the discriminant $\Delta_\pi$ 
+has the following prime factorization:
+\[
+\begin{aligned}
+& -2^5 \cdot 20507 \cdot 67429 \cdot 11718238170290677 \cdot 12248034502305872059 \\
+& \cdot 60884358188204745129468762751254728712569\\
+& \cdot 68495197685926430905162211241300486171895491480444062860794276603493,
+\end{aligned}
+\]
+hence $\Delta_K$ is a 511-bit integer.
 
 \subsection{Security proofs}
 \label{sec:proofs}
@@ -1107,6 +1121,7 @@ adversaries using at most $t$ resources (e.g.\ running time, queries,
 etc.).
 
 \begin{lemma}
+\label{lem:adv}
   Assuming GRH, for $q$ large enough and for any bound $t$ on running
   time,
   \[3\Adv{IW-DDH}(t) ≤ 8\Adv{IWD}(t+\poly(\log q)) + 3\Adv{CGA-DDH}(t).\]
@@ -1185,94 +1200,48 @@ instance,~\cite[20.4.11]{galbraith2012mathematics}.
 \end{theorem}
 
 
-\paragraph{The distribution of random walks}
-An important aspect of isogeny graphs, used in most
-isogeny-based cryptosystem, is their \emph{expansion properties}.
-Random walks in these graphs mix rapidly in the sense that they
-quickly become undistinguishable from the uniform distribution.
-Showing this result currently requires using number-theoretic
-assumptions such as GRH.
-We quote the following result from~\cite{jao+miller+venkatesan09}:
+\paragraph{A heuristic discussion of the IWD assumption.}
 
-\begin{theorem}
-Fix an elliptic curve $E$ over $\F_q$ and consider the graph $\Graph$
-whose vertices are isomorphism classes of elliptic curves over $\F_q$
-with endomorphism ring $\End(E)$, and two vertices are joined by an edge
-if there exists an isogeny of degree at most $\log(4q)^B$ between them
-for some $B>2$.
+From its very definition, the IWD assumption depends on
+the probability distribution $\sigma$ we use to sample
+random walks in the isogeny graph. In this paragraph,
+we provide heuristic arguments indicating that IWD is hard
+using Algorithm~\ref{alg:walk}, provided the following
+two statements are true:
+\begin{itemize}
+\item $S$ is \emph{not too small}, i.e. the number of
+isogeny degrees used is $\Omega(\log q)$;
+\item Key space size is at least $\sqrt{|\Delta_K|}$.
+\end{itemize}
 
-Assuming GRH, $\Graph$ is an expander graph in the following sense:
-there is a constant $C$, depending only on $B$, such that any random
-walk of length at least
-\[
-	C \frac{\log |\Graph|}{\log\log q}
-\]
-starting from any vertex lands in any finite subset $S$ of vertices
-with probability at least $\frac{\#S}{2|\Graph|}$.
-\end{theorem}
+At present, proving rapid mixing of random walks with such
+parameters seems out of reach even under number-theoretic
+hypotheses such as GRH. The best results available,
+like~\cite[Theorem~1.5]{jao+miller+venkatesan09}
+that was used in the proof of Lemma~\ref{lem:adv},
+typically require isogeny degrees $\Omega((\log q)^B)$
+for some $B>2$, and fully random walks that are not,
+for example, weighted towards smaller-degree isogenies.
 
-This result is encouraging, but several drawbacks prevent us from
-using it directly in our setting. First, it does not guarantee
-computational indistinguishability between the output of random
-walks and the uniform distribution, although lengthening the
-random walks along the lines of~\cite[Theorem ...]{todo:expanders}
-would be sufficient. Second, the walks we consider are not fully random
-walks, because smaller degree isogenies are used more frequently
-(as well as degrees for which we apply algorithm~\algstyle{Step2}),
-and the number of steps is bounded for each degree. Most
-importantly, this result is likely too weak: in~\cite[7.2]{jao+miller+venkatesan09},
+However, numerical evidence widely suggests that
+such results are too weak. In~\cite[7.2]{jao+miller+venkatesan09},
 it is asked whether an analogue of the previous theorem would
-be true with the sole constraint $B>1$.
+be true with the sole constraint $B>1$. In~\cite[Section~3]{GHS},
+it is mentioned that much less split primes are needed to walk
+in the isogeny graph than theoretically expected.
+We believe that these experiments can bring some evidence
+in relying on the IWD assumptions with more aggressive
+parameters than those provided by GRH.
 
-Unfortunately, these adaptations seem out of reach even under
-GRH, and heuristic assumptions have to be used. Here, we propose using
-a very aggressive one: \emph{as long as the key space is large
-enough, the output from walks in the isogeny graph using algorithms~\ref{alg:key}
-and~\ref{alg:walk} are computationnally undistinguishable from the uniform
-distribution}. More precisely, if $L$ is the list of isogeny degrees used
-in the key exchange, and $M_\ell$ is a bound for the number of $\ell$-isogenies
-we want to compute for each $\ell\in L$, provided $L$ is not too small
-and $\prod (2 M_\ell + 1) \geq |\Graph|$, we suppose that
-the output is computationnally
-undistinguishable from the uniform distribution in $\Graph$.
+Regarding the weighting of random walks,
+practical evidence also suggests that the rapid mixing
+properties are not lost: in~\cite{galbraith+stolbunov11},
+such walks are used to accelerate the algorithm
+solving Problem~\ref{prob:isog}.
 
 \subsection{Key validation and active security}
 
 
-
-\subsection{Security of the proposed parameters}
-
-We now argue that the initial curve $E$ we proposed in section~\ref{sec:initcurve}
-offers approximately 128-bit security in the classical as well as quantum
-setting. For this curve, the discriminant $\Delta_\pi$ of $\Z[\pi]$ is
-given by the following prime factorization:
-\[
-\begin{aligned}
-& -2^5 * 20507 * 67429 * 11718238170290677 * 12248034502305872059 \\
-& * 60884358188204745129468762751254728712569\\
-& * 68495197685926430905162211241300486171895491480444062860794276603493,
-\end{aligned}
-\]
-hence the fundamental discriminant of $\End(E)$ is a 511-bit integer.
-According to approximate formulas like~\cite{todo:classnumbers},
-the class number $h$ of the maximal order containing $\End(E)$ should
-be at the very least a 250-bit integer with overwhelming
-probability. Unfortunately,
-no currently available algorithm can compute class numbers for such values
-in reasonable time. As seen above, this value guarantees security
-in both the classical and quantum settings once the walks in
-the graph are well distributed, which we admit.
-
-From its construction, this elliptic curve has lots of rational
-points of small order. This raises the following question: does
-this property have a negative impact on the security of our scheme ?
-We believe that the answer is negative, although further study
-is necessary for validation.
-On the other hand, the structure of the class group of $\End(E)$
-\emph{does} have an impact on the security, since it determines the
-shape of the isogeny graph and the speed of mixing of random walks.
-However, there seems to be no sign that this particular curve
-might be weaker than the average.
 
 \section{Experimental results}
 \label{sec:exp}
