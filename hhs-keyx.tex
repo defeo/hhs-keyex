@@ -914,16 +914,16 @@ is the maximal order, hence this condition is automatically satisfied.
 The collision search in Stage~1 relies on the birthday paradox, thus
 it has a complexity of $O(\sqrt{h})$, where $h=\#\Ell_q(\O_K)$ is the
 class number of $\O_K$.  It is known that, on average,
-$h(\O_K)≈0.461\dots\sqrt{|Δ_K|}$ (see~\cite[5.10]{Cohen1993}), and,
+$h(\O_K)≈0.461\cdots\sqrt{|Δ_K|}$ (see~\cite[5.10]{Cohen1993}), and,
 assuming the extended Riemann hypothesis, we even have a lower bound
 (see~\cite{littlewood1928class})
 \[h(\O_K) ≥ 0.147\cdots\frac{(1+o(1))\sqrt{|Δ_K|}}{\log\log|Δ|}.\]
 Given that $Δ_K\sim q$, we expect Stage~1 to take time $O(q^{1/4})$,
 thus justifying the choice of a $q$ four times as large as the
-security parameter.  Unfortunately, the class number is notoriously
+security parameter.  Unfortunately, class numbers are notoriously
 difficult to compute, the current record being the computation of
 $h(\O_K)$ for a discriminant of 300
-bits~\cite{10.1007/978-3-642-14081-5_15}. The computation of the class
+bits~\cite{10.1007/978-3-642-14081-5_15}. Computing the class
 number for a discriminant of $\sim 500$ bits seems to be expensive,
 albeit feasible, thus we will only rely on these heuristic arguments
 to justify the security of our proposed parameters.
@@ -934,10 +934,10 @@ outputs an isogeny walk of size polynomial in $\log q$, it thus has no
 impact on our security estimates.
 
 \begin{remark}
-  The Coehn-Lenstra heuristic~\cite{10.1007/BFb0099440} predicts that
-  the odd part of $\Cl(\O_K)$ is be cyclic with overwhelming
+  The Cohen-Lenstra heuristic~\cite{10.1007/BFb0099440} predicts that
+  the odd part of $\Cl(\O_K)$ is cyclic with overwhelming
   probability; and more heuristics~\cite{10.1007/3-540-44448-3_18}
-  indicate that $h(\O_K)$ is likely have a large prime factor.
+  indicate that $h(\O_K)$ is likely to have a large prime factor.
   However, there is no known way in which the group structure of
   $\Cl(\O_K)$ affect the security of our protocol, we can thus
   disregard this matter.
@@ -1108,7 +1108,7 @@ etc.).
 
 \begin{lemma}
   Assuming GRH, for $q$ large enough and for any bound $t$ on running
-  time
+  time,
   \[3\Adv{IW-DDH}(t) ≤ 8\Adv{IWD}(t+\poly(\log q)) + 3\Adv{CGA-DDH}(t).\]
 \end{lemma}
 \begin{proof}[Proof (Sketch)]
@@ -1147,7 +1147,7 @@ etc.).
   \[4\Adv[T]{IWD} = \Adv[A]{IW-DDH} - \Adv[S]{CGA-DDH}.\] %
   Averaging over the two outcomes gives
   \[8\Adv[T]{IWD} = 3\Adv[A]{IW-DDH} - 3\Adv[S]{CGA-DDH},\] %
-  Concluding the proof.
+  concluding the proof.
 \end{proof}
 
 Finally, we give an assumption akin to the classical CDH assumption
