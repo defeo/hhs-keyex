@@ -208,11 +208,13 @@ In isogeny-based cryptography one is mostly interested in
 \emph{isogeny graphs}: (multi)-graphs whose vertices are
 elliptic curves up to isomorphism, and whose edges are isogenies
 between them (again up to isomorphism).
-The study of isogeny graphs was initiated by
-Kohel~\cite{kohel} and continued by many
-authors~\cite{Gal,fouquet+morain02,GHS,MiretMSTV06,jao+miller+venkatesan09}.
 Because of the dual isogeny theorem, isogeny graphs are typically
 considered undirected.
+The study of isogeny graphs and their algorithmic applications 
+goes back to Mestre and Oesterlé~\cite{Mestre},
+followed notably by Kohel~\cite{kohel},
+and has been continued by many
+authors~\cite{Gal,fouquet+morain02,GHS,MiretMSTV06,jao+miller+venkatesan09}.
 
 We denote by $E[ℓ]$ the subgroup of $ℓ$-torsion points of
 $E(\Fbar_q)$.  If $ℓ$ is coprime to $p$, then $E[ℓ]$ is isomorphic to
@@ -332,23 +334,24 @@ of curves with complex multiplication by $\O$, and assume it is
 non-empty. It turns out that the construction above may be extended
 into a group action: namely, the group of fractional ideals of
 $\End(\O)$ acts on $\Ell_q(\O)$. Furthermore, principal ideals act
-trivially, so that the action factors as an action of the \emph{ideal
+trivially (since the corresponding isogenies are endomorphisms), 
+so the action factors as an action of the \emph{ideal
   class group} $\Cl(\O)$ on $\Ell_q(\O)$.  The main theorem of complex
 multiplication states that this action is \emph{simply transitive}. In
 other terms, $\Ell_q(\O)$ is a \emph{principal homogeneous space}
 under the group $\Cl(\O)$: if we fix a curve $E$ as base point,
-we have a bijection
+then we have a bijection
 \[
 \begin{aligned}
-\Cl(\O) &\to \Ell_q(\O) \\
-\text{Ideal class of }\frak a &\mapsto \text{Isomorphism class of }\frak a\cdot E.
+\Cl(\O) &\longrightarrow \Ell_q(\O) \\
+\text{Ideal class of }\frak a &\longmapsto \text{Isomorphism class of }\frak a\cdot E.
 \end{aligned}
 \]
 The order of $\Cl(\O)$ is called the \emph{class number} of $\O$, and
 denoted by $h(\O)$. An immediate consequence of the theorem is that
 $\#\Ell_q(\O)=h(\O)$.
 
-Let now $ℓ$ be an Elkies prime for $E$, so far we have seen that the
+Now let $ℓ$ be an Elkies prime for $E$. So far, we have seen that the
 connected component of $E$ in the $ℓ$-isogeny graph is a cycle of
 horizontal isogenies. Complex multiplication tells us more. The
 restriction of the Frobenius to $E[ℓ]$ has two eigenvalues $λ≠μ$, to
