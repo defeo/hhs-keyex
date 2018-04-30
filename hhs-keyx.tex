@@ -28,13 +28,18 @@
 \newcommand{\isom}{\overset{\sim}{\longrightarrow}}
 \newcommand{\from}{\ensuremath{\,:\ }}
 \newcommand{\set}[1]{\left\{#1\right\}}
-\newcommand{\suchthat}{\,|\,}
+\newcommand{\suchthat}{\,\middle\vert\,}
 \newcommand{\algstyle}[1]{\textsc{#1}}
 \renewcommand{\v}{\vspace{5mm}}
 \renewcommand{\frak}{\mathfrak}
+\newcommand{\rand}[1]{\overset{#1}{∈}}
+\newcommand{\uni}{\rand{R}}
+\newcommand{\Adv}[2][]{\mathsf{Adv}^{#1}_{\text{\rm #2}}}
 
 \newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
 \newtheorem{prop}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
 \theoremstyle{definition}
 \newtheorem{prob}[theorem]{Problem}
 \newtheorem{remark}[theorem]{Remark}
@@ -44,6 +49,7 @@
 \DeclareMathOperator{\Card}{Card}
 \DeclareMathOperator{\Ell}{Ell}
 \DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\Proba}{Pr}
 
 \title{Towards practical key exchange from ordinary isogeny graphs}
 \author{Luca De Feo, Jean Kieffer, Benjamin Smith}
@@ -966,28 +972,33 @@ worst like the square of the security parameter. However, given that
 the constants implied in the complexities are not made explicit, it is
 hard to estimate the impact of this attack at concrete security levels
 such as those required by NIST~\cite{NIST2016}. Nevertheless, we
-remark that the weaker version of Kuperberg's algorithm, as described
+remark that the weaker version of Kuperberg's algorithm described
 in~\cite[§2.1]{regev04}, requires about $2^{\sqrt{8\log q}}$ queries
 to the black box; this number can be taken as a very conservative
 lower bound, given that the described algorithm is specific to
 $h(O_K)=2^n$, and also because Regev's algorithm, with its polynomial
-storage, is a much more realistic candidate to run on a real world
-quantum computer. By taking into account the fact that each black box
-query runs a quantum circuit of subexponential size itself, we
-estimate that the lower bound on the number of quantum gates is at
+storage requirement, is a much more realistic candidate to run on a
+real world quantum computer. By taking into account the fact that each
+black box query runs a quantum circuit of subexponential size itself,
+we estimate that the lower bound on the number of quantum gates is at
 least the square of the lower bound on the number of quantum
 queries. Based on these observations, we propose in
 Table~\ref{tab:sizes} parameter sizes matching three of the NIST
 categories~\cite{NIST2016}.
 
 \begin{table}
+  \renewcommand{\arraystretch}{1.4}
   \centering
-  \begin{tabular}{c | c | c | c | c}
-    $\log Δ_π$ & $\log h(\O_k)$ & classical security & quantum queries & NIST category\\
+  \begin{tabular}{c | c | c | c | c | c}
+    $\log Δ_π$ & $\log h(\O_k)$
+    & \parbox{10ex}{\centering classical security}
+    & \parbox{10ex}{\centering quantum queries}
+    & \parbox{10ex}{\centering quantum security}
+    & \parbox{10ex}{\centering NIST category}\\
     \hline
-    $512$  & $256$ & $2^{128}$ & $> 2^{64}$ & 2\\
-    $768$  & $284$ & $2^{192}$ & $> 2^{78}$ & 3\\
-    $1024$ & $512$ & $2^{256}$ & $> 2^{90}$ & 5
+    $512$  & $256$ & $2^{128}$ & $> 2^{64}$ & $2^{128}$ & 2\\
+    $768$  & $384$ & $2^{192}$ & $> 2^{78}$ & $> 2^{156}$ & 3\\
+    $1024$ & $512$ & $2^{256}$ & $> 2^{90}$ & $> 2^{180}$ & 5
   \end{tabular}
   \caption{Suggested parameter sizes at different security levels.}
   \label{tab:sizes}
@@ -997,41 +1008,184 @@ categories~\cite{NIST2016}.
 \subsection{Security proofs}
 \label{sec:proofs}
 
+We now formalize the assumptions needed to prove the security of the
+key exchange protocol, and other derived protocols such as PKEs and
+KEMs, in various models. Given the similarity with the classical
+Diffie-Hellman protocol on a cyclic group, our assumptions will be
+mostly modeled after those used in that context. Here we are
+essentially following the lead of
+Couveignes~\cite{cryptoeprint:2006:291} and
+Stolbunov~\cite{Stol,Stolbunov2012}, however we take their analyses a
+step further by explicitly modeling the hardness of distinguishing
+random walks on Cayley graphs from the uniform distribution; this
+yields stronger proofs and a better separation of security concerns.
 
-% todo: integrate this
+We will write $x\rand{σ} X$ for an element taken from a set $X$
+according to a probability distribution $σ$; if $X$ is finite, we
+write $x\uni X$ for an element taken according to the uniform
+distribution.
 
-% Of course, in order to be
-% cryptographically interesting, the action of the group $G$ on $X$ must in particular
-% be difficult to \emph{invert}: $x_1, x_2\in X$ being given, finding a combination
-% $g\in G$ of the generators such that $g\cdot x_1 = x_2$ must be a hard problem.
-% This is the main reason why this framework cannot usually be used with
-% Cayley graphs given by multiplication in the group, since division in $G$ is usually
-% a simple operation. To be more precise, the security of this key exchange relies
-% on the difficulty of the following Diffie--Hellman-like problems:
+For the rest of the section, $q$ is a prime power, $\O$ is an order in
+a quadratic imaginary field with discriminant $Δ\sim q$, $\Cl(\O)$ is
+the class group of $\O$, $\Ell_q(\O)$ is the (non-empty) set of
+elliptic curves with complex multiplication by $\O$, and $E_0$ is a
+fixed curve in $\Ell_q(\O)$. Finally, $S$ is a set of ideals of $\O$
+with norm polynomial in $\log q$, and $σ$ is a probability
+distribution on $S^*$, used to sample secrets in the key exchange
+protocol.
 
-% \begin{prob}[Group Action Decisional Diffie--Hellman (GADDH) problem] Let $x, y\in X$,
-% $a, b\in G$. Given $x,\ y,\ a\cdot x$ and $b\cdot x$, decide whether $(ab)\cdot x = y$.
-% \end{prob}
+The assumption needed to prove security of the protocols is analogous
+to the classical DDH assumption.
 
-% \begin{prob}[Group Action Computational Diffie--Hellman (GACDH) problem] Let $x\in X$,
-% $a, b\in G$. Given $x,\ a\cdot x$ and $b\cdot x$, compute $(ab)\cdot x$.
-% \end{prob}
+\begin{definition}[Isogeny Walk Decisional Diffie-Hellman (IW-DDH)]
+  Given curves $E_a,E_b,E_{ab}∈\Ell_q(\O)$ sampled with probability
+  $\frac{1}{2}$ from one of the following two distributions
+  \begin{align*}
+    \mathcal{R}_{q,Δ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,E'\bigr) \suchthat
+                        (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*,\;
+                        E'\uni\Ell_q(\O)\right\},\\
+    \mathcal{W}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,(\frak a_i)·(\frak b_i)·E_0\bigr) \suchthat
+                          (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*\right\},
+  \end{align*}
+  decide from which of the two they were sampled.
+\end{definition}
 
-% For a particular family of group actions, we will call GADDH assumption the assumption
-% that the GADDH problem is computationally infeasible, in the sence that the advantage
-% given by any polynomial-time algorithm is a negligible function of the security parameter
-% $\log(\Card(G))$.
+We split this assumption into two more atomic assumptions. The first
+states that it is computationally hard to distinguish between
+commutative diagrams sampled uniformly at random, and commutative
+diagrams sampled from the distribution $σ$.
 
-%todo: some kind of security proof (reduction to diffie-hellman-like (2) given (1)) ?
-We first address assertion (2), which has already been well studied and
-is used in the vast majority of isogeny-based cryptosystem, before
-assertion (1) which is more specific to our protocol and depends on
-several number-theoretic heuristic hypotheses.
+\begin{definition}[Isogeny Walk Distinguishing (IWD)]
+  Given curves $E_a,E_b,E_{ab}∈\Ell_q(\O)$ sampled with probability
+  $\frac{1}{2}$ from one of the following two distributions
+  \begin{align*}
+    \mathcal{G}_{q,Δ} &= \left\{(\frak a·E_0,\frak b·E_0,\frak{ab}·E_0) \suchthat
+                        \frak a,\frak b\uni\Cl(\O)\right\},\\
+    \mathcal{W}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,(\frak a_i)·(\frak b_i)·E_0\bigr) \suchthat
+                          (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*\right\},
+  \end{align*}
+  decide from which of the two they were sampled.
+\end{definition}
+
+The second assumption is an analogue of DDH in the context of group
+actions. It also appears in~\cite{cryptoeprint:2006:291} under the
+name \emph{vectorization}, and in~\cite{Stol,Stolbunov2012} under the
+name DDHAP.
+ 
+\begin{definition}[Class Group Action Decisional Diffie-Hellman (CGA-DDH)]
+  Given curves $E_a,E_b,E_{ab}∈\Ell_q(\O)$ sampled with probability
+  $\frac{1}{2}$ from one of the following two distributions
+  \begin{align*}
+    \mathcal{U}_{q,Δ} &= \left\{(E_a,E_b,E_{ab}) \suchthat E_a,E_b,E_{ab}\uni\Ell_q(\O)\right\},\\
+    \mathcal{G}_{q,Δ} &= \left\{(\frak a·E_0,\frak b·E_0,\frak{ab}·E_0) \suchthat
+                        \frak a,\frak b\uni\Cl(\O)\right\},
+  \end{align*}
+  decide from which of the two they were sampled.
+\end{definition}
+
+We want to prove the security of protocols based on the primitive of
+Section~\ref{sec:keyex} under the CGA-DDH and IWD assumptions
+combined. To do this we give a lemma showing that CGA-DDH and IWD
+together imply IW-DDH. The technique is straightforward: we use an
+IW-DDH oracle to solve both the CGA-DDH and IWD problems, showing that
+at least one of the two must be solvable with non-negligible
+advantage. The only technical difficulty lies in the fact that we need
+an efficient way to simulate the uniform distribution on $\Ell_q(\O)$;
+for this, we use another Cayley graph on $\Ell_q(\O)$, potentially
+with a larger edge set, that is proven
+in~\cite{jao+miller+venkatesan09} to be an expander.
+
+We let $\Adv[A]{IW-DDH}$ be the \emph{advantage} of an adversary $A$
+against IW-DDH, defined as the probability that $A$ answers correctly,
+minus $\frac{1}{2}$:
+\[2\Adv[A]{IW-DDH} = \Proba\bigl[A(\mathcal{R}_{q,Δ}) = 1\bigr] -
+  \Proba\bigl[A(\mathcal{W}_{q,Δ,σ}) = 1\bigr].\] %
+We define similarly $\Adv[A]{CGA-DDH}$ and $\Adv[A]{IWD}$. By switching
+answers if needed, we can assume all advantages are positive. We
+denote by $\Adv{xxx}(t)$ the maximum of $\Adv[A]{xxx}$ over all
+adversaries using at most $t$ resources (e.g.\ running time, queries,
+etc.).
+
+\begin{lemma}
+  Assuming GRH, for $q$ large enough and for any bound $t$ on running
+  time
+  \[3\Adv{IW-DDH}(t) ≤ 8\Adv{IWD}(t+\poly(\log q)) + 3\Adv{CGA-DDH}(t).\]
+\end{lemma}
+\begin{proof}[Proof (Sketch)]
+  We start with an adversary $A$ for IW-DDH, and we construct two simulators
+  $S$ and $T$ for CGA-DDH and IWD respectively.
+
+  The simulator $S$ simply passes its inputs to $A$ and returns
+  whatever response $A$ gives.
+
+  The simulator $T$ receives a triplet $(E_a,E_b,E_{ab})$ taken from
+  one of $\mathcal{G}_{q,Δ}$ or $\mathcal{W}_{q,Δ,σ}$. It flips a coin
+  to decide which of the two following actions it will do:
+  \begin{itemize}
+  \item It forwards $(E_a,E_b,E_{ab})$ to $A$, it returns the same bit
+    as given by $A$;
+  \item It generates a random curve $E_c∈\Ell_q(\O)$, it forwards
+    $(E_a,E_b,E_c)$ to $A$, it returns the opposite bit to the one
+    given by $A$.
+  \end{itemize}
+  
+  The curve $E_c$ must be taken from a distribution close to uniform
+  for the simulator to work. The only way at our disposal to sample
+  $E_c$ uniformly would be to sample a uniform $\frak c∈\O$, and take
+  $E_c=\frak c·E_0$, but this would be too costly. Instead we
+  use~\cite[Theorem~1.5]{jao+miller+venkatesan09} to sample $E_c$ so
+  that any curve in $\Ell_q(\O)$ is taken with probability at least
+  % todo: Jean, you mentioned that you could get closer to the uniform
+  % distribution by lengthening the walks?
+  $1/2h(\O)$, using only $\poly(\log q)$ operations.
+
+  Now, if $T$ forwarded $(E_a,E_b,E_{ab})$ untouched, it is immediate
+  to see that
+  \[2\Adv[T]{IWD} = \Adv[A]{IW-DDH} - \Adv[S]{CGA-DDH}.\] %
+  If $T$ forwarded $(E_a,E_b,E_c)$, then the advantage is at most
+  divided by $2$, thus
+  \[4\Adv[T]{IWD} = \Adv[A]{IW-DDH} - \Adv[S]{CGA-DDH}.\] %
+  Averaging over the two outcomes gives
+  \[8\Adv[T]{IWD} = 3\Adv[A]{IW-DDH} - 3\Adv[S]{CGA-DDH},\] %
+  Concluding the proof.
+\end{proof}
+
+Finally, we give an assumption akin to the classical CDH assumption
+for groups. Using the same techniques as above, we can prove the
+security of the relevant protocols based only on CGA-CDH and IWD,
+\emph{without GRH}.
+
+\begin{definition}[Class Group Action Computational Diffie Hellman (CGA-CDH)]
+  Given curves $E_a=\frak a·E_0$ and $E_b=\frak b·E_0$, with
+  $\frak a,\frak b\uni\Cl(\O)$, compute the curve
+  $E_{ab}=\frak{ab}·E_0$.
+\end{definition}
+
+We can now prove the security of our schemes. Stolbunov already proved
+the security of Algorithm~\ref{proto:hhs} under the equivalent of
+CGA-DDH~\cite{Stol}. By repeating the same steps, we can prove the
+following theorem.
+
+\begin{theorem}
+  If the CGA-DDH and IWD assumptions hold, assuming GRH, the
+  key-agreement protocol in Algorithm~\ref{alg:keyex} is session-key
+  secure in the authenticated-links adversarial model of Canetti and
+  Krawczyk~\cite{canetti}.
+\end{theorem}
+
+Similarly, we can prove the IND-CPA security of the hashed El Gamal
+protocol derived from Algorithm~\ref{alg:keyex} by replicating the
+classical techniques of, for
+instance,~\cite[20.4.11]{galbraith2012mathematics}.
+
+\begin{theorem}
+  Assuming CGA-CDH and IWD, the hashed El Gamal protocol derived from
+  Algorithm~\ref{alg:keyex} is IND-CPA secure in the random oracle
+  model.
+\end{theorem}
 
 
-
-\subsection{The distribution of random walks}
-
+\paragraph{The distribution of random walks}
 An important aspect of isogeny graphs, used in most
 isogeny-based cryptosystem, is their \emph{expansion properties}.
 Random walks in these graphs mix rapidly in the sense that they
@@ -1081,6 +1235,10 @@ we want to compute for each $\ell\in L$, provided $L$ is not too small
 and $\prod (2 M_\ell + 1) \geq |\Graph|$, we suppose that
 the output is computationnally
 undistinguishable from the uniform distribution in $\Graph$.
+
+\subsection{Key validation and active security}
+
+
 
 \subsection{Security of the proposed parameters}
 
