@@ -167,20 +167,20 @@ and the \emph{Frobenius} endomorphism
   π : E &\longrightarrow E \,, \\
   (x,y) &\longmapsto (x^q,y^q) \,.
 \end{align*}
-As an element of $\End(E)$, it satisfies a quadratic equation
-$π^2 + q = tπ$, where the integer $t$, called the \emph{trace} of $π$,
+As an element of $\End(E)$, Frobenius satisfies a quadratic equation
+$π^2 + q = tπ$.  The integer $t$ (the \emph{trace})
 fully determines the order of $E$ as $\#E(\F_q)=q+1-t$. A curve is
 called \emph{supersingular} if $p$ divides $t$, \emph{ordinary}
 otherwise.
 
-An \emph{isogeny} is a non-zero homomorphism.
+An \emph{isogeny} is a non-zero homomorphism of elliptic curves.
 The
 degree of an isogeny is its degree as an algebraic map,
 so for example the Frobenius endomorphism $\pi$ has degree $q$,
-and scalar multiplication by $m$ has degree $m^2$.
+and the scalar multiplication $[m]$ has degree $m^2$.
 Isogenies of degree $ℓ$ are called $ℓ$-isogenies.
 The kernel $\ker ϕ$ of $\phi$
-is the set of points of $E(\Fbar_q)$ that is
+is the subgroup of $E(\Fbar_q)$ that is
 mapped to $0_{E'}$. 
 An isogeny $ϕ$ is \emph{cyclic} 
 if $\ker ϕ$ is a cyclic group.
@@ -188,7 +188,7 @@ if $\ker ϕ$ is a cyclic group.
 Any isogeny can be factored as a composition of a \emph{separable} and
 a \emph{purely inseparable} isogeny. \emph{Purely inseparable}
 isogenies have trivial kernel, and degree a power of $p$.
-\emph{Separable} isogenies contain all
+\emph{Separable} isogenies include all
 isogenies of degree coprime to $p$.
 Up to isomorphism, separable isogenies
 are in one-to-one correspondence with their kernels:
@@ -212,25 +212,27 @@ points over $\F_q$.
 
 
 \subsection{Isogeny graphs}
+\label{sec:isogeny-graphs}
 
 In isogeny-based cryptography one is mostly interested in
 \emph{isogeny graphs}: (multi)-graphs whose vertices are
 elliptic curves up to isomorphism, and whose edges are isogenies
 between them (again up to isomorphism).
-Because of the dual isogeny theorem, isogeny graphs are typically
-considered undirected.
-The study of isogeny graphs and their algorithmic applications 
+%Because of the dual isogeny theorem, isogeny graphs are typically
+%considered undirected.  %% BS: removed this sentence because we never use it.
+The use of isogeny graphs for algorithmic applications 
 goes back to Mestre and Oesterlé~\cite{Mestre},
 followed notably by Kohel~\cite{kohel},
 and has been continued by many
 authors~\cite{Gal,fouquet+morain02,GHS,MiretMSTV06,jao+miller+venkatesan09}.
 
-We denote by $E[ℓ]$ the subgroup of $ℓ$-torsion points of
+We write $E[ℓ]$ for the subgroup of $ℓ$-torsion points of
 $E(\Fbar_q)$.  If $ℓ$ is coprime to $p$, then $E[ℓ]$ is isomorphic to
-$(ℤ/ℓℤ)^2$.  Furthermore, if $ℓ$ is prime $E[ℓ]$ contains exactly
+$(ℤ/ℓℤ)^2$.  Furthermore, if $ℓ$ is prime then $E[ℓ]$ contains exactly
 $ℓ+1$ cyclic subgroups of order $ℓ$; it follows that, over $\Fbar_q$,
-there are exactly $ℓ+1$ distinct (separable) $ℓ$-isogenies starting
-from $E$.  Generically, a connected component of the isogeny graph of
+there are exactly $ℓ+1$ distinct (non-isomorphic) separable $ℓ$-isogenies 
+from $E$ to other curves.
+Generically, a connected component of the isogeny graph of
 $ℓ$-isogenies over $\Fbar_q$ will be an infinite $(ℓ+1)$-regular
 graph; a notable exception is the finite connected component of
 \emph{supersingular} curves, used in SIDH and related protocols.
@@ -240,7 +242,8 @@ becomes more complex.  By definition, an isogeny $ϕ:E→E'$ is
 \emph{defined over} $\F_q$ if and only if the Frobenius endomorphism
 $π$ stabilizes $\ker ϕ$. If $ϕ$ is cyclic, this is equivalent to
 saying that $π$ acts like a scalar on the points of $\ker ϕ$.  Thus,
-for any prime $ℓ≠p$, the number of outgoing $ℓ$-isogenies from $E$ is
+for any prime $ℓ≠p$, the number of outgoing $ℓ$-isogenies from $E$ 
+defined over $\F_q$ can be
 totally understood by looking at how $π$ acts on $E[ℓ]$. Since $E[ℓ]$
 is a $ℤ/ℓℤ$-module of rank $2$, the action of $π$ is represented by a
 $2×2$ matrix with entries in $ℤ/ℓℤ$ and characteristic polynomial
@@ -641,9 +644,9 @@ eigenvalues $\lambda,\mu$. We would like to compute an $\ell$-isogeny
 step from $E$ in direction $\lambda$, i.e. the isogeny $\phi_{\frak s}$
 for $\frak s = (\pi-\lambda, \ell)$.
 
-\paragraph{Algorithm~\algstyle{Step1}.} This classical algorithm makes use
-of so-called modular equations to compute isogenies between elliptic
-curves. More specifically, we use the \emph{classical modular polynomial}
+\paragraph{Algorithm~\algstyle{Step1}.} This algorithm uses
+so-called modular equations to compute isogenies between elliptic
+curves.  Specifically, we use the \emph{classical modular polynomial}
 $\Phi_\ell(X, Y)$~\cite{todo:classicalmodpoly}.
 This bivariate polynomial with integer coefficients has
 the following property: a cyclic $\ell$-isogeny exists between two elliptic
@@ -654,7 +657,8 @@ of $E$ in the cycle of $\ell$-isogenies. The degree of this equation
 is $\ell+1$.
 
 Using this idea, when one picks a new prime $\ell$ and starts a sequence
-of isogeny steps in direction $\lambda$, only one of the two neighbors is
+of $\ell$-isogeny steps in direction $\lambda$, 
+only one of the two neighbors is
 correct. To determine which, choose one of them at random and
 compute the \emph{kernel} $K$ of the corresponding $\ell$-isogeny. Several
 algorithms have been designed for this purpose~\cite{todo:isogkernel}.
@@ -663,8 +667,9 @@ by performing a scalar multiplication on the ``generic'' point of $K$.
 This computation is only necessary for the \emph{first} $\ell$-isogeny
 step, since no return on the isogeny cycle is allowed.
 
-In practice, we store modular equations with coefficients already reduced
-in~$\F_q$. Several publicly available databases of modular polynomials
+In practice, we store modular polynomials $\Phi_\ell$
+with coefficients already reduced in~$\F_q$. 
+Several publicly available databases of modular polynomials
 exist~\cite{todo:modulardatabases}. The size of the classical modular polynomial
 $\Phi_\ell$ mentioned above grows quickly with $\ell$, so it is convenient
 to use other types of modular equations when $\ell$ grows, such as the so-called
@@ -819,12 +824,16 @@ b =\ & 7929994832424543515682621940590901949591050994041239 \\
 & 90133670177545414851226849642510122057033563808087.
 \end{aligned}
 \]
-This curve, or its twist, admits a rational $\ell$-torsion point 
+This curve, or its twist, has a rational $\ell$-torsion point 
 for each $\ell$ in
 \[
-  \{2, 3, 5, 7, 11, 13, 17, 103, 523, 821, 947, 1723\}
+  \{3, 5, 7, 11, 13, 17, 103, 523, 821, 947, 1723\}
+  \,,
 \]
-as well as a Montgomery model. The cardinality of $E(\F_p)$ is
+and each of these primes $\ell$ is of Type (2)
+in the sense of Subsection~\ref{sec:isogeny-graphs}.
+The curve $E$ also admits a Montgomery model.
+The cardinality of $E(\F_p)$ is
 \[
 \begin{aligned}
 & 1203734073820884503438338397822280113709202945127019 \\ 
@@ -1304,70 +1313,80 @@ The time needed to factor the modular equation of level $\ell$
 was approximately $0.017 * \ell$ seconds.
 
 We can use this data to propose a maximal number of steps to be
-computed for each prime. In the upper table of Figure~\ref{fig:steps}, we
-list the primes for which Algorithm~\algstyle{Step2} is used, with
+computed for each prime. Table~\ref{tab:step2s}
+lists the primes for which Algorithm~\algstyle{Step2} can be used, with
 the corresponding extension degree $r$, and a star if the twisted curve
-allows to use both directions in the isogeny graph. In the lower table,
-we list other Elkies primes for which we apply Algorithm~\algstyle{Step1}.
+allows to use both directions in the isogeny graph.
+Table~\ref{tab:step1s}
+lists other Elkies primes for which we apply Algorithm~\algstyle{Step1}.
 
-\begin{figure}
+\begin{table}
 \centering
 \begin{tabular}{cclc}
 $r$ & $M_\ell$ & Primes \\
 \hline
-1* & 409 & \{3, 5, 7, 11, 13, 17, 103\} \\
-1 & 409 & \{523, 821, 947, 1723\} \\
-3 & 81 & \{19, 661\} \\
-4 & 54 & \{1013, 1181\} \\
-5 & 34 & \{31, 61, 1321\} \\
-7 & 10 & \{547\} \\
-8 & 7 & \{881\} \\
-9 & 6 & \{1693\}
+1* & 409 & 3, 5, 7, 11, 13, 17, 103 \\
+1 & 409 & 523, 821, 947, 1723 \\
+3 & 81 & 19, 661 \\
+4 & 54 & 1013, 1181 \\
+5 & 34 & 31, 61, 1321 \\
+7 & 10 & 547 \\
+8 & 7 & 881 \\
+9 & 6 & 1693
 \end{tabular}
-\vfill
+    \caption{Primes $\ell$ for which Algorithm~\algstyle{Step2} can be
+    used for our candidate isogeny graph,
+    with corresponding $r$-values and proposed bounds $M_\ell$}
+    \label{tab:step2s}
+\end{table}
+
+\begin{table}
 \begin{tabular}{cl}
 $M_\ell$ & Primes \\
 \hline
-20 & \{23\} \\
-16 & \{29\} \\
-12 & \{37\} \\
-11 & \{41\} \\
-10 & \{43\} \\
-9 & \{47\} \\
-6 & \{71,73\} \\
-5 & \{89\} \\
-4 & \{107,109,113\} \\
-3 & \{131,151\} \\
-2 & \{157,163,167,191,
-  193,
-  197,
-  223,
-  229\} \\
-1 & \{241,
-  251,
-  257,
-  277,
-  283,
-  293,
-  307,
-  317,
-  349,
-  359,
-  373,
+20 & 23  \\
+16 & 29  \\
+12 & 37  \\
+11 & 41  \\
+10 & 43  \\
+9  & 47  \\
+6  & 71, 73  \\
+5  & 89  \\
+4  & 107,109,113  \\
+3  & 131, 151  \\
+2  & 157, 163, 167, 191,
+     193,
+     197,
+     223,
+     229  \\
+1 &  241,
+     251,
+     257,
+     277,
+     283,
+     293,
+     307,
+     317,
+     349,
+     359,
+     373,
 	\\ &
-  383,
-  401,
-  421,
-  431,
-  433,
-  439,
-  443,
-  449,
-  457,
-  467\} \\
+     383,
+     401,
+     421,
+     431,
+     433,
+     439,
+     443,
+     449,
+     457,
+     467 \\
 \end{tabular}
-\caption{\label{fig:steps} A proposal for the bounds $M_\ell$}
-\end{figure}
+    \caption{Primes $\ell$ for which Algorithm~\algstyle{Step1} can be
+    used for our candidate isogeny graph, with proposed bounds $M_\ell$}
+    \label{tab:step1s}
+\end{table}
+
 
 These numbers were found using the following procedure: given a maximum time
 $T$ that one is willing to spend for each prime, one can compute the
