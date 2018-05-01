@@ -150,28 +150,22 @@ suggest~\cite{defeo2017isogenybased}.
 
 In what follows $\F_q$ is a finite field of characteristic $p$ with
 $q$ elements, and $\Fbar_q$ is its algebraic closure. Let $E$ and $E'$
-be elliptic curves defined over $\F_q$. An isogeny $ϕ:E→E'$ is a
-non-constant algebraic map sending the identity point of $E$ to
-the identity point of $E'$; it induces a group homomomorphism from
-$E(\Fbar_q)$ to $E'(\Fbar_q)$~\cite[III.4]{silverman:elliptic}. The
-degree of an isogeny is its degree as an algebraic map; 
-an isogeny of degree $ℓ$ is called an $ℓ$-isogeny.
-The kernel of an isogeny,
-denoted by $\ker ϕ$, is the set of points of $E(\Fbar_q)$ that is
-sent to the identity point of $E'$. 
-An isogeny $ϕ$ is \emph{cyclic} 
-if $\ker ϕ$ is a cyclic group.
-
-An isogeny from a curve $E$ to itself is called an
-\emph{endomorphism}.
-% FIXME: need to include [0] (...otherwise End(E) isn't a ring!)
-Endomorphisms with the operations of addition
-and composition form a ring, called the \emph{endomorphism ring} of
-$E$ and denoted by $\End(E)$. Besides scalar multiplications, the
-simplest example of an endomorphism is the \emph{Frobenius map}
+be elliptic curves defined over $\F_q$. 
+A homomorphism $ϕ:E→E'$ is an
+algebraic map sending $0_E$ to $0_{E'}$;
+it induces a group homomomorphism from
+$E(\Fbar_q)$ to $E'(\Fbar_q)$~\cite[III.4]{silverman:elliptic}.
+An \emph{endomorphism} is a homomorphism from a curve to itself.
+The endomorphisms of $E$ form a ring $\End(E)$,
+with the group law on $E$ for addition
+and composition for multiplication.
+The simplest examples of endomorphisms
+are the scalar multiplications $[m]$
+(mapping $P$ to the sum of $m$ copies of $P$)
+and the \emph{Frobenius} endomorphism
 \begin{align*}
-  π : E &→ E,\\
-  (x,y) &↦ (x^q,y^q).
+  π : E &\longrightarrow E \,, \\
+  (x,y) &\longmapsto (x^q,y^q) \,.
 \end{align*}
 As an element of $\End(E)$, it satisfies a quadratic equation
 $π^2 + q = tπ$, where the integer $t$, called the \emph{trace} of $π$,
@@ -179,26 +173,38 @@ fully determines the order of $E$ as $\#E(\F_q)=q+1-t$. A curve is
 called \emph{supersingular} if $p$ divides $t$, \emph{ordinary}
 otherwise.
 
+An \emph{isogeny} is a non-zero homomorphism.
+The
+degree of an isogeny is its degree as an algebraic map,
+so for example the Frobenius endomorphism $\pi$ has degree $q$,
+and scalar multiplication by $m$ has degree $m^2$.
+Isogenies of degree $ℓ$ are called $ℓ$-isogenies.
+The kernel $\ker ϕ$ of $\phi$
+is the set of points of $E(\Fbar_q)$ that is
+mapped to $0_{E'}$. 
+An isogeny $ϕ$ is \emph{cyclic} 
+if $\ker ϕ$ is a cyclic group.
+
 Any isogeny can be factored as a composition of a \emph{separable} and
 a \emph{purely inseparable} isogeny. \emph{Purely inseparable}
-isogenies have trivial kernel, and degree a power of
-$p$. \emph{Separable} isogenies contain all
+isogenies have trivial kernel, and degree a power of $p$.
+\emph{Separable} isogenies contain all
 isogenies of degree coprime to $p$.
-Up to isomorphism,
-separable isogenies
-are in one-to-one correspondence with
-their kernels:
-for any finite subgroup $G⊂E$ of order $ℓ$ there is a
-unique elliptic curve up to isomorphism, denoted by $E/G$, and a
-unique $ℓ$-isogeny $ϕ:E→E/G$ up to composition by the same
-isomorphism, such that $\kerϕ=G$. In particular $\deg ϕ=\#\ker ϕ$. It follows
+Up to isomorphism, separable isogenies
+are in one-to-one correspondence with their kernels:
+for any finite subgroup $G⊂E$ of order $ℓ$ there is 
+an elliptic curve $E/G$ and an $\ell$-isogeny $\phi: E \to E/G$
+such that $\ker \phi = G$,
+and the curve and isogeny are unique up to isomorphism.
+In particular, if $\phi$ is separable then $\deg ϕ=\#\ker ϕ$.
+It follows
 that any isogeny of degree greater than $1$ can be factored as a
 composition of cyclic isogenies of prime degree.
 
 For any $ℓ$-isogeny $ϕ:E→E'$, there is a unique $ℓ$-isogeny
-$\hat{ϕ}:E'→E$ such that the compositions $ϕ∘\hat{ϕ}$ and $\hat{ϕ}∘ϕ$
-are equal to the multiplication-by-$ℓ$ maps on $E'$ and $E$
-respectively. We call $\hat{ϕ}$ the \emph{dual} of $ϕ$. This
+$\hat{ϕ}:E'→E$ such that $ϕ∘\hat{ϕ} = [\ell]$ on $E'$
+and $\hat{ϕ}∘ϕ = [\ell]$ on $E$.
+We call $\hat{ϕ}$ the \emph{dual} of $ϕ$. This
 shows that being \emph{$\ell$-isogenous} is an equivalence
 relation. Further, a theorem of Tate states that two curves are
 isogenous over $\F_q$ if and only if they have the same number of
