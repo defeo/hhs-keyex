@@ -1011,7 +1011,7 @@ categories~\cite{NIST2016}.
   \renewcommand{\arraystretch}{1.4}
   \centering
   \begin{tabular}{c | c | c | c | c | c}
-    $\log Δ_π$ & $\log h(\O_K)$
+    $\log Δ_K$ & $\log h(\O_K)$
     & \parbox{10ex}{\centering classical security}
     & \parbox{10ex}{\centering quantum queries}
     & \parbox{10ex}{\centering quantum security}
@@ -1050,15 +1050,15 @@ essentially following the lead of
 Couveignes~\cite{cryptoeprint:2006:291} and
 Stolbunov~\cite{Stol,Stolbunov2012}, however we take their analyses a
 step further by explicitly modeling the hardness of distinguishing
-random walks on Cayley graphs from the uniform distribution; this
+random walks on Cayley graphs from the uniform distribution: this
 yields stronger proofs and a better separation of security concerns.
 
 We will write $x\rand{σ} X$ for an element taken from a set $X$
-according to a probability distribution $σ$; if $X$ is finite, we
-write $x\uni X$ for an element taken according to the uniform
+according to a probability distribution $σ$. If $X$ is finite,
+then we write $x\uni X$ for an element taken according to the uniform
 distribution.
 
-For the rest of the section, $q$ is a prime power, $\O$ is an order in
+For the rest of this section $q$ is a prime power, $\O$ is an order in
 a quadratic imaginary field with discriminant $Δ\sim q$, $\Cl(\O)$ is
 the class group of $\O$, $\Ell_q(\O)$ is the (non-empty) set of
 elliptic curves with complex multiplication by $\O$, and $E_0$ is a
@@ -1178,7 +1178,7 @@ etc.).
 	We can consider this sampling as follows:
 	with probability $1-\epsilon$, sample $E_c$ \emph{uniformly},
 	and with probability $\epsilon$ sample it from
-	an unknown distribution of probability.
+	an unknown probability distribution.
 
   Now, if $T$ forwarded $(E_a,E_b,E_{ab})$ untouched, it is immediate
   to see that
@@ -1236,7 +1236,7 @@ two statements are true:
 \begin{itemize}
 \item $S$ is \emph{not too small}, i.e. the number of
 isogeny degrees used is $\Omega(\log q)$;
-\item Key space size is at least $\sqrt{|\Delta_K|}$.
+\item The keyspace size is at least $\sqrt{|\Delta_K|}$.
 \end{itemize}
 
 At present, proving rapid mixing of random walks with such
@@ -1252,10 +1252,10 @@ However, numerical evidence widely suggests that
 such results are too weak. In~\cite[7.2]{jao+miller+venkatesan09},
 it is asked whether an analogue of the previous theorem would
 be true with the sole constraint $B>1$. In~\cite[Section~3]{GHS},
-it is mentioned that much less split primes are needed to walk
+it is mentioned that many fewer split primes are needed to walk
 in the isogeny graph than theoretically expected.
 We believe that these experiments can bring some evidence
-in relying on the IWD assumptions with more aggressive
+in favour of relying on the IWD assumptions with more aggressive
 parameters than those provided by GRH.
 
 Regarding the weighting of random walks,
@@ -1274,16 +1274,17 @@ solving Problem~\ref{prob:isog}.
 In order to demonstrate that our key-exchange protocol is usable
 at standard security levels, we implemented it in the Julia
 programming language with the help of the computer algebra package
-Nemo~\cite{todo:Nemo}. In this occasion, we developed a small
-Julia package built upon Nemo that handles basic functionalities
-regarding elliptic curves over finite fields~\cite{todo:package}.
-We used the Bostan--Morain--Salvy--Schost~\cite{todo:BMSS} for
+Nemo~\cite{todo:Nemo}. For this, we developed a small
+Julia package, built upon Nemo, to handle basic functionalities
+for elliptic curves over finite fields~\cite{todo:package}.
+We used the Bostan--Morain--Salvy--Schost~\cite{todo:BMSS} algorithm for
 isogeny computations.
 
-We use the public parameters as given in
-Section~\ref{sec:initcurve}.
-In this unoptimized implementation, we obtain
-the following times to perform a scalar multiplication over $\F_{q^r}$:
+In this unoptimized implementation, 
+using the public parameters given in
+Section~\ref{sec:initcurve},
+we obtain
+the following times to perform a scalar multiplication over~$\F_{q^r}$:
 %todo: on which gear ?
 
 \begin{center}
@@ -1293,11 +1294,10 @@ $r$ & 1 & 3 & 4 & 5 & 7 & 8 & 9 \\
 $t\ (s)$ & 0.02 & 0.10 & 0.15 & 0.24 & 0.8 & 1.15 & 1.3
 \end{tabular}
 \end{center}
+The time needed to factor the modular equation of level $\ell$
+was approximately $0.017 * \ell$ seconds.
 
-and the approximate time needed to factor the modular equation of level $\ell$
-is $0.017 * \ell$ seconds.
-
-Using such data, one can propose a maximal number of steps to be
+We can use this data to propose a maximal number of steps to be
 computed for each prime. In the upper table of Figure~\ref{fig:steps}, we
 list the primes for which Algorithm~\algstyle{Step2} is used, with
 the corresponding extension degree $r$, and a star if the twisted curve
