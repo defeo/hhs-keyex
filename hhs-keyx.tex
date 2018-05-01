@@ -99,45 +99,87 @@ the information on the identity element has been forgotten. Couveignes
 defines a \emph{hard homogeneous space} (HHS) to be a principal
 homogeneous space where computing
 the action of $G$ on $X$ is computationally feasible, but inverting
-the isomorphism $φ_x$ is computationally hard for any $x$. 
-Given a HHS $X$, we can immediately build a Diffie--Hellman type of key exchange
-where the elements of $X$ are used as \emph{labels} to \emph{mask} the
-group elements; then, the security of the scheme relies not (only) on
-the discrete logarithm problem of $G$, but rather on the hardness of
-inverting the isomorphisms $φ_x$.
+the isomorphism $φ_x$ is computationally hard for any $x$.
+
+\begin{algorithm}
+  \caption{Generic key exchange from a hard homogeneous space}
+  \label{proto:hhs}
+  \Params{A \emph{base point} $x_0∈X$}
+  \Alice{
+    \Samples a random element $a∈G$\;
+    \Sends $x_a = a·x_0$ to Bob}
+  \Bob{
+    \Samples a random element $b∈G$\;
+    \Sends $x_b = b·x_0$ to Alice}
+  \Key{$a·x_b = b·x_a = ab·x_0$}
+\end{algorithm}
+
+Any HHS $X$ for a finite Abelian group $G$ can be used to construct a
+key exchange as shown in Algorithm~\ref{proto:hhs}.  If $X$ is a
+cyclic group $〈x〉$ of order $p$, and $G=ℤ/pℤ$ acting on $X$ by
+$g·x=x^g$, then this is simply the Diffie--Hellman key exchange, and
+inverting $φ_x$ is the discrete logarithm problem (DLP) in $X$.  But,
+for other homogeneous spaces, inverting $φ_x$ may have no relationship
+with a DLP, and may potentially be harder to solve, including for a
+quantum computer. Similar ideas have repeatedly appeared in the
+literature under different
+flavors~\cite{10.1007/3-540-44598-6_10,monico2007}.
 
 Couveignes viewed HHS chiefly as a general framework, encompassing
 various flavors of Diffie--Hellman-like systems. Nevertheless, he
 suggested using a specific HHS based on the theory of complex
 multiplication of elliptic curves, in a sense generalizing to the HHS
 framework the class-group-based Diffie--Hellman key exchange of
-Buchmann and Williams~\cite{Buchmann1988}. It is however Rostovtsev
-and Stolbunov who first gave in~\cite{rostovtsev+stolbunov06} a
-concrete and detailed realization of Couveignes' idea.
+Buchmann and Williams~\cite{Buchmann1988}. Independently, Rostovtsev
+and Stolbunov proposed in~\cite{rostovtsev+stolbunov06} a public key
+encryption scheme based on the same HHS. Later, Stolbunov~\cite{Stol}
+derived more protocols from their primitive, including an interactive
+key exchange scheme similar to Algorithm~\ref{proto:hhs}.  Rostovtsev
+and Stolbunov's proposal crucially deviates from the HHS paradigm in
+the way random elements of $G$ are sampled, as we will explain in
+Section~\ref{sec:keyex}. This makes the primitive less flexible, but
+also (relatively) more practical.
 
-Rostovtsev and Stolbunov advertised their system as a potential
-post-quantum candidate, leading Childs, Jao and Soukharev to introduce
+Rostovtsev and Stolbunov advertised their protocols as a potential
+post-quantum candidates, leading Childs, Jao and Soukharev to introduce
 the first subexponential quantum algorithm capable of breaking
-it~\cite{childs2014constructing}. Hence, being already slow enough to
+them~\cite{childs2014constructing}. Hence, being already slow enough to
 be impractical in a classical security setting, the
-Rostovtsev--Stolbunov system became even more unusable in a quantum
+Rostovtsev--Stolbunov primitive became even more unusable in a quantum
 security setting. This led Jao and De Feo to create the SIDH
 key-exchange protocol~\cite{jao+defeo2011}, which to the present day
 is not victim to any subexponential attack.
 
 The aim of the present paper is to improve and modernize the
-Couveignes--Rostovtsev--Stolbunov construction, borrowing techniques
-from SIDH and point-counting algorithms, to the point of making it
-usable in a post-quantum setting. Although the final result is far
-from being practical, we believe it constitutes progress in the
-direction of having a valid isogeny-based alternative to SIDH.
-Furthermore, our proposed scheme presents some distinct advantages
-over SIDH, that we shall discuss in Section~\ref{todo}. While
-preparing this paper we were informed of
-% todo: say something on CSIDH
+Couveignes--Rostovtsev--Stolbunov (CRS) construction, borrowing
+techniques from SIDH and point-counting algorithms, to the point of
+making it usable in a post-quantum setting.  Our main contributions
+are in Sections~\ref{sec:keyex}--\ref{sec:initcurve}, where we present
+a new, more efficient way of computing the CRS group action, and in
+Section~\ref{sec:sec} where we give precise classic and quantum
+security estimates, we formalize hardness assumptions, and sketch
+security proofs in models stronger than what was previously
+considered.
 
-The paper is structured as follows.
-% todo
+Although the final result is far from being practical, we believe it
+constitutes progress in the direction of having a valid isogeny-based
+alternative to SIDH.  Furthermore, the CRS primitive presents some
+distinct advantages over SIDH, that we shall discuss in
+Section~\ref{sec:sec}. While preparing this paper we were informed of
+a recent work by Castryk, Lange, Martindale, Panny and Renes,
+introducing an efficient post-quantum primitive very similar to
+CRS~\cite{csidh}.  Their work builds upon the ideas presented in
+Sections~\ref{sec:keyex}--\ref{sec:initcurve}, and uses them in a
+different homogeneous space where they apply effortlessly.  Their
+breakthrough confirms that, if anything, our techniques were a
+fundamental step towards the first practical post-quantum
+non-interactive key exchange protocol.
+
+The paper is structured as follows. In Section~\ref{sec:math} we
+review the fundamental mathematical concepts underlying the CRS group
+action, in Sections~\ref{sec:keyex}--\ref{sec:sec} we present our main
+contributions, finally in Section~\ref{sec:exp} we present a
+proof-of-concept implementation and measure its performance.
 
 \section{Isogenies and complex multiplication}
 \label{sec:math}
@@ -438,45 +480,21 @@ partitioning the set $\Ell_q(\End(E))$ into cycles of equal size.
 In this section, following Couveignes~\cite{cryptoeprint:2006:291} and
 Rostovtsev and Stolbunov~\cite{rostovtsev+stolbunov06}, we describe a
 key exchange protocol based on the action of a class group on an
-isogeny graph.  This is essentially the Rostovtsev--Stolbunov key
-exchange protocol, with the twist of taking advantage of specially
-selected parameters to improve efficiency.
+isogeny graph.
 
-Any principal homogeneous space $X$ for a finite Abelian group $G$ can
-be used to construct a key exchange as follows:
-
-\begin{algorithm}
-  \caption{Generic key exchange from a hard homogeneous space}
-  \label{proto:hhs}
-  \Params{A \emph{base point} $x_0∈X$}
-  \Alice{
-    \Samples a random element $a∈G$\;
-    \Sends $x_a = a·x_0$ to Bob}
-  \Bob{
-    \Samples a random element $b∈G$\;
-    \Sends $x_b = b·x_0$ to Alice}
-  \Key{$a·x_b = b·x_a = ab·x_0$}
-\end{algorithm}
-
-If $X$ is a cyclic group $〈x〉$ of order $p$, and $G=ℤ/pℤ$ acting on
-$X$ by $g·x=x^g$, then this is simply the Diffie--Hellman key exchange:
-security is based on the difficulty of the discrete logarithm problem
-in $X$.
-
-More generally, if $X$ is a \emph{hard homogeneous space}, i.e.\ one
-such that given $x,y∈X$ it is hard to find $g∈G$ such that $g·x=y$,
-then the security of the protocol relies on a new assumption. Similar
-ideas have repeatedly appeared in the literature under different
-flavors~\cite{10.1007/3-540-44598-6_10,monico2007}.
-
-We would like to apply this idea to the principal homogeneous space
+Ideally, we would like to instantiate the key exchange protocol of
+Algorithm~\ref{proto:hhs} with the principal homogeneous space
 $\Ell_q(\O)$ for the class group $\Cl(\O)$, for some well chosen order
 $\O$ in a quadratic imaginary field. However, given a generic element
 of $\Cl(\O)$, the best algorithm~\cite{jao+soukharev10} to evaluate
 its action on $\Ell_q(\O)$ has subexponential complexity in $q$,
-making Algorithm~\ref{proto:hhs} infeasible. The solution is to use a
-special \emph{smooth} representation for the elements of $\Cl(\O)$,
-that is best explained by looking at Cayley graphs.
+making the protocol infeasible. The solution is to use a special
+\emph{smooth} representation for the elements of $\Cl(\O)$.
+
+In the next subsection, we present Stolbunov's key exchange
+protocol~\cite{Stol}, in a more general framework using Cayley graphs.
+Then, we present our improvement to Stolbunov's key exchange, taking
+advantage of specially selected parameters to boost efficiency.
 
 
 \subsection{Key exchange from Abelian Cayley graphs}
@@ -548,10 +566,6 @@ in the next subsection. The action of an isogeny walk $(\frak s_i)_i$
 will be simply evaluated as the sequence of isogeny steps
 $ϕ_{\frak s_i}$.
 
-Both Couveignes' and Rostovtsev and Stolbunov's cryptosystems are
-special instances of the latter protocol, differing essentially in the
-way walks are sampled and evaluated. In the next subsection, we
-describe our own take on the protocol.
 
 \subsection{Sampling and evaluating isogeny walks}
 
@@ -1098,9 +1112,9 @@ to the classical DDH assumption.
   decide from which of the two they were sampled.
 \end{definition}
 
-We split this assumption into two more atomic assumptions. The first
+We split this assumption into two finer grained assumptions. The first
 states that it is computationally hard to distinguish between
-commutative diagrams sampled uniformly at random, and commutative
+commutative diagrams sampled uniformly at random and commutative
 diagrams sampled from the distribution $σ$.
 
 \begin{definition}[Isogeny Walk Distinguishing (IWD)]
