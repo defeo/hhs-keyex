@@ -126,7 +126,7 @@ key-exchange protocol~\cite{jao+defeo2011}, which to the present day
 is not victim to any subexponential attack.
 
 The aim of the present paper is to improve and modernize the
-Couveignes-Rostovtsev--Stolbunov construction, borrowing techniques
+Couveignes--Rostovtsev--Stolbunov construction, borrowing techniques
 from SIDH and point-counting algorithms, to the point of making it
 usable in a post-quantum setting. Although the final result is far
 from being practical, we believe it constitutes progress in the
@@ -143,9 +143,9 @@ The paper is structured as follows.
 \label{sec:math}
 
 We recall here basic facts on isogenies of elliptic curves defined
-over finite fields. For an in depth introduction to these concepts, we
-refer the reader to~\cite{silverman:elliptic}, and for a general
-overview of isogenies and their use in cryptography we
+over finite fields. For an in-depth introduction to these concepts, we
+refer the reader to~\cite{silverman:elliptic}. For a general
+overview of isogenies and their use in cryptography, we
 suggest~\cite{defeo2017isogenybased}.
 
 In what follows $\F_q$ is a finite field of characteristic $p$ with
@@ -183,9 +183,12 @@ Any isogeny can be factored as a composition of a \emph{separable} and
 a \emph{purely inseparable} isogeny. \emph{Purely inseparable}
 isogenies have trivial kernel, and degree a power of
 $p$. \emph{Separable} isogenies contain all
-isogenies of degree coprime to $p$, and
+isogenies of degree coprime to $p$.
+Up to isomorphism,
+separable isogenies
 are in one-to-one correspondence with
-their kernels: for any finite subgroup $G⊂E$ of order $ℓ$ there is a
+their kernels:
+for any finite subgroup $G⊂E$ of order $ℓ$ there is a
 unique elliptic curve up to isomorphism, denoted by $E/G$, and a
 unique $ℓ$-isogeny $ϕ:E→E/G$ up to composition by the same
 isomorphism, such that $\kerϕ=G$. In particular $\deg ϕ=\#\ker ϕ$. It follows
@@ -195,7 +198,7 @@ composition of cyclic isogenies of prime degree.
 For any $ℓ$-isogeny $ϕ:E→E'$, there is a unique $ℓ$-isogeny
 $\hat{ϕ}:E'→E$ such that the compositions $ϕ∘\hat{ϕ}$ and $\hat{ϕ}∘ϕ$
 are equal to the multiplication-by-$ℓ$ maps on $E'$ and $E$
-respectively. $\hat{ϕ}$ is called the \emph{dual isogeny} to $ϕ$. This
+respectively. We call $\hat{ϕ}$ the \emph{dual} of $ϕ$. This
 shows that being \emph{$\ell$-isogenous} is an equivalence
 relation. Further, a theorem of Tate states that two curves are
 isogenous over $\F_q$ if and only if they have the same number of
@@ -491,17 +494,17 @@ not matter.
 
 If we have a Schreier graph where $G$ is finite and Abelian, and the
 action $G$ on $X$ is efficiently computable, we can define a key
-exchange protocol as follows:
+exchange protocol as in Algorithm~\ref{proto:cayley}.
 
 \begin{algorithm}
   \caption{Generic key exchange from a Cayley graph}
   \label{proto:cayley}
   \Params{A \emph{base point} $x_0∈X$}
   \Alice{
-    \Samples a random walk $(a_i)_i$ in $\Graph(G,S,X)$\;
+    \Samples a random walk $(a_i)_i$ in $S^*$\; %$\Graph(G,S,X)$\;
     \Sends $x_a = (a_i)_i·x_0$ to Bob}
   \Bob{
-    \Samples a random walk $(b_i)_i$ in $\Graph(G,S,X)$\;
+    \Samples a random walk $(b_i)_i$ in $S^*$\; %$\Graph(G,S,X)$\;
     \Sends $x_b = (b_i)_i·x_0$ to Alice}
   \Key{$(a_i)_i·x_b = (b_i)_i·x_a$}
 \end{algorithm}
@@ -516,18 +519,19 @@ the Diffie--Hellman protocol on $X$.
 
 The specialization to isogeny graphs is now evident. We take:
 \begin{itemize}
-\item $X=\Ell_q(\O)$ as vertex set, for well chosen $q$ and $\O$;
-\item $G=\Cl(\O)$ as group acting on $X$;
+\item $X=\Ell_q(\O)$ as the vertex set, for some well-chosen $q$ and $\O$;
+\item $G=\Cl(\O)$ as the group acting on $X$;
 \item $S$ a set of ideals of the form $(π-λ,ℓ)$, where $ℓ$ is an
-  Elkies prime for the isogeny class $\Ell_q(\O)$, and $λ$ is a
-  Frobenius eigenvalue for $E[ℓ]$ (i.e.\ an integer in $ℤ/ℓℤ$).
+  Elkies prime for the isogeny class $\Ell_q(\O)$,
+  and $λ$ is an eigenvalue of Frobenius on $E[ℓ]$. 
+  % (i.e.\ an integer in $ℤ/ℓℤ$).
 \end{itemize}
 The graph $\Graph(G,S,X)$ is thus an isogeny graph, composed of many
 isogeny cycles superimposed on the same vertex set $\Ell_q(\O)$,
 isomorphic to a Cayley graph of $\Cl(\O)$, connected if $S$ generates
 $\Cl(\O)$, looking exactly like the one in Figure~\ref{fig:cayley}.
 
-We will call \emph{isogeny walk} a walk in this graph. The action of
+We will call a walk in this graph an \emph{isogeny walk}. The action of
 an ideal $\frak s=(π-λ,ℓ)$ on an elliptic curve $E∈\Ell_q(\O)$ will be
 evaluated by computing the unique isogeny $ϕ_{\frak s}:E→E'$ such that
 $π(P)=λP$ for all $P∈\ker ϕ_{\frak s}$; algorithms for this operation are given
@@ -542,7 +546,7 @@ describe our own take on the protocol.
 
 \subsection{Sampling and evaluating isogeny walks}
 
-In order to specialize algorithm~\ref{proto:cayley} to isogeny graphs,
+In order to specialize Algorithm~\ref{proto:cayley} to isogeny graphs,
 Rostovtsev and Stolbunov avoid computing the order $\O$, the set $\Ell_q(\O)$
 or performing arithmetic operations on ideal classes. Instead, they only
 manipulate isogenies between elliptic curves. We retain this idea here.
@@ -556,10 +560,12 @@ using one of two different algorithms:
 	$\lambda$ satisfies certain properties.
 \end{itemize}
 
-Rostovtsev and Stolbunov only used an analogue of~\algstyle{Step1}. Using
-algorithm~\algstyle{Step2}, that is inspired from the SIDH cryptosystem and
-related protocols, and analyzing its consequences on the choice of public
-parameters (see Section~\ref{sec:initcurve}), is the main contribution of our work.
+Rostovtsev and Stolbunov only used an analogue of~\algstyle{Step1}. 
+The introduction of the \algstyle{Step2} algorithm, 
+inspired by the SIDH cryptosystem and related protocols, 
+and the analysis of its consequences for the choice of public
+parameters (see Section~\ref{sec:initcurve}),
+is the main contribution of our work.
 
 The cost of computing an isogeny step given by $\frak s$
 varies heavily according to which algorithm is used and the values of $\lambda$
@@ -580,7 +586,7 @@ in our particular setting. Using the same public parameters, procedure
 \algstyle{KeySample} generates a list $(k_\ell)$ with $-M_\ell\leq k_\ell\leq M_\ell$
 for each $(\ell, \lambda, \mu, i)\in S_{sym}$, and $0\leq k_\ell\leq M_\ell$ for
 each $(\ell, \lambda)\in S_{asym}$. Procedure \algstyle{Walk} simply performs
-a sequence of isogeny steps as detailed in algorithm~\ref{alg:walk}.
+a sequence of isogeny steps as detailed in Algorithm~\ref{alg:walk}.
 
 \begin{algorithm}
   \caption{Key exchange from an isogeny graph}
@@ -635,7 +641,7 @@ curves. More specifically, we use the \emph{classical modular polynomial}
 $\Phi_\ell(X, Y)$~\cite{todo:classicalmodpoly}.
 This bivariate polynomial with integer coefficients has
 the following property: a cyclic $\ell$-isogeny exists between two elliptic
-curves $E$ and $E'$ if and only if $\Phi_\ell(j(E), j(E')$ = 0,
+curves $E$ and $E'$ if and only if $\Phi_\ell(j(E), j(E')) = 0$,
 where $j$ denotes the $j$-invariant. Thus, the roots
 of the polynomial equation $\Phi_\ell(j(E), X)=0$ give the two neighbors
 of $E$ in the cycle of $\ell$-isogenies. The degree of this equation
@@ -652,24 +658,24 @@ This computation is only necessary for the \emph{first} $\ell$-isogeny
 step, since no return on the isogeny cycle is allowed.
 
 In practice, we store modular equations with coefficients already reduced
-in $\F_q$. Several publicly available databases of modular polynomials
+in~$\F_q$. Several publicly available databases of modular polynomials
 exist~\cite{todo:modulardatabases}. The size of the classical modular polynomial
-$\Phi_\ell$ mentioned above grows quickly with $\ell$, hence it is convenient
+$\Phi_\ell$ mentioned above grows quickly with $\ell$, so it is convenient
 to use other types of modular equations when $\ell$ grows, such as the so-called
 Atkin modular equations~\cite{todo:atkinmodpoly}. One then has to
 modify the kernel computation accordingly~\cite{todo:isogkernelatkin}.
 
-The costly step in algorithm~\algstyle{Step1} is computing the roots
+The costly step in Algorithm~\algstyle{Step1} is computing the roots
 of the polynomial $\Phi_\ell(j(E), X)$. Using a Cantor--Zassenhaus-type
 algorithm~\cite{todo:canzass}, this amounts to computing $X^q$ modulo
 this polynomial. Using asymptotically fast methods for polynomial
 arithmetic, the cost is $\softO(\ell\log q)$ field operations.
 
 \paragraph{Algorithm \algstyle{Step2}.} This algorithm, very different
-in spirit from algorithm~\algstyle{Step1}, is given by the following
+in spirit from Algorithm~\algstyle{Step1}, is given by the following
 pattern:
 \begin{itemize}
-\item Find a nonzero $Q\in \ker \phi_{\frak s}$,
+\item Find a nonzero $Q\in E[\frak s]$ (which is $\ker \phi_{\frak s}$),
 \item Recover $\ker \phi_{\frak s}$ entirely by enumerating the multiples of $Q$,
 \item Compute the image of $\phi_{\frak s}$ from its kernel using
 Vélu's formulas~\cite{todo:velu}.
@@ -694,32 +700,32 @@ When $\ell$ is not too large, the cost is dominated by that of the scalar
 multiplication. Using asymptotically fast arithmetic operations,
 the overall cost is $\softO(r^2\log q)$ field operations, as $C_{ext}$
 has the same order of magnitude as $q^r$. Since the scalar
-multiplication dominates, algorithm~\algstyle{Step2} can be improved
+multiplication dominates, Algorithm~\algstyle{Step2} can be improved
 by using elliptic curve models with more efficient arithmetic~\cite{todo:curvearith}.
 
 Note that when $r = 1$
-(i.e. $\lambda = 1$), we saved a factor $\ell$ over algorithm \algstyle{Step1},
+(i.e. $\lambda = 1$), we save a factor $\ell$ over Algorithm~\algstyle{Step1},
 in addition with much better constant factors. As a general rule,
 algorithm \algstyle{Step2} is more efficient when $r$ is small, while
-for generic values of $r$ (typically $O(\ell))$ algorithm~\algstyle{Step1}
+for generic values of $r$ (typically $O(\ell))$ Algorithm~\algstyle{Step1}
 should be preferred.
 
 
 
-Even if the multiplicative orders of $\lambda$ divides that of $\mu$,
-we can still try to use algorithm \algstyle{Step2} in both directions.
-The trick is to use the \emph{twisted} curve of $E$. While this does not
+Even if the multiplicative order of $\lambda$ divides that of $\mu$,
+we can still try to use Algorithm~\algstyle{Step2} in both directions.
+The trick is to use the \emph{quadratic twist} of $E$. While this does not
 change the isomorphism class of the curve, the Frobenius eigenvalues
 become $-\lambda$ and $-\mu$. For example, if
-$p = -1\mod\ell$ and $\lambda = 1$, then $\mu=-1$ and algorithm
-\algstyle{Step2} can be used in both directions with $r=1$.
+$p \equiv -1\pmod{\ell}$ and $\lambda = 1$, then $\mu=-1$ and 
+Algorithm~\algstyle{Step2} can be used in both directions with $r=1$.
 
 
 It is now evident that the choice of public parameters, especially
 the initial curve $E_0$, has heavy impact on the execution time:
 smaller Elkies primes,
 and smaller multiplicative orders of the Frobenius eigenvalues, will
-lead to better practical performances. Since all this information
+lead to better practical performances. Since all of this information
 is contained in the value of $\# E(\F_q)$, we now face the problem
 of constructing ordinary elliptic curves with prescribed
 order, or more precisely with prescribed order \emph{modulo small
@@ -741,32 +747,32 @@ to construct curves whose cardinality satisfies some constraints
 modulo small prime.
 This is faster than choosing curves at random and computing their cardinalities
 completely until a convenient one is found, but still does not allow us
-to use the full power of algorithm~\algstyle{Step2}.
+to use the full power of Algorithm~\algstyle{Step2}.
 
 The SEA algorithm~\cite{schoof95,todo} is a polynomial-time algorithm for
 point counting on elliptic curves over a finite field. In order to compute
-$C = \# E(\F_p)$, it computes the value of $C\mod\ell$ modulo a series
+$C = \# E(\F_p)$, it computes the value of $C$ modulo a series
 of small primes $\ell$: it is a \emph{multimodular algorithm}.
 Cryptographers are usually interested in generating elliptic curves of
 prime or nearly prime order. In this case, one uses an \emph{early-abort}
-mechanism: when $C = 0\mod\ell$ for some $\ell$, the algorithm is aborted
+mechanism: when $C \equiv 0\pmod{\ell}$ for some $\ell$, the algorithm is aborted
 and a new curve is chosen.
 
-Here, the situation is the opposite: we rather want elliptic curves
+Here, the situation is the opposite: we \emph{want} elliptic curves
 whose cardinality has lots of small factors. To fix ideas, let us choose
 \[
 p = 7 \left(\prod_{2\leq\ell\leq 380,\ \ell \text{ prime}} \ell\right) - 1
 \]
-which is a 512-bit prime. Then, algorithm~\algstyle{Step2} can be used
+which is a 512-bit prime. Then, Algorithm~\algstyle{Step2} can be used
 for $\ell$-isogenies with $r=1$ in both directions if and only if
-$C_0 = \# E_0(\F_p)$ satisfies $C=0\mod\ell$.
+$C_0 = \# E_0(\F_p)$ satisfies $C_0 \equiv0\pmod{\ell}$.
 
 We now proceed as follows:
 \begin{itemize}
 \item Choose a smoothness bound $B$ (we used $B = 13$).
-\item Pick elliptic curves at random in $\F_p$, and use the SEA
-algorithm, aborting when any $\ell\leq B$ with $C\mod\ell\neq 0$
-is found.
+\item Pick elliptic curves $E$ at random in $\F_p$, and use the SEA algorithm,
+aborting when any $\ell\leq B$ 
+with $\#E(\F_p) \not\equiv 0\pmod{\ell}$ is found.
 \item For each curve which passed the tests above, complete the SEA
 algorithm and estimate the key exchange running time using this
 curve as a public parameter (see Section~\ref{sec:exp}).
@@ -777,7 +783,7 @@ Considering the efficiency of this procedure, it is important to remark
 that very few curves will pass the early-abort tests. The bound $B$ is
 chosen to balance the overall cost of the first few tests with that of
 the complete SEA algorithm for the curves which pass them. Therefore,
-its value is somewhat implementation-dependant. In practice, one also
+its value is somewhat implementation-dependent. In practice, one also
 incorporates the test of existence of a Montgomery model for the
 elliptic curve as in~\cite{todo:refMontgomery}.
 
@@ -807,11 +813,12 @@ b =\ & 7929994832424543515682621940590901949591050994041239 \\
 & 90133670177545414851226849642510122057033563808087.
 \end{aligned}
 \]
-It admits $\ell$-torsion rational points for each $\ell$ in
+This curve, or its twist, admits a rational $\ell$-torsion point 
+for each $\ell$ in
 \[
-  \{3, 5, 7, 11, 13, 17, 103, 523, 821, 947, 1723\}
+  \{2, 3, 5, 7, 11, 13, 17, 103, 523, 821, 947, 1723\}
 \]
-as well as a Montgomery model, and its cardinality is
+as well as a Montgomery model. The cardinality of $E(\F_p)$ is
 \[
 \begin{aligned}
 & 1203734073820884503438338397822280113709202945127019 \\ 
@@ -857,16 +864,17 @@ We start by addressing the following, more general, problem:
   $(ϕ_i)_{1≤i≤n}$ such that $ϕ_n∘\cdots∘ϕ_1(E)=E'$.
 \end{prob}
 
-This problem has been studied for some time before the emergence of
+This problem was studied for some time before the emergence of
 isogeny-based cryptography~\cite{Gal,GHS,galbraith+stolbunov11},
 because of its applications to elliptic curve
 cryptography~\cite{GHS,teske06,jao+miller+venkatesan09}.  The
 algorithm with the best asymptotic complexity is due to Galbraith,
-Hess and Smart~\cite{GHS}; it consists of three stages:
+Hess and Smart~\cite{GHS}. It consists of three stages:
 \begin{description}
-\item[Stage 0.] Use \emph{ascending} walks to reduce to the case where
-  $\End(E)=\End(E')$ is the maximal order.
-\item[Stage 1.] Start two random walks from $E$ and $E'$; detect the
+\item[Stage 0.] Use walks of \emph{ascending} isogenies to reduce to the case where
+  $\End(E)\cong\End(E')$ is the maximal order.
+\item[Stage 1.] Start two random walks of horizontal isogenies 
+  from $E$ and $E'$; detect the
   moment when they collide using a Pollard-rho type of algorithm.
 \item[Stage 2.] Reduce the size of the obtained walk using
   index-calculus techniques.
@@ -879,7 +887,7 @@ $\End(E)$ is contained in the ring of integers $\O_K$ of
 $K=ℚ(\sqrt{Δ_π})$. Write $Δ_π=d^2Δ_K$, where $Δ_K$ is the
 discriminant\footnote{$Δ_K$ is also called a \emph{fundamental
     discriminant}; it is in $\{0,1\}\bmod 4$, and either $Δ_K$ or
-  $Δ_K/4$ is squarefree.} of $\O_k$, then for any $ℓ\mid d$ the
+  $Δ_K/4$ is squarefree.} of $\O_K$, then for any $ℓ\mid d$ the
 $ℓ$-isogeny graph of $E$ contains \emph{ascending} and
 \emph{descending} isogenies and is sometimes referred to as a
 \emph{volcano}~\cite{fouquet+morain02} (see Figure~\ref{fig:volcano}).
@@ -916,11 +924,11 @@ $\log q$.
 \end{figure}
 
 The class $\Ell_q(\O_K)$ is the smallest among all classes
-$\Ell_q(\O)$ for some $\O⊂\O_K$, thus it is always interesting to
+$\Ell_q(\O)$ for $\O⊂\O_K$, so it is always interesting to
 reduce to it. This justifies using curves with maximal endomorphism
 ring in the definition of the protocol in
-Section~\ref{sec:keyex}. Remark that, when $Δ_π$ is square-free $ℤ[π]$
-is the maximal order, hence this condition is automatically satisfied.
+Section~\ref{sec:keyex}. We remark that when $Δ_π$ is square-free, $ℤ[π]$
+is the maximal order, and hence this condition is automatically satisfied.
 
 The collision search in Stage~1 relies on the birthday paradox, thus
 it has a complexity of $O(\sqrt{h})$, where $h=\#\Ell_q(\O_K)$ is the
@@ -940,19 +948,20 @@ albeit feasible, thus we will only rely on these heuristic arguments
 to justify the security of our proposed parameters.
 % todo: check this is really the latest record
 
-Finally, Stage~2 has a complexity bounded by that of Stage~1, and
-outputs an isogeny walk of size polynomial in $\log q$, it thus has no
-impact on our security estimates.
+Finally, Stage~2,
+which outputs an isogeny walk of size polynomial in $\log q$,
+has a complexity bounded by that of Stage~1.
+It therefore has no impact on our security estimates.
 
 \begin{remark}
-  The Cohen-Lenstra heuristic~\cite{10.1007/BFb0099440} predicts that
+  The Cohen--Lenstra heuristic~\cite{10.1007/BFb0099440} predicts that
   the odd part of $\Cl(\O_K)$ is cyclic with overwhelming
   probability; and more heuristics~\cite{10.1007/3-540-44448-3_18}
   indicate that $h(\O_K)$ is likely to have a large prime factor.
-  However, there is no known way in which the group structure of
-  $\Cl(\O_K)$ affect the security of our protocol, we can thus
+  However, since there is no known way in which the group structure of
+  $\Cl(\O_K)$ can affect the security of our protocol, we can 
   disregard this matter. No link between the group structure
-	of $E(\F_q)$ itself and the security is known either.
+	of $E(\F_q)$ itself and the security is known, either.
 \end{remark}
 
 \paragraph{Quantum attacks.}
@@ -1024,10 +1033,10 @@ has the following prime factorization:
 \begin{aligned}
 & -2^5 \cdot 20507 \cdot 67429 \cdot 11718238170290677 \cdot 12248034502305872059 \\
 & \cdot 60884358188204745129468762751254728712569\\
-& \cdot 68495197685926430905162211241300486171895491480444062860794276603493,
+& \cdot 68495197685926430905162211241300486171895491480444062860794276603493\,.
 \end{aligned}
 \]
-hence $\Delta_K$ is a 511-bit integer.
+The fundamental discriminant $\Delta_K$ is therefore a 511-bit integer.
 
 \subsection{Security proofs}
 \label{sec:proofs}
@@ -1290,10 +1299,10 @@ is $0.017 * \ell$ seconds.
 
 Using such data, one can propose a maximal number of steps to be
 computed for each prime. In the upper table of Figure~\ref{fig:steps}, we
-list the primes for which algorithm~\algstyle{Step2} is used, with
+list the primes for which Algorithm~\algstyle{Step2} is used, with
 the corresponding extension degree $r$, and a star if the twisted curve
 allows to use both directions in the isogeny graph. In the lower table,
-we list other Elkies primes for which we apply algorithm~\algstyle{Step1}.
+we list other Elkies primes for which we apply Algorithm~\algstyle{Step1}.
 
 \begin{figure}
 \centering
