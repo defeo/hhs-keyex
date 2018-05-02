@@ -864,7 +864,7 @@ scheme in our implementation.
 \section{Security}
 \label{sec:sec}
 
-We now address the security of our proposed scheme, and related
+We now address the security of the CRS primitive, and derived
 protocols. Intuitively, these systems rely on two assumptions:
 \begin{enumerate}
 \item Given two elliptic curves $E,E'$ in $\Ell_q(\O)$, it is hard to
@@ -1114,8 +1114,8 @@ to the classical DDH assumption.
 
 We split this assumption into two finer grained assumptions. The first
 states that it is computationally hard to distinguish between
-commutative diagrams sampled uniformly at random and commutative
-diagrams sampled from the distribution $σ$.
+commutative squares sampled uniformly at random and commutative
+squares sampled from the distribution $σ$.
 
 \begin{definition}[Isogeny Walk Distinguishing (IWD)]
   Given curves $E_a,E_b,E_{ab}∈\Ell_q(\O)$ sampled with probability
@@ -1275,7 +1275,7 @@ like~\cite[Theorem~1.5]{jao+miller+venkatesan09}
 that was used in the proof of Lemma~\ref{lem:adv},
 typically require isogeny degrees $\Omega((\log q)^B)$
 for some $B>2$, and fully random walks that are not,
-for example, weighted towards smaller-degree isogenies.
+for example, skewed towards smaller-degree isogenies.
 
 However, numerical evidence widely suggests that
 such results are too weak. In~\cite[7.2]{jao+miller+venkatesan09},
@@ -1284,10 +1284,10 @@ be true with the sole constraint $B>1$. In~\cite[Section~3]{GHS},
 it is mentioned that many fewer split primes are needed to walk
 in the isogeny graph than theoretically expected.
 We believe that these experiments can bring some evidence
-in favour of relying on the IWD assumptions with more aggressive
+in favor of relying on the IWD assumptions with more aggressive
 parameters than those provided by GRH.
 
-Regarding the weighting of random walks,
+Regarding the skewing of random walks,
 practical evidence also suggests that the rapid mixing
 properties are not lost: in~\cite{galbraith+stolbunov11},
 such walks are used to accelerate the algorithm
@@ -1295,6 +1295,84 @@ solving Problem~\ref{prob:isog}.
 
 \subsection{Key validation and active security}
 
+Modern practice in cryptography mandates the use of stronger security
+notions than IND-CPA.  From the DLP assumption, it is easy to
+construct protocols with strong security against active adversaries.
+For example, it is well known that the hashed El Gamal KEM achieves
+IND-CCA security in the random oracle model under various
+assumptions~\cite[§7]{10.1007/3-540-45353-9_12,cryptoeprint:1999:007,doi:10.1137/S0097539702403773}.
+All these constructions crucially rely on \emph{key validation}, i.e.\
+Alice must verify that the public data sent by Bob defines valid
+protocol data (e.g., valid elements of a cyclic group), or abort if
+this is not the case.
+
+Failure to perform validation may result in catastrophic attacks, such
+as small subgroup~\cite{10.1007/BFb0052240}, invalid
+point~\cite{10.1007/3-540-44598-6_8}, and invalid curve
+attacks~\cite{Ciet2005}.  In our context, key validation amounts to
+verify that the curve sent by Bob really is an element of
+$\Ell_q(\O_K)$. Failure to do so exposes Alice to an \emph{invalid
+  graph attack} where Bob forces Alice onto an isogeny class with much
+smaller discriminant, or different Elkies primes, and learns something
+on Alice's secret.
+
+Fortunately, key validation is relatively easy for protocols based on
+the CRS primitive. All we need to check is that the received curve has
+the right order, and has maximal endomorphism ring. Notice that,
+because these algorithms only operate on public data, they do not need
+to be constant-time.
+
+\paragraph{Verifying the order.} Since we already know the trace $t$
+of the Frobenius endomorphism of $E$, we only need to check that the
+order is equal to $q+1-t$. Assuming that $E$ is cyclic, or contains a
+cyclic group of order larger than $4\sqrt{q}$, a very efficient
+randomized algorithm consists in taking a random point $P$ and
+verifying that it has the expected order.  This task is easy if the
+factorization of $q+1-t$ is known.
+
+Concretely, the curve given in Section~\ref{sec:initcurve} has order
+\[N = 2^2 · 3^2 · 5 · 7 · 11 · 13^2 · 17 · 103 · 523 · 821 ·
+  1174286389 · m,\] %
+where $m$ is a $432$ bits prime, and its group structure is
+$ℤ/2ℤ×ℤ/\frac{N}{2}ℤ$. To check that a curve is in the same isogeny
+class, we repeatedly take random points until we find one with order
+$N/2$.
+
+\paragraph{Verifying the \emph{level}.} The previous verification
+proves that endomorphism ring of $E$ is contained between $ℤ[π]$ and
+$\O_K$. We have already seen that there is only a finite number of
+possible rings, and their indices must divide $d^2=Δ_π/Δ_K$. Ascending
+and descending isogenies connect curves with different endomorphism
+rings, thus we are left with the problem of verifying that $E$ is on
+the crater of any $ℓ$-volcano for $ℓ\mid d$.
+
+Assuming that no large prime divides $d$, this check can be
+accomplished efficiently by performing random walks in the volcanoes,
+as described in~\cite{fouquet+morain02}. Notice that if we choose
+$Δ_π$ square-free, then the only possible endomorphism ring is $\O_K$,
+and this check is empty.
+
+Concretely, for the curve of Section~\ref{sec:initcurve} $Δ_π/Δ_K=4$,
+so there are exactly two possible endomorphism rings. By looking at
+the action of the Frobenius endomorphism, we see that $\End(E)=\O_K$
+if and only if $E[2]≃(ℤ/2ℤ)^2$, i.e.\ if and only if $x^3+ax+b$ has
+three roots in $\F_q$.
+
+\smallskip
+
+Both checks can be done much more efficiently than evaluating a single
+isogeny walk, thus we conclude that key validation is possible for
+protocols based on the CRS construction. Contrast this with the case
+of SIDH, where key validation is known to be
+problematic~\cite{galbraithsecurity}, and even conjectured to be has
+hard as breaking the system~\cite{cryptoeprint:2018:336}.
+
+Thanks to key validation, we can obtain CCA-secure encryption from the
+CRS action without resorting to generic transforms such as
+Fujisaki-Okamoto~\cite{10.1007/3-540-48405-1_34}, unlike the case of
+SIKE~\cite{SIKE,10.1007/978-3-319-70500-2_12}. This in turn enables
+applications, such as non-interactive key exchange, for which no
+practical post-quantum scheme was known previously to~\cite{csidh}.
 
 
 \section{Experimental results}
