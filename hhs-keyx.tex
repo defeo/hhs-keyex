@@ -1278,7 +1278,8 @@ etc.).
   $E_c=\frak c·E_0$, but this would be too costly. Instead we
   use~\cite[Theorem~1.5]{jao+miller+venkatesan09},
 	combined with standard results about random walks in
-	expander graphs, to sample $E_c$ so
+	expander graphs (for instance, an easy adaptation of the proof
+	of~\cite[Lemma~2.1]{jao+miller+venkatesan09}), to sample $E_c$ so
   that any curve in $\Ell_q(\O)$ is taken with probability between
   % todo: Jean, you mentioned that you could get closer to the uniform
   % distribution by lengthening the walks?
@@ -1294,9 +1295,7 @@ etc.).
   \[2\Adv[T]{IWD} = \Adv[A]{IW-DDH} - \Adv[S]{CGA-DDH},\] %
   while if $T$ forwarded $(E_a,E_b,E_c)$, then we get
   \[2\Adv[T]{IWD} \geq \Adv[A]{IW-DDH} - (1-\epsilon)\Adv[S]{CGA-DDH} - \epsilon.\] %
-  Averaging over the two outcomes gives in particular
-  \[2\Adv[T]{IWD} \geq \Adv[A]{IW-DDH} - \Adv[S]{CGA-DDH} - \epsilon,\] %
-  concluding the proof.
+  Averaging over the two outcomes concludes the proof.
 \end{proof}
 
 Finally, we give an assumption akin to the classical CDH assumption
