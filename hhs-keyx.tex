@@ -822,21 +822,28 @@ in the procedure of selecting elliptic curves in the Elliptic Curve Method
 for factoring~\cite{todo:refECM}.
 
 We implemented this research using the Sage computer algebra system.
-After 17,000 hours of CPU time, we found the elliptic curve
+After 17,000 hours of CPU time, we found the elliptic curve under
+Montgomery form %todo: which hardware ?
 $
-	E : y^2 = x^3 + ax + b
+	E : y^2 = x^3 + A x^2 + x
 $
 over $\F_p$ where the prime $p$ is given above, and
 \[
 \begin{aligned}
-a =\ & 1111646484886395301540457987288261558243572147007270 \\ 
-& 1808037226672236659358145861235530764279830938006566 \\
-& 253824939581765595814774014481950202045501019370057,\\
-b =\ & 7929994832424543515682621940590901949591050994041239 \\
-& 8234989651750360146055419691525037257274779805461497 \\ 
-& 90133670177545414851226849642510122057033563808087.
+A =\ 
+& 1086133850464928038385995014077294700770364640837283 \\
+& 1934324660566888732797778932142488253565145603672591 \\
+& 944602210571423767689240032829444439469242521864171\,.
 \end{aligned}
 \]
+The trace of Frobenius $t$ of $E$ is
+\[
+\begin{aligned}
+-&147189550172528104900422131912266898599 \\
+&387555512924231762107728432541952979290\,.
+\end{aligned}
+\]
+
 This curve, or its twist, has a rational $\ell$-torsion point 
 for each $\ell$ in
 \[
@@ -845,13 +852,13 @@ for each $\ell$ in
 \]
 and each of these primes $\ell$ is of Type (2)
 in the sense of Subsection~\ref{sec:isogeny-graphs}.
-The curve $E$ also admits a Montgomery model.
-The cardinality of $E(\F_p)$ is
+Furthermore, $\End(E)$ is the maximal order, and its discriminant is
+a 511-bit integer that has the following prime factorization:
 \[
 \begin{aligned}
-& 1203734073820884503438338397822280113709202945127019 \\ 
-& 7923071397735408251586670085481138030088461790938201 \\
-& 874171652771344144043268298219947026188471598838060.
+& -2^3 \cdot 20507 \cdot 67429 \cdot 11718238170290677 \cdot 12248034502305872059 \\
+& \cdot 60884358188204745129468762751254728712569\\
+& \cdot 68495197685926430905162211241300486171895491480444062860794276603493\,.
 \end{aligned}
 \]
 
@@ -1034,6 +1041,8 @@ least the square of the lower bound on the number of quantum
 queries. Based on these observations, we propose in
 Table~\ref{tab:sizes} parameter sizes matching three of the NIST
 categories~\cite{NIST2016}.
+According to this table, the public parameters we proposed
+in Section~\ref{sec:initcurve} fit in NIST category 2.
 
 \begin{table}
   \renewcommand{\arraystretch}{1.4}
@@ -1052,19 +1061,6 @@ categories~\cite{NIST2016}.
   \caption{Suggested parameter sizes at different security levels.}
   \label{tab:sizes}
 \end{table}
-
-According to this table, the public parameters we proposed
-in Section~\ref{sec:initcurve} fit in NIST category 2.
-Indeed, for this curve, the discriminant $\Delta_\pi$ 
-has the following prime factorization:
-\[
-\begin{aligned}
-& -2^5 \cdot 20507 \cdot 67429 \cdot 11718238170290677 \cdot 12248034502305872059 \\
-& \cdot 60884358188204745129468762751254728712569\\
-& \cdot 68495197685926430905162211241300486171895491480444062860794276603493\,.
-\end{aligned}
-\]
-The fundamental discriminant $\Delta_K$ is therefore a 511-bit integer.
 
 \subsection{Security proofs}
 \label{sec:proofs}
@@ -1354,8 +1350,7 @@ and this check is empty.
 Concretely, for the curve of Section~\ref{sec:initcurve} $Δ_π/Δ_K=4$,
 so there are exactly two possible endomorphism rings. By looking at
 the action of the Frobenius endomorphism, we see that $\End(E)=\O_K$
-if and only if $E[2]≃(ℤ/2ℤ)^2$, i.e.\ if and only if $x^3+ax+b$ has
-three roots in $\F_q$.
+if and only if $E[2]≃(ℤ/2ℤ)^2$.
 
 \smallskip
 
