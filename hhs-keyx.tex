@@ -547,6 +547,7 @@ the Diffie--Hellman protocol on $X$.
 The specialization to isogeny graphs is now evident. We take:
 \begin{itemize}
 \item $X=\Ell_q(\O)$ as the vertex set, for some well-chosen $q$ and $\O$;
+in particular we demand that $\O$ be the maximal order (see Section~\ref{sec:sec}).
 \item $G=\Cl(\O)$ as the group acting on $X$;
 \item $S$ a set of ideals of the form $(π-λ,ℓ)$, where $ℓ$ is an
   Elkies prime for the isogeny class $\Ell_q(\O)$,
@@ -572,43 +573,122 @@ instead, only isogenies between elliptic curves are computed.
 
 \subsection{Sampling and evaluating isogeny walks}
 
-Given an ideal $\frak s = (\pi-\lambda, \ell)$, we will compute $\phi_{\frak s}:E\to E'$
-using one of two different algorithms:
+In order to boost the practical performances of our protocol,
+we will compute \emph{skewed random walks} in the isogeny graph.
+Indeed, the computational cost of an isogeny step may vary, and
+we would like to compute costlier steps with smaller probability.
+
+Given an ideal $\frak s = (\pi-\lambda, \ell)$ and an elliptic curve $E$,
+we will compute $\phi_{\frak s}:E\to E'$ using one of two different algorithms:
 \begin{itemize}
-\item Algorithm~\algstyle{Step1} that uses
+\item Algorithm~\algstyle{ElkiesStep}$(E, \ell, \lambda)$ that uses
 	\emph{modular equations}, and works with any $\frak s$;
-\item Algorithm~\algstyle{Step2} that
-	uses \emph{torsion points} on $E$, and is only used when
+\item Algorithm~\algstyle{VéluStep}$(E, \ell,\lambda)$ that
+	uses \emph{torsion points} on $E$, and can only be used when
 	$\lambda$ satisfies certain properties.
 \end{itemize}
+Although the \emph{curve} $E$ is given as input to these algorithms,
+we really work on isomorphism classes of curves.
 
-Rostovtsev and Stolbunov only used an analogue of~\algstyle{Step1}. 
-The introduction of the \algstyle{Step2} algorithm, 
-inspired by the SIDH cryptosystem and related protocols, 
-and the analysis of its consequences for the choice of public
-parameters (see Section~\ref{sec:initcurve}),
-is the main contribution of our work.
+Rostovtsev and Stolbunov only used an analogue of~\algstyle{ElkiesStep}. 
+The introduction of Algorithm \algstyle{VéluStep}, 
+inspired by the SIDH cryptosystem and related protocols,
+speeds up the protocol by a considerable factor and
+is the main contribution of our work. The set $S$ and the
+sampling of random walks (i.e. secret keys) is designed
+to take full advantage of algorithm~\algstyle{VéluStep},
+when available. We give details about these two \algstyle{Step}
+algorithms at the end of this subsection.
 
-The cost of computing an isogeny step given by $\frak s$
-varies heavily according to which algorithm is used and the values of $\lambda$
-and $\ell$. Therefore, we choose to \emph{weight} the isogeny walks as
-follows: for each $\frak s = (\pi-\lambda,\ell)\in S$,
-we define a bound $M_\ell$ for the number of times $\frak s$
-appears in the random walk given as an element of $S^*$.
-For convenience, we partition the set $S$
-into its symmetric part $S_{sym}$, containing those ideals $\frak s$ such that
-$\frak s^{-1}\in S$, and an asymmetric part $S_{asym}$. Looking back at
-Figure~\ref{fig:cycle}, if $\frak s\in S_{sym}$ then both directions
-$\lambda,\mu$ are used, while if $\frak s\in S_{asym}$ then only one is
-available. In practice, the existence of $S_{asym}$ is connected with the use of
-algorithm~\algstyle{Step2}.
+\paragraph{Construction of $S$.} The generating set will consist of
 
+\begin{enumerate}
+\item \label{case:elkstep} Ideals $(\pi - \lambda, \ell)$ and their inverses $(\pi - \mu, \ell)$
+	for very small Elkies primes $\ell$, when \emph{neither} $\lambda$ nor $\mu$
+	are eligible to algorithm~\algstyle{VéluStep}.
+\item \label{case:velustep-sym} Ideals $(\pi - \lambda, \ell)$ and their inverses $(\pi - \mu, \ell)$
+	for small Elkies primes $\ell$, when \emph{both} $\lambda$ and $\mu$
+	are eligible to algorithm~\algstyle{VéluStep}.
+\item \label{case:velustep-asym} Ideals $(\pi - \lambda, \ell)$, \emph{without their inverses},
+	if $\ell$ is a small Elkies prime and \emph{only} eigenvalue $\lambda$
+	is eligible to algorithm~\algstyle{VéluStep}.
+\end{enumerate}
+
+Therefore, $S$ can be encoded as three lists, each matching one of these three cases:
+
+\begin{enumerate}
+\item A list $S_E$ of tuples $(\ell, \lambda, \mu)$, the \emph{Elkies part} of $S$;
+\item A list $S_{V, 2}$ of tuples $(\ell, \lambda, \mu)$, the \emph{symmetric Vélu part} of $S$;
+\item A list $S_{V, 1}$ of tuples $(\ell, \lambda)$, the \emph{asymmetric Vélu part} of $S$.
+\end{enumerate}
+
+Looking back at Figure~\ref{fig:cycle}, in cases~\ref{case:elkstep} and~\ref{case:velustep-sym}
+both directions $\lambda,\mu$ are used, while in case~\ref{case:velustep-asym} only $\lambda$ is
+available.
+
+\paragraph{Key generation.}
+
+In Algorithm~\ref{proto:hhs}, (ephemeral) secret keys are random walks
+in $S^*$. Since the class group $\Cl(\O)$ is commutative, such a walk is fully
+determined by an \emph{exponent vector}, with one exponent for each ideal in $S$
+up to inverse: for an ideal $\frak s\in S$, this exponent can be negative if
+$\frak s^{-1}$ also appears in $S$, and must be nonnegative otherwise.
+
+In order to minimize the cost of computing an isogeny walk, we use \emph{bounds}
+on the number of steps for each ideal, as follows.
+For each Elkies prime $\ell$ appearing in $S$, we define a bound $M_\ell$
+on (the absolute value of) the exponent of ideals of norm $\ell$. As a rule,
+$M_\ell$ will be much bigger in the Vélu case.
+
+Algorithm~\algstyle{KeyGen} that generates secret keys can now
+be described as follows: knowing the set $S$ and the bounds $M_\ell$,
+\begin{itemize}
+\item For each $(\ell, \lambda, \mu)\in S_E\cup S_{V, 2}$, pick $k_\ell\uni [-M_\ell, M_\ell]$;
+\item For each $(\ell, \lambda)\in S_{V, 1}$, pick $k_\ell\uni [0,M_\ell]$;
+\item Output the exponent vector $(k_\ell)_\ell$.
+\end{itemize}
+
+\paragraph{Key exchange.} Algorithm~\ref{alg:walk} describes how to use the
+information contained in the secret key to compute an isogeny walk. Using
+this primitive and Algorithm~\algstyle{KeyGen} outlined above,
 Algorithm~\ref{alg:keyex} rephrases the generic key exchange~\ref{proto:cayley}
-in our particular setting. Using the same public parameters, procedure
-\algstyle{KeySample} generates a list $(k_\ell)$ with $-M_\ell\leq k_\ell\leq M_\ell$
-for each $(\ell, \lambda, \mu, i)\in S_{sym}$, and $0\leq k_\ell\leq M_\ell$ for
-each $(\ell, \lambda)\in S_{asym}$. Procedure \algstyle{Walk} simply performs
-a sequence of isogeny steps as detailed in Algorithm~\ref{alg:walk}.
+in our setting, making explicit all public parameters involved in the
+protocol. This algorithm is presented in the classical Diffie--Hellman style,
+although variants can also provide static-static key exchange (see Section~\ref{sec:sec}).
+
+\begin{algorithm}
+	\caption{\algstyle{Walk}: an isogeny walk}
+	\label{alg:walk}
+	\Input{
+		\begin{itemize}
+		\itemsep0em
+		\item An ephemeral key $k = (k_\ell)_\ell$
+		\item An initial curve $E_I$
+		\item The set $S$ given as $S_E,\ S_{V,2},\ S_{V,1}$
+		\end{itemize}
+	}
+	$E \gets E_I$\;
+	\For{$(\ell, \lambda, \mu)\in S_E$}{
+		\If{$k_\ell\geq 0$}{
+			\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{ElkiesStep}(E, \ell, \lambda)$}
+		}
+		\Else{
+			\lFor{$1\leq j \leq |k_\ell|$}{$E\gets \algstyle{ElkiesStep}(E, \ell, \mu)$}
+		}
+	}
+	\For{$(\ell, \lambda, \mu)\in S_{V,2}$}{
+		\If{$k_\ell\geq 0$}{
+			\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{VéluStep}(E, \ell, \lambda)$}
+		}
+		\Else{
+			\lFor{$1\leq j \leq |k_\ell|$}{$E\gets \algstyle{VéluStep}(E, \ell, \mu)$}
+		}
+	}
+	\For{$(\ell,\lambda)\in S_{V,1}$}{
+		\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{VéluStep}(E, \ell, \lambda)$}
+	}
+	\Return{E}
+\end{algorithm}
 
 \begin{algorithm}
   \caption{Key exchange from an isogeny graph}
@@ -617,47 +697,29 @@ a sequence of isogeny steps as detailed in Algorithm~\ref{alg:walk}.
 		\begin{itemize}
 		\itemsep0em
 		\item A prime power $q$ 
-		\item An ordinary elliptic curve $E_0/\F_q$ with Frobenius trace $t$ 
-		\item $S_{sym}$ given as a list of $(\ell, \lambda, \mu, i)$ with $i\in\{1,2\}$ 
-		\item $S_{asym}$ given as a list of $(\ell, \lambda)$ 
+		\item An ordinary elliptic curve $E_0/\F_q$ with Frobenius trace $t$, and maximal endomorphism ring
+		\item The set $S$ given as $S_E,\ S_{V,2},\ S_{V,1}$
 		\item Bounds $M_\ell$
 		\end{itemize}
 	}
   \Alice{
-    \Samples $k_A = \algstyle{KeySample}$()\;
-    \Sends $E_A = \algstyle{Walk}(k_A, E_0)$ to Bob}
+    \Samples $k_A = \algstyle{KeySample}(S, (M_\ell))$\;
+    \Sends $E_A = \algstyle{Walk}(k_A, E_0, S)$ to Bob}
   \Bob{
-    \Samples $k_B = \algstyle{KeySample}$()\;
-    \Sends $E_B = \algstyle{Walk}(k_B, E_0)$ to Alice}
-  \Key{$\algstyle{Walk}(k_A, E_B) = \algstyle{Walk}(k_B, E_A)$}
+    \Samples $k_B = \algstyle{KeySample}(S, (M_\ell))$\;
+    \Sends $E_B = \algstyle{Walk}(k_B, E_0, S)$ to Alice}
+  \Key{$\algstyle{Walk}(k_A, E_B, S) = \algstyle{Walk}(k_B, E_A, S)$}
 \end{algorithm}
 
-\begin{algorithm}
-	\caption{\algstyle{Walk}: an isogeny walk}
-	\label{alg:walk}
-	\Input{An ephemeral key $k = (k_\ell)$; an initial curve $E_I$; \newline
-	public data $S_{sym}, S_{asym}$}
-	$E \gets E_I$\;
-	\For{$(\ell, \lambda, \mu, i)\in S_{sym}$}{
-		\If{$k_\ell\geq 0$}{
-			\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{Step}i(E, \ell, \lambda)$}
-		}
-		\Else{
-			\lFor{$1\leq j \leq |k_\ell|$}{$E\gets \algstyle{Step}i(E, \ell, \mu)$}
-		}
-	}
-	\For{$(\ell,\lambda)\in S_{asym}$}{
-		\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{Step2}(E, \ell, \lambda)$}
-	}
-\end{algorithm}
 
-We now describe how isogeny steps are computed. Let $E$ be an elliptic
-curve over $\F_q$ and $\ell$ an Elkies prime for $E$, with Frobenius
+
+We now describe how isogeny steps are computed. Let $E\in\Ell_q(\O)$
+and $\ell$ an Elkies prime for $E$, with Frobenius
 eigenvalues $\lambda,\mu$. We would like to compute an $\ell$-isogeny
 step from $E$ in direction $\lambda$, i.e. the isogeny $\phi_{\frak s}$
 for $\frak s = (\pi-\lambda, \ell)$.
 
-\paragraph{Algorithm~\algstyle{Step1}.} This algorithm uses
+\paragraph{Algorithm~\algstyle{ElkiesStep}.} This algorithm uses
 so-called modular equations to compute isogenies between elliptic
 curves.  Specifically, we use the \emph{classical modular polynomial}
 $\Phi_\ell(X, Y)$~\cite{todo:classicalmodpoly}.
@@ -678,7 +740,7 @@ algorithms have been designed for this purpose~\cite{todo:isogkernel}.
 We then check whether the eigenvalue of $\pi$ on $K$ is indeed $\lambda$
 by performing a scalar multiplication on the ``generic'' point of $K$.
 This computation is only necessary for the \emph{first} $\ell$-isogeny
-step, since no return on the isogeny cycle is allowed.
+step, since no return on the isogeny cycle is allowed in Algorithm~\ref{alg:walk}.
 
 In practice, we store modular polynomials $\Phi_\ell$
 with coefficients already reduced in~$\F_q$. 
@@ -689,14 +751,14 @@ to use other types of modular equations when $\ell$ grows, such as the so-called
 Atkin modular equations~\cite{todo:atkinmodpoly}. One then has to
 modify the kernel computation accordingly~\cite{todo:isogkernelatkin}.
 
-The costly step in Algorithm~\algstyle{Step1} is computing the roots
+The costly step in Algorithm~\algstyle{ElkiesStep} is computing the roots
 of the polynomial $\Phi_\ell(j(E), X)$. Using a Cantor--Zassenhaus-type
 algorithm~\cite{todo:canzass}, this amounts to computing $X^q$ modulo
 this polynomial. Using asymptotically fast methods for polynomial
 arithmetic, the cost is $\softO(\ell\log q)$ field operations.
 
-\paragraph{Algorithm \algstyle{Step2}.} This algorithm, very different
-in spirit from Algorithm~\algstyle{Step1}, is given by the following
+\paragraph{Algorithm \algstyle{VéluStep}.} This algorithm, very different
+in spirit from Algorithm~\algstyle{ElkiesStep}, is given by the following
 pattern:
 \begin{itemize}
 \item Find a nonzero $Q\in E[\frak s]$ (which is $\ker \phi_{\frak s}$),
@@ -707,7 +769,11 @@ Vélu's formulas~\cite{todo:velu}.
 In order to find a nonzero element in $\ker\phi_{\frak s}$, we make the
 following hypothesis: \emph{the multiplicative order of $\lambda$ in
 $\Z/\ell\Z$ is $r$, and the multiplicative order of $\mu$ does not
-divide $r$}. Then, $\ker\phi_{\frak s}$ is exactly the set of $\ell$-torsion
+divide $r$}. These multiplicative orders are easily computed
+from $\ell$ and $\lambda$, but could as well be part of the public
+parameters.
+
+Then, $\ker\phi_{\frak s}$ is exactly the set of $\ell$-torsion
 points on $E$ that are defined over $\F_{q^r}$. Let $C_{ext}$ be the
 order of $E(\F_{q^r})$, which can be quickly computed from the
 Frobenius trace $t$~\cite{todo:hasseext}.
@@ -724,26 +790,26 @@ When $\ell$ is not too large, the cost is dominated by that of the scalar
 multiplication. Using asymptotically fast arithmetic operations,
 the overall cost is $\softO(r^2\log q)$ field operations, as $C_{ext}$
 has the same order of magnitude as $q^r$. Since the scalar
-multiplication dominates, Algorithm~\algstyle{Step2} can be improved
+multiplication dominates, Algorithm~\algstyle{VéluStep} can be improved
 by using elliptic curve models with more efficient arithmetic~\cite{todo:curvearith}.
 
 Note that when $r = 1$
-(i.e. $\lambda = 1$), we save a factor $\ell$ over Algorithm~\algstyle{Step1},
+(i.e. $\lambda = 1$), we save a factor $\ell$ over Algorithm~\algstyle{ElkiesStep},
 in addition with much better constant factors. As a general rule,
-algorithm \algstyle{Step2} is more efficient when $r$ is small, while
-for generic values of $r$ (typically $O(\ell))$ Algorithm~\algstyle{Step1}
+algorithm \algstyle{VéluStep} is more efficient when $r$ is small, while
+for generic values of $r$ (typically $O(\ell))$ Algorithm~\algstyle{ElkiesStep}
 should be preferred.
 
-
-
 Even if the multiplicative order of $\lambda$ divides that of $\mu$,
-we can still try to use Algorithm~\algstyle{Step2} in both directions.
+we can still try to use Algorithm~\algstyle{VéluStep} in both directions.
 The trick is to use the \emph{quadratic twist} of $E$. While this does not
 change the isomorphism class of the curve, the Frobenius eigenvalues
 become $-\lambda$ and $-\mu$. For example, if
 $p \equiv -1\pmod{\ell}$ and $\lambda = 1$, then $\mu=-1$ and 
-Algorithm~\algstyle{Step2} can be used in both directions with $r=1$.
+Algorithm~\algstyle{VéluStep} can be used in both directions with $r=1$.
 
+\section{Public parameter selection}
+\label{sec:initcurve}
 
 It is now evident that the choice of public parameters, especially
 the initial curve $E_0$, has heavy impact on the execution time:
@@ -755,15 +821,9 @@ of constructing ordinary elliptic curves with prescribed
 order, or more precisely with prescribed order \emph{modulo small
 primes}. Unfortunately, and in contrast with the case of
 supersingular curves, no polynomial-time method to achieve this 
-is known in general (we will see in Section~\ref{sec:sec} why
-we cannot use the CM method).
-In the next section, we present our methods to find the best possible
-public parameters in reasonable time.
-
-\section{Public parameter selection}
-\label{sec:initcurve}
-
-% todo: put here remark on uselessness of complex multiplication method
+is known in general; the CM method~\cite{todo:cmmethod}, which solves this problem
+when the corresponding class groups are small, is useless in our
+setting as we will see in Section~\ref{sec:sec}.
 
 In this section, we describe how to use the Schoof--Elkies--Atkin (SEA) point counting
 algorithm with early abort, combined with the use of certain modular curves,
@@ -771,7 +831,7 @@ to construct curves whose cardinality satisfies some constraints
 modulo small prime.
 This is faster than choosing curves at random and computing their cardinalities
 completely until a convenient one is found, but still does not allow us
-to use the full power of Algorithm~\algstyle{Step2}.
+to use the full power of Algorithm~\algstyle{VéluStep}.
 
 The SEA algorithm~\cite{schoof95,todo} is a polynomial-time algorithm for
 point counting on elliptic curves over a finite field. In order to compute
@@ -787,7 +847,7 @@ whose cardinality has lots of small factors. To fix ideas, let us choose
 \[
 p = 7 \left(\prod_{2\leq\ell\leq 380,\ \ell \text{ prime}} \ell\right) - 1
 \]
-which is a 512-bit prime. Then, Algorithm~\algstyle{Step2} can be used
+which is a 512-bit prime. Then, Algorithm~\algstyle{VéluStep} can be used
 for $\ell$-isogenies with $r=1$ in both directions if and only if
 $C_0 = \# E_0(\F_p)$ satisfies $C_0 \equiv0\pmod{\ell}$.
 
@@ -1399,12 +1459,12 @@ The time needed to factor the modular equation of level $\ell$
 was approximately $0.017 * \ell$ seconds.
 
 We can use this data to propose a maximal number of steps to be
-computed for each prime. Table~\ref{tab:step2s}
-lists the primes for which Algorithm~\algstyle{Step2} can be used, with
+computed for each prime. Table~\ref{tab:VéluSteps}
+lists the primes for which Algorithm~\algstyle{VéluStep} can be used, with
 the corresponding extension degree $r$, and a star if the twisted curve
 allows to use both directions in the isogeny graph.
-Table~\ref{tab:step1s}
-lists other Elkies primes for which we apply Algorithm~\algstyle{Step1}.
+Table~\ref{tab:ElkiesSteps}
+lists other Elkies primes for which we apply Algorithm~\algstyle{ElkiesStep}.
 
 \begin{table}
 \centering
@@ -1420,10 +1480,10 @@ $r$ & $M_\ell$ & Primes \\
 8 & 7 & 881 \\
 9 & 6 & 1693
 \end{tabular}
-    \caption{Primes $\ell$ for which Algorithm~\algstyle{Step2} can be
+    \caption{Primes $\ell$ for which Algorithm~\algstyle{VéluStep} can be
     used for our candidate isogeny graph,
     with corresponding $r$-values and proposed bounds $M_\ell$}
-    \label{tab:step2s}
+    \label{tab:VéluSteps}
 \end{table}
 
 \begin{table}
@@ -1468,9 +1528,9 @@ $M_\ell$ & Primes \\
      457,
      467 \\
 \end{tabular}
-    \caption{Primes $\ell$ for which Algorithm~\algstyle{Step1} can be
+    \caption{Primes $\ell$ for which Algorithm~\algstyle{ElkiesStep} can be
     used for our candidate isogeny graph, with proposed bounds $M_\ell$}
-    \label{tab:step1s}
+    \label{tab:ElkiesSteps}
 \end{table}
 
 
