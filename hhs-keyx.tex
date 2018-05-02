@@ -833,6 +833,7 @@ This is faster than choosing curves at random and computing their cardinalities
 completely until a convenient one is found, but still does not allow us
 to use the full power of Algorithm~\algstyle{VéluStep}.
 
+\paragraph{Early-abort SEA.}
 The SEA algorithm~\cite{schoof95,todo} is a polynomial-time algorithm for
 point counting on elliptic curves over a finite field. In order to compute
 $C = \# E(\F_p)$, it computes the value of $C$ modulo a series
@@ -861,7 +862,7 @@ with $\#E(\F_p) \not\equiv 0\pmod{\ell}$ is found.
 algorithm and estimate the key exchange running time using this
 curve as a public parameter (see Section~\ref{sec:exp}).
 \end{itemize}
-The ``fastest'' curves are now good candidates for the curve $E_0$.
+The ``fastest'' curves now give promising candidates for $\#E_0(\F_p)$.
 
 Considering the efficiency of this procedure, it is important to remark
 that very few curves will pass the early-abort tests. The bound $B$ is
@@ -871,6 +872,28 @@ its value is somewhat implementation-dependent. In practice, one also
 incorporates the test of existence of a Montgomery model for the
 elliptic curve as in~\cite{todo:refMontgomery}.
 
+\paragraph{Finding the maximal order.}
+Once such a curve $E_1$ has been computed, it is important to find a curve
+$E_0$ having the same order, but whose endomorphism ring is maximal, and
+to ensure that its discriminant is a large integer. Therefore, we attempt to
+factor the discriminant $\Delta_\pi$ of $\Z[\pi]$: if it is squarefree,
+then $E_1$ already has maximal endomorphism ring, and in general the square
+factors of $\Delta_\pi$ indicate which isogeny volcanoes have to be climbed up
+in order to find $E_0$.
+
+\begin{remark}
+Factoring random 512-bit integers is not hard, and quadratic discriminants
+tend to be slightly smoother than random integers.
+It took less then one hour of GMP-ECM on 10 cores to factor the 512 bits discriminant
+given at the end of this section. %todo: which hardware ?
+If this fails,
+a conservative strategy would be to discard this discriminant; alternatively
+one could argue that leaving an unsmooth enough unfactored part is not a
+security issue, since such large-degree isogenies would be untractable to
+compute anyway (see section~\ref{sec:sec}).
+\end{remark}
+
+\paragraph{Using the modular curve $X_1(N)$.}
 Since we are looking for curves with smooth cardinalities, another
 improvement to this procedure is available: instead of using elliptic
 curves uniformly chosen at random, we pick random candidates using
@@ -881,6 +904,7 @@ implementation, we used $N = 17$. This idea is used, for example,
 in the procedure of selecting elliptic curves in the Elliptic Curve Method
 for factoring~\cite{todo:refECM}.
 
+\paragraph{Results.}
 We implemented this research using the Sage computer algebra system.
 After 17,000 hours of CPU time, we found the elliptic curve under
 Montgomery form %todo: which hardware ?
@@ -993,7 +1017,8 @@ algorithms
 of~\cite{kohel,fouquet+morain02,ionica+joux13,defeo2016explicit},
 thus, Stage~0 can be accomplished\footnote{This statement is assuming
   that all prime factors of $d$ are in $O(\log q)$, which is typically
-  the case for isogeny-based protocols.}  in time polynomial in
+  the case for isogeny-based protocols: no counter-example
+	has ever been constructed.}  in time polynomial in
 $\log q$.
 
 \begin{figure}
