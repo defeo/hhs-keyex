@@ -227,6 +227,14 @@ mapped to $0_{E'}$.
 An isogeny $ϕ$ is \emph{cyclic} 
 if $\ker ϕ$ is a cyclic group.
 
+An \emph{isomorphism} is an isogeny of degree one. It is a
+group isomorphism on $\Fbar_q$-points, but not necessarily on $\F_q$-points
+unless the isomorphism is defined over $\F_q$. An \emph{isomorphism class}
+of elliptic curves, or \emph{elliptic curve up to isomorphism}, is
+fully determined by their common \emph{$j$-invariant}, which is an
+element of $\Fbar_q$. If any curve in the isomorphism class is defined
+over $\F_q$, then its $j$-invariant also belongs to $\F_q$.
+
 Any isogeny can be factored as a composition of a \emph{separable} and
 a \emph{purely inseparable} isogeny. \emph{Purely inseparable}
 isogenies have trivial kernel, and degree a power of $p$.
@@ -365,11 +373,11 @@ subsection.
 \textbf{If $ℓ$ does not divide $Δ_π$, then $ϕ$ is necessarily
   horizontal.}
 
-We now present a group action on the set of all curves having complex
+We now present a group action on the set of all curves 
+up to isomorphism having complex
 multiplication by a fixed order $\O$; the key exchange protocol of
 Section~\ref{sec:keyex} will be built on this action. Let $\frak a$ be
-% todo: shall we say "invertible" ideal?
-an ideal in $\End(E)≃\O$, and define the
+an invertible ideal in $\End(E)≃\O$, and define the
 \emph{${\frak a}$-torsion} subgroup of $E$ as
 \[
 E[\frak a] = \set{P\in E(\Fbar_q) \suchthat \sigma(P) = 0\ 
@@ -415,15 +423,15 @@ $E[\frak a]$ is the eigenspace of $λ$, defining an isogeny
 $ϕ_{\frak{a}}$ of degree $ℓ$. Furthermore
 $\frak a\hat{\frak a} = \hat{\frak a}\frak a = (ℓ)$, implying that
 $\frak a$ and $\hat{\frak a}$ are the inverse of one another in
-$\Cl(\End(E))$, thus the isogeny $ϕ_{\hat{\frak a}}:\frak a·E→E$ of
+$\Cl(\O)$, thus the isogeny $ϕ_{\hat{\frak a}}:\frak a·E→E$ of
 kernel $(\frak a·E)[\hat{\frak a}]$ is the dual of $ϕ_{\frak a}$ (up
 to isomorphism). Hence, 
 % todo: more bold
 \textbf{the eigenvalues $λ$ and $μ$ define two opposite
   \emph{directions} on the isogeny cycle, independently of the
   starting curve}, as shown in Figure~\ref{fig:cycle}.  Finally, the
-size of the cycle is the order of $(π-λ,ℓ)$ in $\Cl(\End(E))$, thus
-partitioning the set $\Ell_q(\End(E))$ into cycles of equal size.
+size of the cycle is the order of $(π-λ,ℓ)$ in $\Cl(\O)$, thus
+partitioning the set $\Ell_q(\O)$ into cycles of equal size.
 
 \begin{figure}[t]
   \begin{minipage}{0.45\textwidth}
@@ -521,7 +529,9 @@ not matter.
 
 If we have a Schreier graph where $G$ is finite and Abelian, and the
 action $G$ on $X$ is efficiently computable, we can define a key
-exchange protocol as in Algorithm~\ref{proto:cayley}.
+exchange protocol as in Algorithm~\ref{proto:cayley}. The
+commutativity of $G$ is essential to ensure Alice and Bob
+compute the same secret.
 
 \begin{algorithm}
   \caption{Generic key exchange from a Cayley graph}
@@ -570,13 +580,17 @@ in $\Cl(\O)$, one avoids computing the group $\Cl(\O)$,
 the set $\Ell_q(\O)$, and performing arithmetic operations on ideal classes:
 instead, only isogenies between elliptic curves are computed.
 
+Remember that an isomorphism class of elliptic curves determines
+a unique $j$-invariant in $\F_q$. While is is more convenient to
+compute isogeny steps using ``real'' curves, all communications
+between Alice and Bob should only mention $j$-invariants.
 
 \subsection{Sampling and evaluating isogeny walks}
 
 In order to boost the practical performances of our protocol,
 we will compute \emph{skewed random walks} in the isogeny graph.
 Indeed, the computational cost of an isogeny step may vary, and
-we would like to compute costlier steps with smaller probability.
+we would like to compute costlier steps less often.
 
 Given an ideal $\frak s = (\pi-\lambda, \ell)$ and an elliptic curve $E$,
 we will compute $\phi_{\frak s}:E\to E'$ using one of two different algorithms:
@@ -587,8 +601,6 @@ we will compute $\phi_{\frak s}:E\to E'$ using one of two different algorithms:
 	uses \emph{torsion points} on $E$, and can only be used when
 	$\lambda$ satisfies certain properties.
 \end{itemize}
-Although the \emph{curve} $E$ is given as input to these algorithms,
-we really work on isomorphism classes of curves.
 
 Rostovtsev and Stolbunov only used an analogue of~\algstyle{ElkiesStep}. 
 The introduction of Algorithm \algstyle{VéluStep}, 
@@ -645,7 +657,7 @@ be described as follows: knowing the set $S$ and the bounds $M_\ell$,
 \begin{itemize}
 \item For each $(\ell, \lambda, \mu)\in S_E\cup S_{V, 2}$, pick $k_\ell\uni [-M_\ell, M_\ell]$;
 \item For each $(\ell, \lambda)\in S_{V, 1}$, pick $k_\ell\uni [0,M_\ell]$;
-\item Output the exponent vector $(k_\ell)_\ell$.
+\item Return the exponent vector $(k_\ell)_\ell$.
 \end{itemize}
 
 \paragraph{Key exchange.} Algorithm~\ref{alg:walk} describes how to use the
@@ -663,11 +675,11 @@ although variants can also provide static-static key exchange (see Section~\ref{
 		\begin{itemize}
 		\itemsep0em
 		\item An ephemeral key $k = (k_\ell)_\ell$
-		\item An initial curve $E_I$
+		\item An initial $j$-invariant $j_I$
 		\item The set $S$ given as $S_E,\ S_{V,2},\ S_{V,1}$
 		\end{itemize}
 	}
-	$E \gets E_I$\;
+	$E \gets $ a curve of $j$-invariant $j_I$\;
 	\For{$(\ell, \lambda, \mu)\in S_E$}{
 		\If{$k_\ell\geq 0$}{
 			\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{ElkiesStep}(E, \ell, \lambda)$}
@@ -687,7 +699,7 @@ although variants can also provide static-static key exchange (see Section~\ref{
 	\For{$(\ell,\lambda)\in S_{V,1}$}{
 		\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{VéluStep}(E, \ell, \lambda)$}
 	}
-	\Return{E}
+	\Return{$j(E)$}
 \end{algorithm}
 
 \begin{algorithm}
@@ -704,11 +716,11 @@ although variants can also provide static-static key exchange (see Section~\ref{
 	}
   \Alice{
     \Samples $k_A = \algstyle{KeySample}(S, (M_\ell))$\;
-    \Sends $E_A = \algstyle{Walk}(k_A, E_0, S)$ to Bob}
+    \Sends $j_A = \algstyle{Walk}(k_A, j(E_0), S)$ to Bob}
   \Bob{
     \Samples $k_B = \algstyle{KeySample}(S, (M_\ell))$\;
-    \Sends $E_B = \algstyle{Walk}(k_B, E_0, S)$ to Alice}
-  \Key{$\algstyle{Walk}(k_A, E_B, S) = \algstyle{Walk}(k_B, E_A, S)$}
+    \Sends $j_B = \algstyle{Walk}(k_B, j(E_0), S)$ to Alice}
+  \Key{$j_F = \algstyle{Walk}(k_A, j_B, S) = \algstyle{Walk}(k_B, j_A, S)$}
 \end{algorithm}
 
 
