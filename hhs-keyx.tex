@@ -190,6 +190,9 @@ refer the reader to~\cite{silverman:elliptic}. For a general
 overview of isogenies and their use in cryptography, we
 suggest~\cite{defeo2017isogenybased}.
 
+\subsection{Isogenies between elliptic curves}
+\label{sec:isogeny}
+
 In what follows $\F_q$ is a finite field of characteristic $p$ with
 $q$ elements, and $\Fbar_q$ is its algebraic closure. Let $E$ and $E'$
 be elliptic curves defined over $\F_q$. 
@@ -327,7 +330,7 @@ case~(2) it will be called an \emph{Elkies prime}.
 
 We will chiefly be interested in Elkies primes. Since all curves in
 the same isogeny class over $\F_q$ have the same number of points,
-they also have the same trace $t$ and discriminant $d_π$.
+they also have the same trace $t$ and discriminant $Δ_π$.
 % todo: do we frown upon bold emphasis?
 \textbf{It follows that, if $ℓ$ is an Elkies prime for a curve $E$,
   the connected component of $E$ in the graph of $ℓ$-isogenies is a
@@ -380,8 +383,8 @@ Section~\ref{sec:keyex} will be built on this action. Let $\frak a$ be
 an invertible ideal in $\End(E)≃\O$, and define the
 \emph{${\frak a}$-torsion} subgroup of $E$ as
 \[
-E[\frak a] = \set{P\in E(\Fbar_q) \suchthat \sigma(P) = 0\ 
-\text{ for all }\sigma\in\frak a}.
+E[\frak a] = \set{P\in E(\Fbar_q) \suchthat σ(P) = 0\ 
+\text{ for all }σ\in\frak a}.
 \]
 This subgroup is the kernel of an isogeny $\phi_{\frak a}$, defined up
 to composition by an isomorphism, hence the codomain of
@@ -903,9 +906,9 @@ elliptic curve as in~\cite{todo:refMontgomery}.
 Once such a curve $E_1$ has been computed, it is important to find a curve
 $E_0$ having the same order, but whose endomorphism ring is maximal, and
 to ensure that its discriminant is a large integer. Therefore, we attempt to
-factor the discriminant $\Delta_\pi$ of $\Z[\pi]$: if it is squarefree,
+factor the discriminant $Δ_\pi$ of $\Z[\pi]$: if it is squarefree,
 then $E_1$ already has maximal endomorphism ring, and in general the square
-factors of $\Delta_\pi$ indicate which isogeny volcanoes have to be climbed up
+factors of $Δ_\pi$ indicate which isogeny volcanoes have to be climbed up
 in order to find $E_0$.
 
 \begin{remark}
@@ -1210,7 +1213,7 @@ to the classical DDH assumption.
   Given curves $E_a,E_b,E_{ab}∈\Ell_q(\O)$ sampled with probability
   $\frac{1}{2}$ from one of the following two distributions
   \begin{align*}
-    \mathcal{R}_{q,Δ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,E'\bigr) \suchthat
+    \mathcal{R}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,E'\bigr) \suchthat
                         (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*,\;
                         E'\uni\Ell_q(\O)\right\},\\
     \mathcal{W}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,(\frak a_i)·(\frak b_i)·E_0\bigr) \suchthat
@@ -1267,7 +1270,7 @@ in~\cite{jao+miller+venkatesan09} to be an expander.
 We let $\Adv[A]{IW-DDH}$ be the \emph{advantage} of an adversary $A$
 against IW-DDH, defined as the probability that $A$ answers correctly,
 minus $\frac{1}{2}$:
-\[2\Adv[A]{IW-DDH} = \Proba\bigl[A(\mathcal{R}_{q,Δ}) = 1\bigr] -
+\[2\Adv[A]{IW-DDH} = \Proba\bigl[A(\mathcal{R}_{q,Δ,σ}) = 1\bigr] -
   \Proba\bigl[A(\mathcal{W}_{q,Δ,σ}) = 1\bigr].\] %
 We define similarly $\Adv[A]{CGA-DDH}$ and $\Adv[A]{IWD}$. By switching
 answers if needed, we can assume all advantages are positive. We
@@ -1363,7 +1366,7 @@ instance,~\cite[20.4.11]{galbraith2012mathematics}.
 \paragraph{A heuristic discussion of the IWD assumption.}
 
 From its very definition, the IWD assumption depends on
-the probability distribution $\sigma$ we use to sample
+the probability distribution $σ$ we use to sample
 random walks in the isogeny graph. In this paragraph,
 we provide heuristic arguments indicating that IWD is hard
 using Algorithm~\ref{alg:walk}, provided the following
@@ -1371,7 +1374,7 @@ two statements are true:
 \begin{itemize}
 \item $S$ is \emph{not too small}, i.e. the number of
 isogeny degrees used is $\Omega(\log q)$;
-\item The keyspace size is at least $\sqrt{|\Delta_K|}$.
+\item The keyspace size is at least $\sqrt{|Δ_K|}$.
 \end{itemize}
 
 At present, proving rapid mixing of random walks with such
