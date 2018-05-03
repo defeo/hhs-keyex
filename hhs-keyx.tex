@@ -323,10 +323,10 @@ If we denote by $Δ_π=t^2-4q$ the discriminant of the characteristic
 equation of $π$, we see that the cases~(1.x) are only possible if $ℓ$
 divides $Δ_π$.  For ordinary curves $Δ_π≠0$, thus only a finite number
 of primes $ℓ$ will fall in these cases, and they will be mostly
-irrelevant to our cryptosystem. Following the literature on the SEA
-point-counting algorithm~\cite{schoof95,todo}, if $ℓ$ falls into
-case~(0) it will be called an \emph{Atkin prime}, if it falls into
-case~(2) it will be called an \emph{Elkies prime}.
+irrelevant to our cryptosystem. 
+Following the literature on the SEA point-counting algorithm,
+if $ℓ$ falls into case~(0) it will be called an \emph{Atkin prime}, 
+if it falls into case~(2) it will be called an \emph{Elkies prime}.
 
 We will chiefly be interested in Elkies primes. Since all curves in
 the same isogeny class over $\F_q$ have the same number of points,
@@ -745,7 +745,7 @@ where $j$ denotes the $j$-invariant. Thus, the roots
 of the polynomial equation $\Phi_\ell(j(E), X)=0$ give the two neighbors
 of $E$ in the cycle of $\ell$-isogenies. The degree of this equation
 is $\ell+1$.
-(See~\cite[\S6]{schoof95} for the relevant theory.)
+(See~\cite[\S6]{schoof95} and~\cite[\S3]{Elkies98} for the relevant theory.)
 
 Using this idea, when one picks a new prime $\ell$ and starts a sequence
 of $\ell$-isogeny steps in direction $\lambda$, 
@@ -765,8 +765,8 @@ exist~\cite{Echidna,SutherlandDatabase}.
 The size of the classical modular polynomial
 $\Phi_\ell$ mentioned above grows quickly with $\ell$, so it is convenient
 to use other types of modular equations when $\ell$ grows, such as the so-called
-Atkin modular equations~\cite{todo:atkinmodpoly}. One then has to
-modify the kernel computation accordingly~\cite{todo:isogkernelatkin}.
+Atkin modular equations~\cite{Elkies98}, 
+modifying the kernel computation accordingly~\cite{Morain95}.
 
 The costly step in Algorithm~\algstyle{ElkiesStep} is computing the roots
 of the polynomial $\Phi_\ell(j(E), X)$. Using a Cantor--Zassenhaus-type
@@ -791,9 +791,14 @@ from $\ell$ and $\lambda$, but could as well be part of the public
 parameters.
 
 Then, $\ker\phi_{\frak s}$ is exactly the set of $\ell$-torsion
-points on $E$ that are defined over $\F_{q^r}$. Let $C_{ext}$ be the
-order of $E(\F_{q^r})$, which can be quickly computed from the
-Frobenius trace $t$~\cite{todo:hasseext}.
+points on $E$ that are defined over $\F_{q^r}$. 
+Let $C_{ext}$ be the order of $E(\F_{q^r})$.
+Note that $C_{ext}$ can be easily computed from the Frobenius trace $t$:
+if we write $\#E(\F_{q^r}) = q - t_r + 1$ for 
+$r > 0$ (so $t_1 = t$) and $t_0 = 2$,
+then the $t_r$ satisfy the standard recurrence
+$t_r = t\cdot t_{r-1} - q\cdot t_{r-2}$. 
+
 We proceed as follows:
 \begin{itemize}
 \item Pick a random point $P\in E(\F_{q^r})$,
@@ -808,7 +813,8 @@ multiplication. Using asymptotically fast arithmetic operations,
 the overall cost is $\softO(r^2\log q)$ field operations, as $C_{ext}$
 has the same order of magnitude as $q^r$. Since the scalar
 multiplication dominates, Algorithm~\algstyle{VéluStep} can be improved
-by using elliptic curve models with more efficient arithmetic~\cite{todo:curvearith}.
+by using elliptic curve models with more efficient arithmetic;
+we used Montgomery arithmetic here~\cite{Montgomery87,CostelloSmith2017}.
 
 Note that when $r = 1$
 (i.e. $\lambda = 1$), we save a factor $\ell$ over Algorithm~\algstyle{ElkiesStep},
@@ -855,7 +861,7 @@ of constructing ordinary elliptic curves with prescribed
 order, or more precisely with prescribed order \emph{modulo small
 primes}. Unfortunately, and in contrast with the case of
 supersingular curves, no polynomial-time method to achieve this 
-is known in general; the CM method~\cite{todo:cmmethod}, which solves this problem
+is known in general; the CM method~\cite{AtkinMorain93}, which solves this problem
 when the corresponding class groups are small, is useless in our
 setting as we will see in Section~\ref{sec:sec}.
 
@@ -868,7 +874,8 @@ completely until a convenient one is found, but still does not allow us
 to use the full power of Algorithm~\algstyle{VéluStep}.
 
 \paragraph{Early-abort SEA.}
-The SEA algorithm~\cite{schoof95,todo} is a polynomial-time algorithm for
+The SEA algorithm~\cite{schoof95,Morain95}
+is a polynomial-time algorithm for
 point counting on elliptic curves over a finite field. In order to compute
 $C = \# E(\F_p)$, it computes the value of $C$ modulo a series
 of small primes $\ell$: it is a \emph{multimodular algorithm}.
@@ -1493,7 +1500,7 @@ practical post-quantum scheme was known previously to~\cite{csidh}.
 In order to demonstrate that our key-exchange protocol is usable
 at standard security levels, we implemented it in the Julia
 programming language with the help of the computer algebra package
-Nemo~\cite{todo:Nemo}. For this, we developed a small
+Nemo~\cite{nemo}. For this, we developed a small
 Julia package, built upon Nemo, to handle basic functionalities
 for elliptic curves over finite fields~\cite{todo:package}.
 We used the Bostan--Morain--Salvy--Schost algorithm for
