@@ -736,8 +736,8 @@ for $\frak s = (\pi-\lambda, \ell)$.
 
 \paragraph{Algorithm~\algstyle{ElkiesStep}.} This algorithm uses
 so-called modular equations to compute isogenies between elliptic
-curves.  Specifically, we use the \emph{classical modular polynomial}
-$\Phi_\ell(X, Y)$~\cite{todo:classicalmodpoly}.
+curves.  
+Specifically, we use the \emph{classical modular polynomial} $\Phi_\ell(X, Y)$.
 This bivariate polynomial with integer coefficients has
 the following property: a cyclic $\ell$-isogeny exists between two elliptic
 curves $E$ and $E'$ if and only if $\Phi_\ell(j(E), j(E')) = 0$,
@@ -745,6 +745,7 @@ where $j$ denotes the $j$-invariant. Thus, the roots
 of the polynomial equation $\Phi_\ell(j(E), X)=0$ give the two neighbors
 of $E$ in the cycle of $\ell$-isogenies. The degree of this equation
 is $\ell+1$.
+(See~\cite[\S6]{schoof95} for the relevant theory.)
 
 Using this idea, when one picks a new prime $\ell$ and starts a sequence
 of $\ell$-isogeny steps in direction $\lambda$, 
@@ -760,7 +761,8 @@ step, since no return on the isogeny cycle is allowed in Algorithm~\ref{alg:walk
 In practice, we store modular polynomials $\Phi_\ell$
 with coefficients already reduced in~$\F_q$. 
 Several publicly available databases of modular polynomials
-exist~\cite{todo:modulardatabases}. The size of the classical modular polynomial
+exist~\cite{Echidna,SutherlandDatabase}. 
+The size of the classical modular polynomial
 $\Phi_\ell$ mentioned above grows quickly with $\ell$, so it is convenient
 to use other types of modular equations when $\ell$ grows, such as the so-called
 Atkin modular equations~\cite{todo:atkinmodpoly}. One then has to
@@ -779,7 +781,7 @@ pattern:
 \item Find a nonzero $Q\in E[\frak s]$ (which is $\ker \phi_{\frak s}$),
 \item Recover $\ker \phi_{\frak s}$ entirely by enumerating the multiples of $Q$,
 \item Compute the image of $\phi_{\frak s}$ from its kernel using
-Vélu's formulas~\cite{todo:velu}.
+    Vélu's formulas~\cite{Velu71}.
 \end{itemize}
 In order to find a nonzero element in $\ker\phi_{\frak s}$, we make the
 following hypothesis: \emph{the multiplicative order of $\lambda$ in
@@ -830,10 +832,12 @@ We find it convenient to use \emph{two} different models:
 \item the Montgomery model $By^2 = x^3 + A x^2 + x$;
 \item the Weierstrass model $y^2 = x^3 + ax + b$.
 \end{itemize}
-The Montgomery model offers better curve arithmetic and convenient
-Vélu formulas~\cite{todo:velumontgomery}. The Weierstrass model is
-more classical, and is usually the considered model in the literature
+The Weierstrass model is classical and universal, 
+and is usually the considered model in the literature
 about isogeny computations.
+The Montgomery model offers better curve
+arithmetic~\cite{Montgomery87,CostelloSmith2017} 
+and convenient Vélu formulas~\cite{Renes2018}.
 Hence, if the initial curve $E_0$ admits a Montgomery model, one can
 compute the Vélu steps \emph{first} using Montgomery models,
 and switch to Weierstrass models afterwards.
@@ -900,7 +904,7 @@ chosen to balance the overall cost of the first few tests with that of
 the complete SEA algorithm for the curves which pass them. Therefore,
 its value is somewhat implementation-dependent. In practice, one also
 incorporates the test of existence of a Montgomery model for the
-elliptic curve as in~\cite{todo:refMontgomery}.
+elliptic curve as in~\cite{OKS00}.
 
 \paragraph{Finding the maximal order.}
 Once such a curve $E_1$ has been computed, it is important to find a curve
@@ -932,7 +936,7 @@ This way, one guarantees the existence of a rational $N$-torsion point
 on the elliptic curve without any further computation. In our
 implementation, we used $N = 17$. This idea is used, for example,
 in the procedure of selecting elliptic curves in the Elliptic Curve Method
-for factoring~\cite{todo:refECM}.
+for factoring~\cite{ECM20,GMP-ECM}.
 
 \paragraph{Results.}
 We implemented this research using the Sage computer algebra system.
@@ -1492,8 +1496,8 @@ programming language with the help of the computer algebra package
 Nemo~\cite{todo:Nemo}. For this, we developed a small
 Julia package, built upon Nemo, to handle basic functionalities
 for elliptic curves over finite fields~\cite{todo:package}.
-We used the Bostan--Morain--Salvy--Schost~\cite{todo:BMSS} algorithm for
-isogeny computations.
+We used the Bostan--Morain--Salvy--Schost algorithm for
+isogeny computations~\cite{BMSS08}.
 
 In this unoptimized implementation, 
 using the public parameters given in
