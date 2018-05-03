@@ -761,11 +761,11 @@ step, since no return on the isogeny cycle is allowed in Algorithm~\ref{alg:walk
 In practice, we store modular polynomials $\Phi_\ell$
 with coefficients already reduced in~$\F_q$. 
 Several publicly available databases of modular polynomials
-exist~\cite{Echidna,SutherlandDatabase}. 
+exist (see~\cite{Echidna}, for example).
 The size of the classical modular polynomial
-$\Phi_\ell$ mentioned above grows quickly with $\ell$, so it is convenient
-to use other types of modular equations when $\ell$ grows, such as the so-called
-Atkin modular equations~\cite{Elkies98}, 
+$\Phi_\ell$ grows quickly with $\ell$, so it is convenient
+to use other types of modular polynomials for larger $\ell$,
+such as the so-called Atkin modular polynomials~\cite{Elkies98}, 
 modifying the kernel computation accordingly~\cite{Morain95}.
 
 The costly step in Algorithm~\algstyle{ElkiesStep} is computing the roots
