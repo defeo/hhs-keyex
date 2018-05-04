@@ -1,6 +1,6 @@
-\documentclass{article}
+\documentclass{llncs}
 
-\usepackage{amssymb, amsmath, amsthm}
+\usepackage{amssymb, amsmath}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{unicode}
@@ -37,14 +37,6 @@
 \newcommand{\uni}{\rand{R}}
 \newcommand{\Adv}[2][]{\mathsf{Adv}^{#1}_{\text{\rm #2}}}
 
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{definition}{Definition}[section]
-\newtheorem{prop}[theorem]{Proposition}
-\newtheorem{lemma}[theorem]{Lemma}
-\theoremstyle{definition}
-\newtheorem{prob}[theorem]{Problem}
-\newtheorem{remark}[theorem]{Remark}
-
 \DeclareMathOperator{\End}{End}
 \DeclareMathOperator{\Ker}{Ker}
 \DeclareMathOperator{\Card}{Card}
@@ -52,18 +44,25 @@
 \DeclareMathOperator{\poly}{poly}
 \DeclareMathOperator{\Proba}{Pr}
 
-\title{Towards practical key exchange from ordinary isogeny graphs}
-\author{Luca De Feo, Jean Kieffer, Benjamin Smith}
-
 \begin{document}
+
+\title{Towards practical key exchange from ordinary isogeny graphs}
+\author{
+  Luca De Feo\inst{1,3}\orcidID{0000-0002-9321-0773} \and
+  Jean Kieffer\inst{2} \and
+  Benjamin Smith\inst{3}}
+\institute{
+  Université Paris Saclay, UVSQ, LMV, Versailles, France \and
+  École Normale Supérieure, Paris, France \and
+  Inria Saclay, Palaiseau, France
+}
 
 \maketitle
 
 \begin{abstract}
-\end{abstract}
 
-\textbf{Keywords:} Public-key cryptography, elliptic curve isogenies,
-complex multiplication, modular curves.
+  \keywords{Post-quantum cryptography \and Key exchange \and Elliptic curves \and Isogenies}
+\end{abstract}
 
 \section{Introduction}
 \label{sec:introduction}
@@ -1054,12 +1053,12 @@ adversaries.
 \paragraph{Classical attacks.}
 We start by addressing the following, more general, problem:
 
-\begin{prob}
+\begin{problem}
 \label{prob:isog}
   Given two ordinary elliptic curves $E,E'$ defined over a finite
   field $\F_q$, such that $\#E(\F_q)=\#E'(\F_q)$, find an isogeny walk
   $(ϕ_i)_{1≤i≤n}$ such that $ϕ_n∘\cdots∘ϕ_1(E)=E'$.
-\end{prob}
+\end{problem}
 
 This problem was studied for some time before the emergence of
 isogeny-based cryptography~\cite{Gal,GHS,galbraith+stolbunov11},
@@ -1672,7 +1671,7 @@ original protocol.
 - Ce protocole a-t-il finalement un intérêt dans le cadre de la crypto post-quantique ?
 
 
-\bibliographystyle{plain}
+\bibliographystyle{splncs04}
 \bibliography{refs}
 
 \end{document}
