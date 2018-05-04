@@ -291,7 +291,8 @@ graph; a notable exception is the finite connected component of
 \emph{supersingular} curves, used in SIDH and related protocols.
 
 If one restricts to isogenies \emph{defined over $\F_q$}, the picture
-becomes more complex.  By definition, an isogeny $ϕ:E→E'$ is
+becomes more complex.  
+By definition, an isogeny $ϕ:E→E'$ is
 \emph{defined over} $\F_q$ if and only if the Frobenius endomorphism
 $π$ stabilizes $\ker ϕ$. If $ϕ$ is cyclic, this is equivalent to
 saying that $π$ acts like a scalar on the points of $\ker ϕ$.  Thus,
@@ -948,8 +949,10 @@ for factoring~\cite{ECM20,GMP-ECM}.
 
 \paragraph{Results.}
 We implemented this research using the Sage computer algebra system.
+Our experiments were conducted on several machines running
+Intel Xeon E5520 processors at 2.27GHz. %todo: more details
 After 17,000 hours of CPU time, we found the elliptic curve under
-Montgomery form %todo: which hardware ?
+Montgomery form
 $
 	E : y^2 = x^3 + A x^2 + x
 $
