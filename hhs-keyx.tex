@@ -117,10 +117,10 @@ the isomorphism $φ_x$ is computationally hard for any $x$.
 Any HHS $X$ for a finite Abelian group $G$ can be used to construct a
 key exchange as shown in Algorithm~\ref{proto:hhs}.  If $X$ is a
 cyclic group $〈x〉$ of order $p$, and $G=ℤ/pℤ$ acting on $X$ by
-$g·x=x^g$, then this is simply the Diffie--Hellman key exchange, and
-inverting $φ_x$ is the discrete logarithm problem (DLP) in $X$.  But,
-for other homogeneous spaces, inverting $φ_x$ may have no relationship
-with a DLP, and may potentially be harder to solve, including for a
+$g·x=x^g$, then %this is simply the Diffie--Hellman key exchange, and %% <- BS: nope! 
+inverting $φ_x$ is the discrete logarithm problem (DLP) in $X$.  
+But for other homogeneous spaces, inverting $φ_x$ may have no relationship
+with any DLP, and may potentially be harder to solve, including for a
 quantum computer. Similar ideas have repeatedly appeared in the
 literature under different
 flavors~\cite{10.1007/3-540-44598-6_10,monico2007}.
