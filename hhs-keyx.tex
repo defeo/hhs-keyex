@@ -1504,15 +1504,14 @@ programming language with the help of the computer algebra package
 Nemo~\cite{nemo}. For this, we developed a small
 Julia package, built upon Nemo, to handle basic functionalities
 for elliptic curves over finite fields~\cite{todo:package}.
-We used the Bostan--Morain--Salvy--Schost algorithm for
-isogeny computations~\cite{BMSS08}.
+Experiments were conducted on a machine running a 3.2GHz Intel Xeon processor.
 
-In this unoptimized implementation, 
-using the public parameters given in
-Section~\ref{sec:initcurve},
-we obtain
-the following times to perform a scalar multiplication over~$\F_{q^r}$:
-%todo: on which gear ?
+Using Algorithm~\ref{alg:ElkiesStep}, we approximate the
+time to compute a step for $\frak s = (\pi-\lambda,\ell)$
+as the cost to find the roots of the modular polynomial,
+which is roughly $0.017\cdot\ell$ seconds in our implementation.
+Using Algorithm~\ref{alg:VéluStep}, the cost of a step is approximated
+as that of the scalar multiplication in $E(\F_{q^r})$ as follows:
 
 \begin{center}
 \begin{tabular}{c|ccccccc}
@@ -1521,17 +1520,32 @@ $r$ & 1 & 3 & 4 & 5 & 7 & 8 & 9 \\
 $t\ (s)$ & 0.02 & 0.10 & 0.15 & 0.24 & 0.8 & 1.15 & 1.3
 \end{tabular}
 \end{center}
-The time needed to factor the modular equation of level $\ell$
-was approximately $0.017 * \ell$ seconds.
 
-We can use this data to propose a maximal number of steps to be
-computed for each prime. Table~\ref{tab:VéluSteps}
+Using this data, finding efficient bounds $M_\ell$
+offering a sufficient key space size is easily seen to be an
+integer optimization problem. Lacking ideas on how to find
+the~\emph{best} solution, we used the following heuristic procedure.
+Given a time bound $T$, let \algstyle{KeySpaceSize}$(T)$ be
+the key space size obtained when each $M_\ell$ is the greatest such
+that the \emph{total time spend on $\ell$-isogenies} is less than $T$.
+Then, we look for the \emph{least $T$} such that
+$
+	\algstyle{KeySpaceSize}(T)\geq 2^{256}
+$
+according to Section~\ref{sec:sec}, using dichotomic search.
+While the bounds $M_\ell$
+we obtain are most likely not the best possible, intuitively
+the outcome does not fall very far from the optimal.
+
+In this way, we obtain a proposal for the bounds $M_\ell$
+to be used in Algorithm~\ref{alg:key}. Table~\ref{tab:VéluSteps}
 lists the primes for which Algorithm~\algstyle{VéluStep} can be used, with
 the corresponding extension degree $r$, and a star if the twisted curve
 allows to use both directions in the isogeny graph.
 Table~\ref{tab:ElkiesSteps}
 lists other Elkies primes for which we apply Algorithm~\algstyle{ElkiesStep}.
 
+%todo: put these two tables on the same page ?
 \begin{table}
 \centering
 \begin{tabular}{cclc}
@@ -1546,7 +1560,7 @@ $r$ & $M_\ell$ & Primes \\
 8 & 7 & 881 \\
 9 & 6 & 1693
 \end{tabular}
-    \caption{Primes $\ell$ for which Algorithm~\algstyle{VéluStep} can be
+    \caption{Primes $\ell$ for which Algorithm~\algstyle{VéluStep} is
     used for our candidate isogeny graph,
     with corresponding $r$-values and proposed bounds $M_\ell$}
     \label{tab:VéluSteps}
@@ -1594,23 +1608,27 @@ $M_\ell$ & Primes \\
      457,
      467 \\
 \end{tabular}
-    \caption{Primes $\ell$ for which Algorithm~\algstyle{ElkiesStep} can be
+    \caption{Primes $\ell$ for which Algorithm~\algstyle{ElkiesStep} is
     used for our candidate isogeny graph, with proposed bounds $M_\ell$}
     \label{tab:ElkiesSteps}
 \end{table}
 
+Using this proposal, we estimate the cost of a single walk in the
+isogeny graph to be approximately 465 seconds, bringing the global
+Diffie--Hellman key-exchange cost to 930 seconds (with $T = 8.2s$).
+As mentioned in Section~\ref{sec:todo}, these timings are~\emph{worst-case}
+in the sense that the number of isogeny steps is exactly $M_\ell$ for each $\ell$.
 
-These numbers were found using the following procedure: given a maximum time
-$T$ that one is willing to spend for each prime, one can compute the
-associated key space size using the timing estimations above. Simply keep
-increasing $T$ until a sufficiently big key space size is reached.
-Using this data, we estimate the cost of a single walk in the
-isogeny graph to be approximately ... seconds, bringing the global
-key-exchange cost to ... seconds. We stress the fact that this implementation
-is \emph{not} optimised: in particular, using an optimised C library
-for the computation of $X^q$ modulo a polynomial could instantly bring a
-gain by a factor at least 2.
+We stress the fact that this implementation
+is \emph{not} optimised. Besides general gains on field arithmetic,
+optimised C code could easily beat our proof-of-concept implementation
+on critical points of our algorithms, for instance the root
+finding step in Algorithm~\ref{alg:ElkiesStep}.
 
+For comparison, without using Algorithm~\ref{alg:VéluStep}, the
+total key-exchange time would exceed 2000 seconds:
+our ideas thus bring an improvement by a factor of over 2 over the
+original protocol.
 
 \section{Conclusion}
 
