@@ -291,7 +291,8 @@ graph; a notable exception is the finite connected component of
 \emph{supersingular} curves, used in SIDH and related protocols.
 
 If one restricts to isogenies \emph{defined over $\F_q$}, the picture
-becomes more complex.  By definition, an isogeny $ϕ:E→E'$ is
+becomes more complex.  
+By definition, an isogeny $ϕ:E→E'$ is
 \emph{defined over} $\F_q$ if and only if the Frobenius endomorphism
 $π$ stabilizes $\ker ϕ$. If $ϕ$ is cyclic, this is equivalent to
 saying that $π$ acts like a scalar on the points of $\ker ϕ$.  Thus,
@@ -1507,7 +1508,10 @@ for elliptic curves over finite fields~\cite{todo:package}.
 We used the Bostan--Morain--Salvy--Schost algorithm for
 isogeny computations~\cite{BMSS08}.
 
-In this unoptimized implementation, 
+Our experiments were conducted on machines running
+Intel Xeon E5520 processors at 2.27GHz. TODO: more details
+
+With this unoptimized implementation, 
 using the public parameters given in
 Section~\ref{sec:initcurve},
 we obtain
