@@ -1182,20 +1182,20 @@ Section~\ref{sec:keyex}. We remark that when $Δ_π$ is square-free, $ℤ[π]$
 is the maximal order, and hence this condition is automatically satisfied.
 
 The collision search in Stage~1 relies on the birthday paradox, thus
-it has a complexity of $O(\sqrt{h})$, where $h=\#\Ell_q(\O_K)$ is the
+it has a complexity of $O(\sqrt{h(\O_K)})$, where $h(\O_K)=\#\Ell_q(\O_K)$ is the
 class number of $\O_K$.  It is known that, on average,
 $h(\O_K)≈0.461\cdots\sqrt{|Δ_K|}$ (see~\cite[5.10]{Cohen1993}), and,
 assuming the extended Riemann hypothesis, we even have a lower bound
 (see~\cite{littlewood1928class})
 \[h(\O_K) ≥ 0.147\cdots\frac{(1+o(1))\sqrt{|Δ_K|}}{\log\log|Δ|}.\]
-Given that $Δ_K\sim q$, we expect Stage~1 to take time $O(q^{1/4})$,
+Since $Δ_K\sim q$, we expect Stage~1 to take time $O(q^{1/4})$,
 thus justifying the choice of a $q$ four times as large as the
 security parameter.  Unfortunately, class numbers are notoriously
-difficult to compute, the current record being the computation of
-$h(\O_K)$ for a discriminant of 300
-bits~\cite{10.1007/978-3-642-14081-5_15}. Computing the class
-number for a discriminant of $\sim 500$ bits seems to be expensive,
-albeit feasible, thus we will only rely on these heuristic arguments
+difficult to compute, the current record being
+for a discriminant of 300 bits~\cite{10.1007/978-3-642-14081-5_15}.
+Computing the class
+number for a discriminant of ${\sim 500}$ bits seems to be expensive,
+albeit feasible; thus, we will only rely on these heuristic arguments
 to justify the security of our proposed parameters.
 % todo: check this is really the latest record
 
@@ -1207,7 +1207,7 @@ It therefore has no impact on our security estimates.
 \begin{remark}
   The Cohen--Lenstra heuristic~\cite{10.1007/BFb0099440} predicts that
   the odd part of $\Cl(\O_K)$ is cyclic with overwhelming
-  probability; and more heuristics~\cite{10.1007/3-540-44448-3_18}
+  probability, and other heuristics~\cite{10.1007/3-540-44448-3_18}
   indicate that $h(\O_K)$ is likely to have a large prime factor.
   However, since there is no known way in which the group structure of
   $\Cl(\O_K)$ can affect the security of our protocol, we can 
