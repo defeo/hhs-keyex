@@ -1018,30 +1018,30 @@ If this fails,
 a conservative strategy would be to discard this discriminant; alternatively
 one could argue that leaving an unsmooth enough unfactored part is not a
 security issue, since such large-degree isogenies would be untractable to
-compute anyway (see section~\ref{sec:sec}).
+compute anyway (see Section~\ref{sec:sec}).
 \end{remark}
 
 \paragraph{Using the modular curve $X_1(N)$.}
 Since we are looking for curves with smooth cardinalities, another
-improvement to this procedure is available: instead of using elliptic
-curves uniformly chosen at random, we pick random candidates using
-an equation for the modular curve $X_1(N)$~\cite{sutherland2012constructing}.
-This way, one guarantees the existence of a rational $N$-torsion point
-on the elliptic curve without any further computation. In our
-implementation, we used $N = 17$. This idea is used, for example,
+improvement to this procedure is available: instead of choosing elliptic
+curves uniformly at random, we pick random candidates using
+an equation for the modular curve $X_1(N)$~\cite{sutherland2012constructing},
+which guarantees the existence of a rational $N$-torsion point
+on the sampled elliptic curve.
+This idea is used
 in the procedure of selecting elliptic curves in the Elliptic Curve Method
 for factoring~\cite{ECM20,GMP-ECM}.
+In our implementation, we used $N = 17$. 
 
 \paragraph{Results.}
-We implemented this research using the Sage computer algebra system.
+We implemented this search using the Sage computer algebra system.
 Our experiments were conducted on several machines running
 Intel Xeon E5520 processors at 2.27GHz. %todo: more details
-After 17,000 hours of CPU time, we found the elliptic curve under
-Montgomery form
+After 17,000 hours of CPU time, we found the Montgomery elliptic curve 
 $
 	E : y^2 = x^3 + A x^2 + x
 $
-over $\F_p$ where the prime $p$ is given above, and
+over $\F_p$ with $p$ as above, and
 \[
 \begin{aligned}
 A =\ 
@@ -1057,15 +1057,16 @@ The trace of Frobenius $t$ of $E$ is
 &387555512924231762107728432541952979290\,.
 \end{aligned}
 \]
+%% p := 7*&*PrimesInInterval(2,380) - 1;
+%% A := 10861338504649280383859950140772947007703646408372831934324660566888732797778932142488253565145603672591944602210571423767689240032829444439469242521864171 ;
 
 This curve, or its twist, has a rational $\ell$-torsion point 
 for each $\ell$ in
 \[
   \{3, 5, 7, 11, 13, 17, 103, 523, 821, 947, 1723\}
-  \,,
+  \,;
 \]
-and each of these primes $\ell$ is of Type (2)
-in the sense of Subsection~\ref{sec:isogeny-graphs}.
+each of these primes is Elkies.
 Furthermore, $\End(E)$ is the maximal order, and its discriminant is
 a 511-bit integer that has the following prime factorization:
 \[
@@ -1283,11 +1284,12 @@ in Section~\ref{sec:initcurve} fit in NIST category 2.
 We now formalize the assumptions needed to prove the security of the
 key exchange protocol, and other derived protocols such as PKEs and
 KEMs, in various models. Given the similarity with the classical
-Diffie--Hellman protocol on a cyclic group, our assumptions will be
-mostly modeled after those used in that context. Here we are
+Diffie--Hellman protocol on a cyclic group, our assumptions are
+mostly modeled on those used in that context. Here we are
 essentially following the lead of
 Couveignes~\cite{cryptoeprint:2006:291} and
-Stolbunov~\cite{Stol,Stolbunov2012}, however we take their analyses a
+Stolbunov~\cite{Stol,Stolbunov2012}.
+However, we take their analyses a
 step further by explicitly modeling the hardness of distinguishing
 random walks on Cayley graphs from the uniform distribution: this
 yields stronger proofs and a better separation of security concerns.
@@ -1310,8 +1312,9 @@ The assumption needed to prove security of the protocols is analogous
 to the classical DDH assumption.
 
 \begin{definition}[Isogeny Walk Decisional Diffie--Hellman (IW-DDH)]
-  Given curves $E_a,E_b,E_{ab}∈\Ell_q(\O)$ sampled with probability
-  $\frac{1}{2}$ from one of the following two distributions
+    Given a triplet of curves $(E_a,E_b,E_{ab})∈\Ell_q(\O)^3$ 
+    sampled with probability $\frac{1}{2}$ 
+    from one of the following two distributions
   \begin{align*}
     \mathcal{R}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,E'\bigr) \suchthat
                         (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*,\;
@@ -1322,14 +1325,15 @@ to the classical DDH assumption.
   decide from which of the two they were sampled.
 \end{definition}
 
-We split this assumption into two finer grained assumptions. The first
+We split this assumption into two finer-grained assumptions. The first
 states that it is computationally hard to distinguish between
 commutative squares sampled uniformly at random and commutative
 squares sampled from the distribution $σ$.
 
 \begin{definition}[Isogeny Walk Distinguishing (IWD)]
-  Given curves $E_a,E_b,E_{ab}∈\Ell_q(\O)$ sampled with probability
-  $\frac{1}{2}$ from one of the following two distributions
+    Given a triplet of curves $(E_a,E_b,E_{ab})∈\Ell_q(\O)^3$
+    sampled with probability $\frac{1}{2}$ 
+    from one of the following two distributions
   \begin{align*}
     \mathcal{G}_{q,Δ} &= \left\{(\frak a·E_0,\frak b·E_0,\frak{ab}·E_0) \suchthat
                         \frak a,\frak b\uni\Cl(\O)\right\},\\
@@ -1345,8 +1349,9 @@ name \emph{vectorization}, and in~\cite{Stol,Stolbunov2012} under the
 name DDHAP.
  
 \begin{definition}[Class Group Action Decisional Diffie--Hellman (CGA-DDH)]
-  Given curves $E_a,E_b,E_{ab}∈\Ell_q(\O)$ sampled with probability
-  $\frac{1}{2}$ from one of the following two distributions
+    Given curves a triplet of curves $(E_a,E_b,E_{ab})∈\Ell_q(\O)^3$ 
+    sampled with probability $\frac{1}{2}$ 
+    from one of the following two distributions
   \begin{align*}
     \mathcal{U}_{q,Δ} &= \left\{(E_a,E_b,E_{ab}) \suchthat E_a,E_b,E_{ab}\uni\Ell_q(\O)\right\},\\
     \mathcal{G}_{q,Δ} &= \left\{(\frak a·E_0,\frak b·E_0,\frak{ab}·E_0) \suchthat
@@ -1384,7 +1389,7 @@ etc.).
   time, and for any $\epsilon>0$,
   \[\Adv{IW-DDH}(t) ≤ 2\Adv{IWD}(t+\poly(\log q, \log\epsilon)) + \Adv{CGA-DDH}(t) + \epsilon.\]
 \end{lemma}
-\begin{proof}[Proof (Sketch)]
+\begin{proof}[Sketch]
   We start with an adversary $A$ for IW-DDH, and we construct two simulators
   $S$ and $T$ for CGA-DDH and IWD respectively.
 
@@ -1395,10 +1400,10 @@ etc.).
   one of $\mathcal{G}_{q,Δ}$ or $\mathcal{W}_{q,Δ,σ}$. It flips a coin
   to decide which of the two following actions it will do:
   \begin{itemize}
-  \item It forwards $(E_a,E_b,E_{ab})$ to $A$, it returns the same bit
+  \item It forwards $(E_a,E_b,E_{ab})$ to $A$, and returns the same bit
     as given by $A$;
-  \item It generates a random curve $E_c∈\Ell_q(\O)$, it forwards
-    $(E_a,E_b,E_c)$ to $A$, it returns the opposite bit to the one
+  \item It generates a random curve $E_c∈\Ell_q(\O)$, forwards
+    $(E_a,E_b,E_c)$ to $A$, and returns the opposite bit to the one
     given by $A$.
   \end{itemize}
   
@@ -1509,18 +1514,20 @@ construct protocols with strong security against active adversaries.
 For example, it is well known that the hashed El Gamal KEM achieves
 IND-CCA security in the random oracle model under various
 assumptions~\cite[§7]{10.1007/3-540-45353-9_12,cryptoeprint:1999:007,doi:10.1137/S0097539702403773}.
-All these constructions crucially rely on \emph{key validation}, i.e.\
-Alice must verify that the public data sent by Bob defines valid
+
+All of these constructions crucially rely on \emph{key validation}, 
+i.e.\ Alice must verify that the public data sent by Bob defines valid
 protocol data (e.g., valid elements of a cyclic group), or abort if
 this is not the case.
-
-Failure to perform validation may result in catastrophic attacks, such
-as small subgroup~\cite{10.1007/BFb0052240}, invalid
+Failure to perform key validation may result in catastrophic attacks,
+such as small subgroup~\cite{10.1007/BFb0052240}, invalid
 point~\cite{10.1007/3-540-44598-6_8}, and invalid curve
-attacks~\cite{Ciet2005}.  In our context, key validation amounts to
-verify that the curve sent by Bob really is an element of
+attacks~\cite{Ciet2005}.  
+
+In our context, key validation amounts to
+verifying that the curve sent by Bob really is an element of
 $\Ell_q(\O_K)$. Failure to do so exposes Alice to an \emph{invalid
-  graph attack} where Bob forces Alice onto an isogeny class with much
+  graph attack}, where Bob forces Alice onto an isogeny class with much
 smaller discriminant, or different Elkies primes, and learns something
 on Alice's secret.
 
@@ -1541,16 +1548,16 @@ factorization of $q+1-t$ is known.
 Concretely, the curve given in Section~\ref{sec:initcurve} has order
 \[N = 2^2 · 3^2 · 5 · 7 · 11 · 13^2 · 17 · 103 · 523 · 821 ·
   1174286389 · m,\] %
-where $m$ is a $432$ bits prime, and its group structure is
+where $m$ is a $432$-bit prime, and its group structure is
 $ℤ/2ℤ×ℤ/\frac{N}{2}ℤ$. To check that a curve is in the same isogeny
 class, we repeatedly take random points until we find one with order
 $N/2$.
 
-\paragraph{Verifying the \emph{level}.} The previous verification
+\paragraph{Verifying the level.} The previous verification
 proves that endomorphism ring of $E$ is contained between $ℤ[π]$ and
 $\O_K$. We have already seen that there is only a finite number of
-possible rings, and their indices must divide $d^2=Δ_π/Δ_K$. Ascending
-and descending isogenies connect curves with different endomorphism
+possible rings, and their indices must divide $d$ where $d^2=Δ_π/Δ_K$.
+Ascending and descending isogenies connect curves with different endomorphism
 rings, thus we are left with the problem of verifying that $E$ is on
 the crater of any $ℓ$-volcano for $ℓ\mid d$.
 
@@ -1560,25 +1567,75 @@ as described in~\cite{fouquet+morain02}. Notice that if we choose
 $Δ_π$ square-free, then the only possible endomorphism ring is $\O_K$,
 and this check is empty.
 
-Concretely, for the curve of Section~\ref{sec:initcurve} $Δ_π/Δ_K=4$,
-so there are exactly two possible endomorphism rings. By looking at
+Concretely, for the curve of Section~\ref{sec:initcurve} $Δ_π/Δ_K=2^2$,
+so there are exactly two possible endomorphism rings. Looking at
 the action of the Frobenius endomorphism, we see that $\End(E)=\O_K$
 if and only if $E[2]≃(ℤ/2ℤ)^2$.
 
-\smallskip
+\begin{example}
+    Let \(p\) and \(\O\) be as in Section~\ref{sec:initcurve}.
+    Suppose we are given the value
+    \begin{align*}
+        \alpha & = 
+        6774653762400376370473362072511594555277819004969905295950079
+        \\
+        & \quad\ 
+        3811735672493775187377489138828163987156950866238907910693817
+        \\
+        & \quad\ 
+        71311397884649111333755665289025
+    \end{align*}
+    in \(\F_p\).  It is claimed that \(\alpha\) is in \(\Ell_p(\O)\);
+    that is, it is a valid public key for the system with parameters
+    defined in Section~\ref{sec:initcurve}.
+    Following the discussion above,
+    to validate \(\alpha\) as a public key,
+    it suffices to exhibit a curve with \(j\)-invariant \(\alpha\),
+    full rational \(2\)-torsion,
+    and a point of order \(N/2\).
+    Using standard formul\ae{},
+    we find that the two \(\F_p\)-isomorphism classes of elliptic curves
+    with \(j\)-invariant \(\alpha\)
+    are represented by the Montgomery curve
+    \(E_\alpha/\F_p: y^2 = x(x^2 + Ax + 1)\)
+    with
+    \begin{align*}
+        A & = 
+        4193809979435365668528368375333535083388979993941154941880421
+        \\
+        & \quad\ 
+        8343694887415884661259992796948986954858364460542381754613120
+        \\
+        & \quad\ 
+        78403116671641017301728201394907
+    \end{align*}
+    and its quadratic twist, \(E_\alpha'\).
+    Checking the \(2\)-torsion first,
+    we have \(E_\alpha[2](\F_p) \cong E_\alpha'[2](\F_p) \cong (\Z/2\Z)^2\),
+    because \(A^2 - 4\) is a square in \(\F_p\).
+    Trying points on \(E_\alpha\),
+    we find that \((23,\sqrt{23(23^2 + 23A + 1)})\) in \(E_\alpha(\F_p)\)
+    has exact order \(N/2\).
+    We conclude that \(\End(E_\alpha) = \O\),
+    so \(\alpha\) is a valid public key.
+    (In fact, \(E_\alpha\) is connected to the initial curve
+    by a single \(3\)-isogeny step.)
+\end{example}
 
 Both checks can be done much more efficiently than evaluating a single
-isogeny walk, thus we conclude that key validation is possible for
-protocols based on the CRS construction. Contrast this with the case
-of SIDH, where key validation is known to be
+isogeny walk, thus we conclude that key validation is not only possible,
+but highly efficient for protocols based on the CRS construction. 
+This stands in stark contrast to the case of SIDH,
+where key validation is known to be
 problematic~\cite{galbraithsecurity}, and even conjectured to be has
 hard as breaking the system~\cite{cryptoeprint:2018:336}.
 
-Thanks to key validation, we can obtain CCA-secure encryption from the
+Thanks to this efficient key validation, 
+we can obtain CCA-secure encryption from the
 CRS action without resorting to generic transforms such as
-Fujisaki-Okamoto~\cite{10.1007/3-540-48405-1_34}, unlike the case of
+Fujisaki--Okamoto~\cite{10.1007/3-540-48405-1_34}, unlike the case of
 SIKE~\cite{SIKE,10.1007/978-3-319-70500-2_12}. This in turn enables
-applications, such as non-interactive key exchange, for which no
+applications such as non-interactive key exchange, for which no
 practical post-quantum scheme was known previously to~\cite{csidh}.
 
 
@@ -1587,24 +1644,26 @@ practical post-quantum scheme was known previously to~\cite{csidh}.
 
 In order to demonstrate that our key-exchange protocol is usable
 at standard security levels, we implemented it in the Julia
-programming language with the help of the computer algebra package
-Nemo~\cite{nemo}. For this, we developed a small
-Julia package, built upon Nemo, to handle basic functionalities
+programming language.
+We developed a small Julia package, built upon 
+the computer algebra package Nemo~\cite{nemo},
+to implement basic functionalities
 for elliptic curves over finite fields~\cite{todo:package}.
 Experiments were conducted on a machine running a 3.2GHz Intel Xeon processor.
 
-Using Algorithm~\ref{alg:ElkiesStep}, we approximate the
-time to compute a step for $\frak s = (\pi-\lambda,\ell)$
-as the cost to find the roots of the modular polynomial,
+First, consider the
+time to compute a step for $\frak s = (\ell,\pi-\lambda)$.
+Using Algorithm~\ref{alg:ElkiesStep}, this is approximately
+the cost of finding the roots of the modular polynomial,
 which is roughly $0.017\cdot\ell$ seconds in our implementation.
-Using Algorithm~\ref{alg:VéluStep}, the cost of a step is approximated
-as that of the scalar multiplication in $E(\F_{q^r})$ as follows:
+Using Algorithm~\ref{alg:VéluStep}, the cost of a step is approximately
+that of one scalar multiplication in $E(\F_{q^r})$ as follows:
 
 \begin{center}
-\begin{tabular}{c|ccccccc}
+    \begin{tabular}{r|@{\;}c@{\ \ }c@{\ \ }c@{\ \ }c@{\ \ }c@{\ \ }c@{\ \ }c}
 $r$ & 1 & 3 & 4 & 5 & 7 & 8 & 9 \\
 \hline
-$t\ (s)$ & 0.02 & 0.10 & 0.15 & 0.24 & 0.8 & 1.15 & 1.3
+time (s) & 0.02 & 0.10 & 0.15 & 0.24 & 0.8 & 1.15 & 1.3
 \end{tabular}
 \end{center}
 
@@ -1614,7 +1673,7 @@ integer optimization problem. Lacking ideas on how to find
 the~\emph{best} solution, we used the following heuristic procedure.
 Given a time bound $T$, let \algstyle{KeySpaceSize}$(T)$ be
 the key space size obtained when each $M_\ell$ is the greatest such
-that the \emph{total time spend on $\ell$-isogenies} is less than $T$.
+that the \emph{total time spent on $\ell$-isogenies} is less than $T$.
 Then, we look for the \emph{least $T$} such that
 $
 	\algstyle{KeySpaceSize}(T)\geq 2^{256}
@@ -1628,7 +1687,7 @@ In this way, we obtain a proposal for the bounds $M_\ell$
 to be used in Algorithm~\ref{alg:key}. Table~\ref{tab:VéluSteps}
 lists the primes for which Algorithm~\algstyle{VéluStep} can be used, with
 the corresponding extension degree $r$, and a star if the twisted curve
-allows to use both directions in the isogeny graph.
+allows us to use both directions in the isogeny graph.
 Table~\ref{tab:ElkiesSteps}
 lists other Elkies primes for which we apply Algorithm~\algstyle{ElkiesStep}.
 
