@@ -6,6 +6,8 @@
 \usepackage{unicode}
 \usepackage{tikz}
 \usepackage{hyperref}
+\usepackage{multirow}
+\usepackage{bigdelim}
 \usepackage[ruled, vlined, linesnumbered]{algorithm2e}
 \SetEndCharOfAlgoLine{}
 \SetKwInput{Params}{Public parameters}
@@ -1653,10 +1655,10 @@ Experiments were conducted on a machine running a 3.2GHz Intel Xeon processor.
 
 First, consider the
 time to compute a step for $\frak s = (\ell,\pi-\lambda)$.
-Using Algorithm~\ref{alg:ElkiesStep}, this is approximately
+Using \algstyle{ElkiesStep}, this is approximately
 the cost of finding the roots of the modular polynomial,
 which is roughly $0.017\cdot\ell$ seconds in our implementation.
-Using Algorithm~\ref{alg:VéluStep}, the cost of a step is approximately
+Using \algstyle{VéluStep}, the cost of a step is approximately
 that of one scalar multiplication in $E(\F_{q^r})$ as follows:
 
 \begin{center}
@@ -1685,79 +1687,166 @@ the outcome does not fall very far from the optimal.
 
 In this way, we obtain a proposal for the bounds $M_\ell$
 to be used in Algorithm~\ref{alg:key}. Table~\ref{tab:VéluSteps}
-lists the primes for which Algorithm~\algstyle{VéluStep} can be used, with
+lists the primes amenable to Algorithm~\algstyle{VéluStep}, with
 the corresponding extension degree $r$, and a star if the twisted curve
 allows us to use both directions in the isogeny graph.
 Table~\ref{tab:ElkiesSteps}
 lists other Elkies primes for which we apply Algorithm~\algstyle{ElkiesStep}.
 
 %todo: put these two tables on the same page ?
+%\begin{table}
+%\centering
+%\begin{tabular}{cclc}
+%$r$ & $M_\ell$ & Primes \\
+%\hline
+%1* & 409 & 3, 5, 7, 11, 13, 17, 103 \\
+%1 & 409 & 523, 821, 947, 1723 \\
+%3 & 81 & 19, 661 \\
+%4 & 54 & 1013, 1181 \\
+%5 & 34 & 31, 61, 1321 \\
+%7 & 10 & 547 \\
+%8 & 7 & 881 \\
+%9 & 6 & 1693
+%\end{tabular}
+%    \caption{Primes $\ell$ for which Algorithm~\algstyle{VéluStep} is
+%    used for our candidate isogeny graph,
+%    with corresponding $r$-values and proposed bounds $M_\ell$}
+%    \label{tab:VéluSteps}
+%\end{table}
+%
 \begin{table}
-\centering
-\begin{tabular}{cclc}
-$r$ & $M_\ell$ & Primes \\
-\hline
-1* & 409 & 3, 5, 7, 11, 13, 17, 103 \\
-1 & 409 & 523, 821, 947, 1723 \\
-3 & 81 & 19, 661 \\
-4 & 54 & 1013, 1181 \\
-5 & 34 & 31, 61, 1321 \\
-7 & 10 & 547 \\
-8 & 7 & 881 \\
-9 & 6 & 1693
-\end{tabular}
-    \caption{Primes $\ell$ for which Algorithm~\algstyle{VéluStep} is
-    used for our candidate isogeny graph,
-    with corresponding $r$-values and proposed bounds $M_\ell$}
+    \centering
+    \begin{tabular}{l|@{\;}r@{\;}|@{\;}l@{\;}||@{\;}l|r@{\;}|@{\;}l}
+        $r$ & $M_\ell$ & $\ell$
+        &
+        $r$ & $M_\ell$ & $\ell$
+        \\
+        \hline
+        1* & 409 & 3, 5, 7, 11, 13, 17, 103
+        &
+        5 & 34 & 31, 61, 1321
+        \\
+        1 & 409 & 523, 821, 947, 1723
+        &
+        7 & 10 & 547
+        \\
+        3 & 81 & 19, 661
+        &
+        8 & 7 & 881
+        \\
+        4 & 54 & 1013, 1181
+        &
+        9 & 6 & 1693
+        \\
+        \hline
+    \end{tabular}
+    \smallskip
+    \caption{Primes $\ell$ amenable to \algstyle{VéluStep}
+    (Algorithm~\ref{alg:VéluStep}) for our candidate isogeny graph,
+    with corresponding $r$-values and proposed walk length bounds $M_\ell$.}
     \label{tab:VéluSteps}
 \end{table}
 
 \begin{table}
-\begin{tabular}{cl}
-$M_\ell$ & Primes \\
-\hline
-20 & 23  \\
-16 & 29  \\
-12 & 37  \\
-11 & 41  \\
-10 & 43  \\
-9  & 47  \\
-6  & 71, 73  \\
-5  & 89  \\
-4  & 107,109,113  \\
-3  & 131, 151  \\
-2  & 157, 163, 167, 191,
-     193,
-     197,
-     223,
-     229  \\
-1 &  241,
-     251,
-     257,
-     277,
-     283,
-     293,
-     307,
-     317,
-     349,
-     359,
-     373,
-	\\ &
-     383,
-     401,
-     421,
-     431,
-     433,
-     439,
-     443,
-     449,
-     457,
-     467 \\
-\end{tabular}
-    \caption{Primes $\ell$ for which Algorithm~\algstyle{ElkiesStep} is
-    used for our candidate isogeny graph, with proposed bounds $M_\ell$}
+    \centering
+    \begin{tabular}{r@{\;}|@{\;}l@{\;}||@{\;}r@{\;}|@{\;}l@{\;}||@{\;}r@{\;}|@{\;}l@{\;}}
+        $M_\ell$ & $\ell$
+        &
+        $M_\ell$ & $\ell$
+        &
+        $M_\ell$ & $\ell$
+        \\
+        \hline
+        % line 1
+        20 & 23
+        &
+        9  & 47
+        &
+        2  & 157, 163, 167, 191, 193, 197, 223, 229
+        \\
+        % line 2
+        16 & 29
+        &
+        6  & 71, 73
+        &
+        1  & 241, 251, 257, 277, 283, 293, 307,
+        \\
+        % line 3
+        12 & 37
+        &
+        5  & 89
+        &
+        1  & 317, 349, 359, 373, 383, 401, 421,
+        \\
+        % line 4
+        11 & 41
+        &
+        4  & 107, 109, 113
+        &
+        1  & 431, 433, 439, 443, 449, 457, 467
+        \\
+        % line 5
+        10 & 43
+        &
+        3  & 131, 151
+        &
+        \\
+        \hline
+        % line 6
+    \end{tabular}
+    \smallskip
+    \caption{Primes $\ell$ amenable to \algstyle{ElkiesStep}
+    (Algorithm~\ref{alg:ElkiesStep}) for our candidate isogeny graph, 
+    with proposed walk length bounds $M_\ell$.}
     \label{tab:ElkiesSteps}
 \end{table}
+
+%\begin{table}
+%\begin{tabular}{cl}
+%$M_\ell$ & Primes \\
+%\hline
+%20 & 23  \\
+%16 & 29  \\
+%12 & 37  \\
+%11 & 41  \\
+%10 & 43  \\
+%9  & 47  \\
+%6  & 71, 73  \\
+%5  & 89  \\
+%4  & 107,109,113  \\
+%3  & 131, 151  \\
+%2  & 157, 163, 167, 191,
+%     193,
+%     197,
+%     223,
+%     229  \\
+%1 &  241,
+%     251,
+%     257,
+%     277,
+%     283,
+%     293,
+%     307,
+%     317,
+%     349,
+%     359,
+%     373,
+%	\\ &
+%     383,
+%     401,
+%     421,
+%     431,
+%     433,
+%     439,
+%     443,
+%     449,
+%     457,
+%     467 \\
+%\end{tabular}
+%    \caption{Primes $\ell$ for which Algorithm~\algstyle{ElkiesStep} is
+%    used for our candidate isogeny graph, with proposed bounds $M_\ell$}
+%    \label{tab:ElkiesSteps}
+%\end{table}
 
 Using this proposal, we estimate the cost of a single walk in the
 isogeny graph to be approximately 465 seconds, bringing the global
