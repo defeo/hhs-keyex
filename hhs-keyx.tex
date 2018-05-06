@@ -343,13 +343,52 @@ $ℓ$-isogenies over $\Fbar_q$ will be an infinite $(ℓ+1)$-regular
 graph; a notable exception is the finite connected component of
 \emph{supersingular} curves, used in SIDH and related protocols.
 
-If we restrict to isogenies \emph{defined over $\F_q$}, the picture
-becomes more complex.  
-If an isogeny $ϕ:E→E'$ is defined over $\F_q$,
-then the Frobenius endomorphism $\pi$ stabilizes $\ker ϕ$.
-Conversely, if $G$ is a subgroup of $E$ stabilized by $\pi$,
-then the quotient isogeny $\phi : E \to E/G$ is defined over $\F_q$.
-If $ϕ$ is defined over $\F_q$ \emph{and cyclic},
+If we restrict to isogenies \emph{defined over $\F_q$}, 
+then the picture becomes more complex.  
+Let $E$ and $E'$ be elliptic curves over $\F_q$;
+then an isogeny $ϕ:E→E'$ is defined over $\F_q$
+if and only if the Frobenius endomorphism $\pi$ on $E$ stabilizes $\ker ϕ$.
+We emphasize that the points in the kernel need not
+be defined over $\F_q$ themselves.
+
+For the vertices of the $\Fbar_q$-graph
+we use $j$-invariants,
+which classify elliptic curves up to
+$\Fbar_q$-isomorphism;
+but now we want to work up to $\F_q$-isomorphism,
+a stronger equivalence.
+If $E$ and $\tilde{E}$ are not $\F_q$-isomorphic
+but $j(E) = j(\tilde{E})$,
+then $\tilde{E}$ is the \emph{quadratic twist} of $E$
+(which is defined and unique up to $\F_q$-isomorphism).\footnote{
+    There is a slight technicality here for $j$-invariants $0$ and $1728$,
+    where non-quadratic twists may exist.
+    We can ignore these special cases
+    because these curves will never appear in our cryptosystem:
+    the class groups of their endomorphism rings are trivial,
+    and keyspaces of size 1 are of limited utility in cryptography.
+}
+When $E$ is ordinary,
+its quadratic twist has a different cardinality
+(if $\#E(\F_q) = q + 1 - t$, then $\#\tilde{E}(\F_q) = q + 1 + t$),
+so $E$ and $\tilde{E}$ are in different components of the isogeny graph.
+But every isogeny $\phi: E \to E'$ over $\F_q$
+corresponds to an isogeny $\tilde{\phi}: \tilde{E} \to \tilde{E}'$
+of the same degree, also defined over $\F_q$, between the quadratic twists.
+The component of the $\F_q$-isogeny graph containing an ordinary curve 
+and the component containing its twist are thus isomorphic,
+and we are therefore justified in identifying them
+and using $j$-invariants for vertices.\footnote{
+    The situation is much more complicated for supersingular graphs,
+    because the curve and its twist are in the same component
+    of the graph; see~\cite[\S2]{DelfsG16} for details.
+}
+This is not just a convenience of labelling:
+we will see below that switching between a curve and its twist
+often allows a useful optimization in isogeny computations.
+
+
+If an isogeny $ϕ$ is defined over $\F_q$ \emph{and cyclic},
 then $π$ acts like a scalar on the points of $\ker ϕ$. 
 Thus, for any prime $ℓ≠p$, the number of outgoing $ℓ$-isogenies from $E$ 
 defined over $\F_q$ can be
@@ -375,14 +414,15 @@ $X^2-tX+q\mod ℓ$. We then have four possibilities:
   there are two isogenies from $E$.
 \end{itemize}
 
-If we denote by $Δ_π=t^2-4q$ the discriminant of the characteristic
-equation of $π$, we see that the cases~(1.x) are only possible if $ℓ$
-divides $Δ_π$.  For ordinary curves $Δ_π≠0$, thus only a finite number
-of primes $ℓ$ will fall in these cases, and they will be mostly
-irrelevant to our cryptosystem. 
-If a prime $\ell$ falls into Case~(2),
-it is called an \emph{Elkies prime};
+The primes $\ell$ in Case~(2)
+are called \emph{Elkies primes} for $E$;
 these are the primes of most interest to us.
+Cases~(1.x) are only possible if $ℓ$ divides $Δ_π = t^2-4q$,
+the discriminant of the characteristic equation of $π$;
+for ordinary curves $Δ_π≠0$, so only a finite number
+of $ℓ$ will fall in these cases, and they will be mostly
+irrelevant to our cryptosystem.
+We do not use any $\ell$ in Case~(0).
 %Following the literature on the SEA point-counting algorithm,
 %if $ℓ$ falls into case~(0) it will be called an \emph{Atkin prime}, 
 %if it falls into case~(2) it will be called an \emph{Elkies prime}.
