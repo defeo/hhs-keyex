@@ -1531,42 +1531,40 @@ instance,~\cite[20.4.11]{galbraith2012mathematics}.
 
 \paragraph{A heuristic discussion of the IWD assumption.}
 
-From its very definition, the IWD assumption depends on
+From its very definition, the IWD problem depends on
 the probability distribution $σ$ we use to sample
 random walks in the isogeny graph. In this paragraph,
 we provide heuristic arguments indicating that IWD is hard
-using Algorithm~\ref{alg:walk}, provided the following
-two statements are true:
-\begin{itemize}
-\item $S$ is \emph{not too small}, i.e. the number of
-isogeny degrees used is $\Omega(\log q)$;
-\item The keyspace size is at least $\sqrt{|Δ_K|}$.
-\end{itemize}
+using Algorithm~\ref{alg:walk}, provided 
+\begin{enumerate}
+    \item the keyspace size is at least $\sqrt{|Δ_K|}$, and
+    \item $S$ is \emph{not too small}, i.e. the number of
+        isogeny degrees used is in $\Omega(\log q)$.
+\end{enumerate}
 
 At present, proving rapid mixing of random walks with such
-parameters seems out of reach even under number-theoretic
+parameters seems out of reach, even under number-theoretic
 hypotheses such as GRH. The best results available,
 like~\cite[Theorem~1.5]{jao+miller+venkatesan09}
-that was used in the proof of Lemma~\ref{lem:adv},
-typically require isogeny degrees $\Omega((\log q)^B)$
+(which we used in the proof of Lemma~\ref{lem:adv}),
+typically require isogeny degrees in $\Omega((\log q)^B)$
 for some $B>2$, and fully random walks that are not,
 for example, skewed towards smaller-degree isogenies.
 
-However, numerical evidence widely suggests that
-such results are too weak. In~\cite[7.2]{jao+miller+venkatesan09},
+However, numerical evidence suggests that
+these theoretical results are too weak. In~\cite[7.2]{jao+miller+venkatesan09},
 it is asked whether an analogue of the previous theorem would
 be true with the sole constraint $B>1$. In~\cite[Section~3]{GHS},
 it is mentioned that many fewer split primes are needed to walk
 in the isogeny graph than theoretically expected.
+Practical evidence also suggests that the rapid mixing
+properties are not lost with skewed random walks:
+such walks are used in~\cite{galbraith+stolbunov11},
+to accelerate an algorithm solving Problem~\ref{prob:isog}.
 We believe that these experiments can bring some evidence
 in favor of relying on the IWD assumptions with more aggressive
 parameters than those provided by GRH.
 
-Regarding the skewing of random walks,
-practical evidence also suggests that the rapid mixing
-properties are not lost: in~\cite{galbraith+stolbunov11},
-such walks are used to accelerate the algorithm
-solving Problem~\ref{prob:isog}.
 
 \subsection{Key validation and active security}
 
@@ -1599,9 +1597,10 @@ the right order, and has maximal endomorphism ring. Notice that,
 because these algorithms only operate on public data, they do not need
 to be constant-time.
 
-\paragraph{Verifying the order.} Since we already know the trace $t$
-of the Frobenius endomorphism of $E$, we only need to check that the
-order is equal to $q+1-t$. Assuming that $E$ is cyclic, or contains a
+\paragraph{Verifying the curve order.} Since we already know the trace $t$
+of the Frobenius endomorphism of all curves in $\Ell_q(\O)$, 
+we only need to check that the given $E$ has order $q+1-t$.
+Assuming that $E$ is cyclic, or contains a
 cyclic group of order larger than $4\sqrt{q}$, a very efficient
 randomized algorithm consists in taking a random point $P$ and
 verifying that it has the expected order.  This task is easy if the
@@ -1615,21 +1614,24 @@ $ℤ/2ℤ×ℤ/\frac{N}{2}ℤ$. To check that a curve is in the same isogeny
 class, we repeatedly take random points until we find one with order
 $N/2$.
 
-\paragraph{Verifying the level.} The previous verification
-proves that endomorphism ring of $E$ is contained between $ℤ[π]$ and
-$\O_K$. We have already seen that there is only a finite number of
-possible rings, and their indices must divide $d$ where $d^2=Δ_π/Δ_K$.
+\paragraph{Verifying the endomorphism ring level.} 
+The curve order verification proves that $\End(E)$ 
+is contained between $ℤ[π]$ and $\O_K$. 
+We have already seen that there is only a finite number of
+possible rings: their indices in $\O_K$ must divide $d$ where $d^2=Δ_π/Δ_K$.
 Ascending and descending isogenies connect curves with different endomorphism
 rings, thus we are left with the problem of verifying that $E$ is on
 the crater of any $ℓ$-volcano for $ℓ\mid d$.
 
 Assuming that no large prime divides $d$, this check can be
 accomplished efficiently by performing random walks in the volcanoes,
-as described in~\cite{fouquet+morain02}. Notice that if we choose
-$Δ_π$ square-free, then the only possible endomorphism ring is $\O_K$,
-and this check is empty.
+as described in~\cite[\S4.2]{kohel} or~\cite{fouquet+morain02}. 
+Note that if we choose $Δ_π$ square-free, 
+then the only possible endomorphism ring is $\O_K$,
+and there is nothing to be done.
 
-Concretely, for the curve of Section~\ref{sec:initcurve} $Δ_π/Δ_K=2^2$,
+Concretely, for the curve of Section~\ref{sec:initcurve}
+we have $Δ_π/Δ_K=2^2$,
 so there are exactly two possible endomorphism rings. Looking at
 the action of the Frobenius endomorphism, we see that $\End(E)=\O_K$
 if and only if $E[2]≃(ℤ/2ℤ)^2$.
@@ -1684,8 +1686,10 @@ if and only if $E[2]≃(ℤ/2ℤ)^2$.
     by a single $3$-isogeny step.)
 \end{example}
 
-Both checks can be done much more efficiently than evaluating a single
-isogeny walk, thus we conclude that key validation is not only possible,
+\paragraph{Consequences for cryptographic constructions.}
+Since both of the checks above can be done much more efficiently 
+than evaluating a single isogeny walk, 
+we conclude that key validation is not only possible,
 but highly efficient for protocols based on the CRS construction. 
 This stands in stark contrast to the case of SIDH,
 where key validation is known to be
@@ -1698,7 +1702,7 @@ CRS action without resorting to generic transforms such as
 Fujisaki--Okamoto~\cite{10.1007/3-540-48405-1_34}, unlike the case of
 SIKE~\cite{SIKE,10.1007/978-3-319-70500-2_12}. This in turn enables
 applications such as non-interactive key exchange, for which no
-practical post-quantum scheme was known previously to~\cite{csidh}.
+practical post-quantum scheme was known prior to~\cite{csidh}.
 
 
 \section{Experimental results}
