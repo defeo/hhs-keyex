@@ -141,7 +141,7 @@ for cryptosystems based on the hardness of inverting $\varphi_x$.
     }
 \end{algorithm}
 
-Any HHS $X$ for a finite abelian group $G$ can be used to construct a
+Any HHS $X$ for an abelian group $G$ can be used to construct a
 key exchange as shown in Algorithm~\ref{alg:HHS-DH}.
 If Alice and Bob have keypairs $(g_A,x_A)$
 and $(g_B,x_B)$, respectively,
@@ -229,6 +229,10 @@ Section~\ref{sec:sec} where we give precise classic and quantum
 security estimates, we formalize hardness assumptions, and sketch
 security proofs in models stronger than what was previously
 considered.
+Finally, in Section~\ref{sec:exp} we present a
+proof-of-concept implementation and measure its performance.
+
+
 
 Although the final result is far from being practical, we believe it
 constitutes progress in the direction of having a valid isogeny-based
@@ -236,21 +240,17 @@ alternative to SIDH.  Furthermore, the CRS primitive presents some
 distinct advantages over SIDH, that we shall discuss in
 Section~\ref{sec:sec}. 
 
+\paragraph{CSIDH.}
 While preparing this paper we were informed of
-a recent work by Castryk, Lange, Martindale, Panny and Renes,
-introducing an efficient post-quantum primitive very similar to
-CRS~\cite{csidh}.  Their work builds upon the ideas presented in
+recent work by Castryk, Lange, Martindale, Panny, and Renes,
+introducing CSIDH, 
+an efficient post-quantum primitive very similar to CRS~\cite{csidh}.
+Their work builds upon the ideas presented in
 Sections~\ref{sec:keyex}--\ref{sec:initcurve}, and uses them in a
 different homogeneous space where they apply effortlessly.  Their
 breakthrough confirms that, if anything, our techniques were a
 fundamental step towards the first practical post-quantum
 non-interactive key exchange protocol.
-
-The paper is structured as follows. In Section~\ref{sec:math} we
-review the fundamental mathematical concepts underlying the CRS group
-action, in Sections~\ref{sec:keyex}--\ref{sec:sec} we present our main
-contributions, finally in Section~\ref{sec:exp} we present a
-proof-of-concept implementation and measure its performance.
 
 \paragraph{Side channel awareness.}
 The algorithms we present here are not intended to provide any protection
