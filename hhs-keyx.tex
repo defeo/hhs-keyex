@@ -1070,15 +1070,17 @@ factors of $Δ_\pi$ indicate which isogeny volcanoes have to be climbed up
 in order to find $E_0$.
 
 \begin{remark}
-Factoring random 512-bit integers is not hard, and quadratic discriminants
-tend to be slightly smoother than random integers.
-It took less then one hour of GMP-ECM on 10 cores to factor the 512-bit discriminant
-given at the end of this section. %todo: which hardware ?
-If this fails,
-a conservative strategy would be to discard this discriminant; alternatively
-one could argue that leaving an unsmooth enough unfactored part is not a
-security issue, since such large-degree isogenies would be untractable to
-compute anyway (see Section~\ref{sec:sec}).
+    Factoring random 512-bit integers is not hard, and quadratic discriminants
+    tend to be slightly smoother than random integers
+    (it took less then one hour of GMP-ECM on 10 cores 
+    to factor the 512-bit discriminant given at the end of this section).
+    %todo: which hardware ?
+    A conservative strategy would be to discard any discriminant 
+    that cannot be completely factored,
+    but ultimately undetected large prime-square factors
+    do not present a security issue
+    because computing the possible corresponding large-degree isogenies 
+    is intractable (see Section~\ref{sec:sec}).
 \end{remark}
 
 \paragraph{Using the modular curve $X_1(N)$.}
