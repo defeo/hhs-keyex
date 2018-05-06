@@ -310,11 +310,11 @@ if $\ker ϕ$ is a cyclic group.
 
 An \emph{isomorphism} is an isogeny of degree one. It is a
 group isomorphism on $\Fbar_q$-points, but not necessarily on $\F_q$-points
-unless the isomorphism is defined over $\F_q$. An \emph{isomorphism class}
-of elliptic curves, or \emph{elliptic curve up to isomorphism}, is
+unless the isomorphism is defined over $\F_q$. 
+An \emph{isomorphism class} of elliptic curves is
 fully determined by their common \emph{$j$-invariant}, which is an
 element of $\Fbar_q$. If any curve in the isomorphism class is defined
-over $\F_q$, then its $j$-invariant also belongs to $\F_q$.
+over $\F_q$, then its $j$-invariant is in $\F_q$.
 
 Any isogeny can be factored as a composition of a \emph{separable} and
 a \emph{purely inseparable} isogeny. \emph{Purely inseparable}
@@ -368,12 +368,12 @@ $ℓ$-isogenies over $\Fbar_q$ will be an infinite $(ℓ+1)$-regular
 graph; a notable exception is the finite connected component of
 \emph{supersingular} curves, used in SIDH and related protocols.
 
-If we restrict to isogenies \emph{defined over $\F_q$}, 
-then the picture becomes more complex.  
-Let $E$ and $E'$ be elliptic curves over $\F_q$;
+When we restrict to isogenies defined over $\F_q$, 
+the picture becomes more complex.  
+If $E$ and $E'$ are elliptic curves over $\F_q$,
 then an isogeny $ϕ:E→E'$ is defined over $\F_q$
 if and only if the Frobenius endomorphism $\pi$ on $E$ stabilizes $\ker ϕ$.
-We emphasize that the points in the kernel need not
+We emphasize that the points in $\ker\phi$ need not
 be defined over $\F_q$ themselves.
 
 For the vertices of the $\Fbar_q$-graph
@@ -397,19 +397,20 @@ When $E$ is ordinary,
 its quadratic twist has a different cardinality
 (if $\#E(\F_q) = q + 1 - t$, then $\#\tilde{E}(\F_q) = q + 1 + t$),
 so $E$ and $\tilde{E}$ are in different components of the isogeny graph.
-But every isogeny $\phi: E \to E'$ over $\F_q$
-corresponds to an isogeny $\tilde{\phi}: \tilde{E} \to \tilde{E}'$
-of the same degree, also defined over $\F_q$, between the quadratic twists.
+But every $\F_q$-isogeny $\phi: E \to E'$ 
+corresponds to an $\F_q$-isogeny $\tilde{\phi}: \tilde{E} \to \tilde{E}'$
+of the same degree between the quadratic twists.
 The component of the $\F_q$-isogeny graph containing an ordinary curve 
-and the component containing its twist are thus isomorphic,
-and we are therefore justified in identifying them
-and using $j$-invariants for vertices.\footnote{
+and the component containing its twist are thus isomorphic;
+we are therefore justified in identifying them,
+using $j$-invariants in $\F_q$ for vertices in the $\F_q$-graph.\footnote{
     The situation is much more complicated for supersingular graphs,
     because the curve and its twist are in the same component
     of the graph; see~\cite[\S2]{DelfsG16} for details.
 }
-This is not just a convenience of labelling:
-we will see below that switching between a curve and its twist
+This is not just a mathematical convenience:
+we will see in Section~\ref{sec:keyex} below 
+that switching between a curve and its twist
 often allows a useful optimization in isogeny computations.
 
 
