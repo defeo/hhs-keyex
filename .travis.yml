@@ -1,0 +1,8 @@
+language: julia
+julia:
+  - release
+  - nightly
+script:
+  - julia -e 'Pkg.add("Nemo");Pkg.add("Primes");Pkg.clone("https://github.com/defeo/ClassPolynomials.jl/"); Pkg.clone("https://github.com/defeo/EllipticCurves.jl/")'
+  - cd implementation
+  - julia toy_example.js
