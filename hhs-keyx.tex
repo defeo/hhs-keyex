@@ -95,18 +95,18 @@ Stolbunov~\cite{rostovtsev+stolbunov06,stolbunov-red,Stol}. The
 origins of isogeny-based cryptography can be traced back to
 Couveignes' seminal work ``Hard Homogeneous Spaces'', that went
 unpublished for ten years before appearing
-in~\cite{cryptoeprint:2006:291}. Let $G$ be a group, a \emph{principal
-  homogeneous space} for $G$ is a set $X$ with an
+in~\cite{cryptoeprint:2006:291}. 
+
+A \emph{principal homogeneous space} for a group $G$ is a set $X$ with an
 action of $G$ on $X$ such that for any $x∈X$ the map $φ_x:g↦g·x$ is an
 isomorphism between $G$ and $X$. Intuitively, one can think of $X$ as
-a \emph{copy} (or, rather, \emph{many different copies}) of $G$ where
-the information on the identity element has been forgotten. 
+a copy (or, rather, many different copies) of $G$ where
+the identity element has been forgotten. 
 
-Couveignes
-defines a \emph{hard homogeneous space} (HHS) to be a principal
-homogeneous space where computing
-the action of $G$ on $X$ is computationally feasible, but inverting
-the isomorphism $φ_x$ is computationally hard for any $x$.
+Couveignes defines a \emph{hard homogeneous space} (HHS) 
+to be a principal homogeneous space 
+where the action of $G$ on $X$ is efficiently computable, 
+but inverting the isomorphism $φ_x$ is computationally hard for any $x$.
 Algorithm~\ref{alg:HHS-KeyGen} generates private-public keypairs
 for cryptosystems based on the hardness of inverting $\varphi_x$.
 
@@ -125,6 +125,21 @@ for cryptosystems based on the hardness of inverting $\varphi_x$.
         \Return{$(g,x)$}
     }
 \end{algorithm}
+
+Any HHS $X$ for a finite abelian group $G$ can be used to construct a
+key exchange as shown in Algorithm~\ref{alg:HHS-DH}.
+If Alice and Bob have keypairs $(g_A,x_A)$
+and $(g_B,x_B)$, respectively,
+then the commutativity of $G$
+lets them derive a shared secret
+\[
+    \DH(g_A,x_B) 
+    = g_A\cdot g_B\cdot x_0 
+    = g_B\cdot g_A\cdot x_0
+    = \DH(g_B,x_A)
+    \,.
+\]
+The analogy with classic group-based Diffie--Hellman is evident.
 
 \begin{algorithm}
     \caption{Diffie--Hellman in an HHS $X$ for a group $G$}
@@ -153,28 +168,16 @@ for cryptosystems based on the hardness of inverting $\varphi_x$.
 %  \Key{$a·x_b = b·x_a = ab·x_0$}
 %\end{algorithm}
 
-Any HHS $X$ for a finite Abelian group $G$ can be used to construct a
-key exchange as shown in Algorithm~\ref{alg:HHS-DH}.
-If Alice and Bob have keypairs $(g_A,x_A)$
-and $(g_B,x_B)$, respectively,
-then the commutativity of $G$
-lets them derive a shared secret
-\[
-    \DH(g_A,x_B) = g_A\cdot(g_B\cdot x_0) = g_B\cdot(g_A\cdot x_0)
-    = \DH(g_B,x_A)
-    \,.
-\]
-The analogy with classic group-based Diffie--Hellman is evident.
 
 If $X$ is a
 cyclic group $〈x〉$ of order $p$, and $G=ℤ/pℤ$ acting on $X$ by
-$g·x=x^g$, then %this is simply the Diffie--Hellman key exchange, and %% <- BS: nope! 
-inverting $φ_x$ is the discrete logarithm problem (DLP) in $X$.  
+$g·x=x^g$, then %this is simply the Diffie--Hellman key exchange, and %% <- BS: nope!
+inverting $φ_x$ is the discrete logarithm problem (DLP) in $X$.
 But for other homogeneous spaces, inverting $φ_x$ may have no relationship
-with any DLP, and may potentially be harder to solve, including for a
-quantum computer. Similar ideas have repeatedly appeared in the
-literature under different
-flavors~\cite{10.1007/3-540-44598-6_10,monico2007}.
+with any DLP,
+and might resist attacks based on Shor's algorithm in the quantum setting.
+Similar ideas have occasionally appeared in the
+literature in different forms~\cite{10.1007/3-540-44598-6_10,monico2007}.
 
 Couveignes viewed HHS chiefly as a general framework, encompassing
 various flavors of Diffie--Hellman-like systems. Nevertheless, he
@@ -631,7 +634,7 @@ We extend the action of $G$ on $X$ to an action of $S^*$ on $X$ by defining
     = 
     \big(\prod_{i=1}^n s_i\big)·x.
 \]
-In our situation $G$ is Abelian,
+In our situation $G$ is abelian,
 so the order of the steps $s_i$ does not matter.
 We can use this action directly in the key exchange protocol
 of Algorithm~\ref{alg:HHS-DH},
