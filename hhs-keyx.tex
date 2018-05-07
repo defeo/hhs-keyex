@@ -875,6 +875,7 @@ Indeed, the second part of the algorithm (lines~\ref{line:kernel}
 to~\ref{line:end_direction}) determines which $j$-invariant
 between $j_1$ and $j_2$ gives the correct direction in the isogeny
 graph (recall Figure~\ref{fig:cycle}), and is only needed
+for the \emph{first} step since no return
 on the isogeny circle is made. After that, one should use the
 simpler \algstyle{ElkiesNextStep} algorithm (Algorithm~\ref{alg:ElkiesNextStep})
 remembering the previous curve. Algorithm \algstyle{ElkiesWalk}
@@ -993,7 +994,7 @@ easily described (Algorithm~\ref{alg:keygen}).
 \begin{algorithm}
 \caption{\algstyle{KeyGen}}
 \label{alg:keygen}
-\Input{The set $S$ given as $S_E, S_{V,2}, S_{V,1}$; the bounds $M_\ell$}
+\Input{The set $S$ given as $S_E, S_{V,2}, S_{V,1}$; the walk length bounds $M_\ell$}
 \Output{A secret exponent vector $(k_\ell)$}
 \For{$(\ell, \lambda, \mu)\in S_E\cup S_{V, 2}$}
 {
@@ -1057,7 +1058,7 @@ protocol.
 		\item A prime power $q$ 
 		\item An ordinary elliptic curve $E_0/\F_q$ with order $C$, and maximal endomorphism ring
 		\item The set $S$ given as $S_E,\ S_{V,2},\ S_{V,1}$
-		\item Bounds $M_\ell$
+		\item Walk length bounds $M_\ell$
 		\end{itemize}
 	}
   \Alice{
