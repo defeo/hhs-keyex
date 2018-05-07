@@ -899,7 +899,11 @@ and is usually the considered model in the literature
 about isogeny computations.
 Hence, if the initial curve $E_0$ admits a Montgomery model, one can
 compute the Vélu steps \emph{first} using Montgomery models,
-and switch to Weierstrass models afterwards.
+and switch to Weierstrass models afterwards. Note that
+we can also avoid computing $y$-coordinates in Algorithm~\ref{alg:ElkiesStep}
+at line~\ref{line:direction} if $\lambda\neq\pm\mu$. In this case,
+choosing the correct quadratic twist at line~\ref{line:end_direction}
+is not an issue.
 
 Note that when $r = 1$ (hence $\lambda = 1$), which is the best case
 in Algorithm~\ref{alg:VéluStep}, Vélu steps cannot be used in direction $\mu$
@@ -940,9 +944,9 @@ determined by an \emph{exponent vector}, with one exponent for each ideal in $S$
 up to inverse: for an ideal $\frak s\in S$, this exponent can be negative if
 $\frak s^{-1}$ also appears in $S$, and must be nonnegative otherwise.
 
-In order to minimize the cost of computing an isogeny walk, we use \emph{bounds}
-on the number of steps for each ideal, as follows.
-For each Elkies prime $\ell$ appearing in $S$, we define a bound $M_\ell$
+In order to minimize the cost of computing an isogeny walk, we use a
+\emph{walk length bound} for each ideal, as follows.
+For each prime $\ell$ appearing in $S$, we define a bound $M_\ell$
 on (the absolute value of) the exponent of ideals of norm $\ell$. As a rule,
 $M_\ell$ will be much bigger in the Vélu case.
 Algorithm~\algstyle{KeyGen} that generates a secret key is now
@@ -1760,12 +1764,12 @@ programming language.
 We developed a small Julia package, built upon 
 the computer algebra package Nemo~\cite{nemo},
 to implement basic functionalities
-for elliptic curves over finite fields~\cite{todo:package}.
+for elliptic curves over finite fields~\cite{package}.
 Experiments were conducted on a machine running a 3.2GHz Intel Xeon processor.
 %todo: more details ?
 
 First, consider the
-time to compute one step for a prime $\frak s = (\ell,\pi-\lambda)$.
+time to compute one step for an ideal $\frak s = (\ell,\pi-\lambda)$.
 Using \algstyle{ElkiesStep}, this is approximately
 the cost of finding the roots of the modular polynomial,
 which is roughly $0.017\cdot\ell$ seconds in our implementation.
@@ -1791,8 +1795,8 @@ for the extension degrees relevant to our parameters.
 
 Using this data, finding efficient bounds $M_\ell$
 offering a sufficient key space size is easily seen to be an
-integer optimization problem. Lacking ideas on how to find
-the~\emph{best} solution, we used the following heuristic procedure.
+integer optimization problem. In order to find a
+satisfactory solution, we used the following heuristic procedure.
 Given a time bound $T$, let \algstyle{KeySpaceSize}$(T)$ be
 the key space size obtained when each $M_\ell$ is the greatest such
 that the \emph{total time spent on $\ell$-isogenies} is less than $T$.
@@ -1806,34 +1810,13 @@ we obtain are most likely not the best possible, intuitively
 the outcome does not fall very far from the optimal.
 
 In this way, we obtain a proposal for the bounds $M_\ell$
-to be used in Algorithm~\ref{alg:key}. Table~\ref{tab:VéluSteps}
-lists the primes amenable to Algorithm~\algstyle{VéluStep}, with
-the corresponding extension degree $r$, and a star if the twisted curve
-allows us to use both directions in the isogeny graph.
+to be used in Algorithm~\ref{alg:keygen}. Table~\ref{tab:VéluSteps}
+lists the isogeny degrees amenable to Algorithm~\algstyle{VéluStep}, with
+the corresponding extension degree $r$ (a star denotes that the twisted curve
+allows us to use both directions in the isogeny graph).
 Table~\ref{tab:ElkiesSteps}
-lists other Elkies primes for which we apply Algorithm~\algstyle{ElkiesStep}.
+lists other primes for which we apply Algorithm~\algstyle{ElkiesStep}.
 
-%todo: put these two tables on the same page ?
-%\begin{table}
-%\centering
-%\begin{tabular}{cclc}
-%$r$ & $M_\ell$ & Primes \\
-%\hline
-%1* & 409 & 3, 5, 7, 11, 13, 17, 103 \\
-%1 & 409 & 523, 821, 947, 1723 \\
-%3 & 81 & 19, 661 \\
-%4 & 54 & 1013, 1181 \\
-%5 & 34 & 31, 61, 1321 \\
-%7 & 10 & 547 \\
-%8 & 7 & 881 \\
-%9 & 6 & 1693
-%\end{tabular}
-%    \caption{Primes $\ell$ for which Algorithm~\algstyle{VéluStep} is
-%    used for our candidate isogeny graph,
-%    with corresponding $r$-values and proposed bounds $M_\ell$}
-%    \label{tab:VéluSteps}
-%\end{table}
-%
 \begin{table}
     \centering
     \begin{tabular}{l|@{\;}r@{\;}|@{\;}l@{\;}||@{\;}l|r@{\;}|@{\;}l}
@@ -1921,58 +1904,12 @@ lists other Elkies primes for which we apply Algorithm~\algstyle{ElkiesStep}.
     \label{tab:ElkiesSteps}
 \end{table}
 
-%\begin{table}
-%\begin{tabular}{cl}
-%$M_\ell$ & Primes \\
-%\hline
-%20 & 23  \\
-%16 & 29  \\
-%12 & 37  \\
-%11 & 41  \\
-%10 & 43  \\
-%9  & 47  \\
-%6  & 71, 73  \\
-%5  & 89  \\
-%4  & 107,109,113  \\
-%3  & 131, 151  \\
-%2  & 157, 163, 167, 191,
-%     193,
-%     197,
-%     223,
-%     229  \\
-%1 &  241,
-%     251,
-%     257,
-%     277,
-%     283,
-%     293,
-%     307,
-%     317,
-%     349,
-%     359,
-%     373,
-%	\\ &
-%     383,
-%     401,
-%     421,
-%     431,
-%     433,
-%     439,
-%     443,
-%     449,
-%     457,
-%     467 \\
-%\end{tabular}
-%    \caption{Primes $\ell$ for which Algorithm~\algstyle{ElkiesStep} is
-%    used for our candidate isogeny graph, with proposed bounds $M_\ell$}
-%    \label{tab:ElkiesSteps}
-%\end{table}
-
 Using this proposal, we estimate the cost of a single walk in the
 isogeny graph to be approximately 465 seconds, bringing the global
 Diffie--Hellman key-exchange cost to 930 seconds (with $T = 8.2s$).
-As mentioned in Section~\ref{sec:todo}, these timings are~\emph{worst-case}
-in the sense that the number of isogeny steps is exactly $M_\ell$ for each $\ell$.
+These timings are~\emph{worst-case}
+in the sense that the number of isogeny steps is taken
+to be exactly $M_\ell$ for each $\ell$.
 
 We stress the fact that this implementation
 is \emph{not} optimised. Besides general gains on field arithmetic,
@@ -1983,12 +1920,8 @@ finding step in Algorithm~\ref{alg:ElkiesStep}.
 For comparison, without using Algorithm~\ref{alg:VéluStep}, the
 total key-exchange time would exceed 2000 seconds:
 our ideas thus bring an improvement by a factor of over 2 over the
-original protocol.
-
-\section{Conclusion}
-
-- A quel point a-t-on accéléré le cryptosystème ?
-- Ce protocole a-t-il finalement un intérêt dans le cadre de la crypto post-quantique ?
+original protocol. A longer search for efficient public
+parameters would bring further improvement.
 
 
 \bibliographystyle{splncs04}
