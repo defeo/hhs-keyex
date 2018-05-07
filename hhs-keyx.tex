@@ -757,16 +757,7 @@ are not the final elliptic curves,
 but their $j$-invariants.
 
 
-\subsection{Sampling and evaluating isogeny walks}
-
-From a computational point of view, we now face the following
-question: given $g\in\Cl(\O)$ given as a product of small ideals
-and an elliptic curve $E$, compute the action $g\cdot E$.
-The cost of this operation is the sum of the costs of each
-isogeny step involved, \emph{which depends on the ideal}.
-We will thus minimize the global
-computational cost by means of adapted, or \emph{skewed},
-smooth representations for elements in $\Cl(\O)$.
+\subsection{Computing and sampling isogeny walks}
 
 Given an ideal $\frak s = (\pi-\lambda, \ell)$ and an elliptic curve $E$,
 we will compute $\phi_{\frak s}:E\to E'$ using one of two different algorithms:
@@ -785,7 +776,14 @@ spirit from Algorithm~\algstyle{ElkiesStep} and
 inspired by the SIDH cryptosystem and related protocols,
 speeds up the protocol by a considerable factor and
 is the main contribution of our work. Vélu steps are also
-a key ingredient in the CSIDH protocol.
+a key ingredient in the CSIDH protocol~\cite{csidh}.
+
+Using these algorithms, the cost of an isogeny step depends
+on the ideal. In order to minimize the global computational cost,
+we will use adapted, or \emph{skewed}, 
+smooth representations when sampling elements in $\Cl(\O)$,
+as explained at the end of this subsection.
+
 Let us now delve into
 the details of these two~\algstyle{Step} algorithms.
 
