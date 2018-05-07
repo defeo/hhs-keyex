@@ -337,8 +337,9 @@ For any $ℓ$-isogeny $ϕ:E→E'$, there is a unique $ℓ$-isogeny
 $\hat{ϕ}:E'→E$ such that $ϕ∘\hat{ϕ} = [\ell]$ on $E'$
 and $\hat{ϕ}∘ϕ = [\ell]$ on $E$.
 We call $\hat{ϕ}$ the \emph{dual} of $ϕ$. This
-shows that being \emph{$\ell$-isogenous} is an equivalence
-relation. Further, a theorem of Tate states that two curves are
+shows that being \emph{$\ell$-isogenous} is a symmetric
+relation, and that being isogenous is an equivalence relation.
+ Further, a theorem of Tate states that two curves are
 isogenous over $\F_q$ if and only if they have the same number of
 points over $\F_q$.
 
@@ -373,7 +374,8 @@ When we restrict to isogenies defined over $\F_q$,
 the picture becomes more complex.  
 If $E$ and $E'$ are elliptic curves over $\F_q$,
 then an isogeny $ϕ:E→E'$ is defined over $\F_q$
-if and only if the Frobenius endomorphism $\pi$ on $E$ stabilizes $\ker ϕ$.
+(maybe up to a twist of $E'$)
+if and only if the Frobenius endomorphism $\pi$ on $E$ stabilizes $\ker ϕ$
 We emphasize that the points in $\ker\phi$ need not
 be defined over $\F_q$ themselves.
 
@@ -530,7 +532,7 @@ trivially (since the corresponding isogenies are endomorphisms),
 so the action factors as an action of the \emph{ideal
   class group} $\Cl(\O)$ on $\Ell_q(\O)$.  The main theorem of complex
 multiplication states that this action is \emph{simply transitive}. In
-other terms, $\Ell_q(\O)$ is a \emph{principal homogeneous space}
+other terms, $\Ell_q(\O)$ is a \emph{principal homogeneous space} (PHS)
 under the group $\Cl(\O)$: if we fix a curve $E$ as base point,
 then we have a bijection
 \[
@@ -542,6 +544,13 @@ then we have a bijection
 The order of $\Cl(\O)$ is called the \emph{class number} of $\O$, and
 denoted by $h(\O)$. An immediate consequence of the theorem is that
 $\#\Ell_q(\O)=h(\O)$.
+
+As before, in practice we prefer working with $\F_q$-isomorphism classes.
+Then $\Ell_q(\O)$ decomposes into two PHS under $\Cl(\O)$, and taking the
+quadratic twist is an isomorphism between them. We choose one of these
+two components, that we will also denote $\Ell_q(\O)$ in the sequel.
+This choice is equivalent to fixing the Frobenius as an element on $\O$,
+and not only up to sign. 
 
 Now let $ℓ$ be an Elkies prime for $E$. So far, we have seen that the
 connected component of $E$ in the $ℓ$-isogeny graph is a cycle of
