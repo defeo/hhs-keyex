@@ -1114,10 +1114,9 @@ To fix ideas, we choose the 512-bit prime
 \[
     p = 7 \left(\prod_{2\leq\ell\leq 380,\ \ell \text{ prime}} \ell\right) - 1
 \]
-Then, Algorithm~\algstyle{VéluStep} can be used
+Then, according to section~\ref{sec:keyex}, Algorithm~\algstyle{VéluStep} can be used
 for $\ell$-isogenies with $r=1$ in both directions if and only if
 $N := \# E(\F_p)$ satisfies $N \equiv0\pmod{\ell}$.
-
 We now proceed as follows:
 \begin{itemize}
 \item Choose a smoothness bound $B$ (we used $B = 13$).
@@ -1140,7 +1139,7 @@ elliptic curve as in~\cite{OKS00}.
 
 \paragraph{Finding the maximal order.}
 Once such a curve $E_1$ has been computed, it is important to find a curve
-$E_0$ having the same order, but whose endomorphism ring is maximal, and
+$E_0$ having the same number of points, but whose endomorphism ring is maximal, and
 to ensure that its discriminant is a large integer. Therefore, we attempt to
 factor the discriminant $Δ_\pi$ of $\Z[\pi]$: if it is squarefree,
 then $E_1$ already has maximal endomorphism ring, and in general the square
@@ -1217,7 +1216,7 @@ a 511-bit integer that has the following prime factorization:
 \end{aligned}
 \]
 
-Other proposals for public parameters are given in~\cite{todo:memoire}.
+Other proposals for public parameters are given in~\cite{memoire}.
 In the sequel, we will argue that using this curve brings a 128-bit security level
 in the classical as well as quantum setting, and we give running times of the whole
 scheme in our implementation.
