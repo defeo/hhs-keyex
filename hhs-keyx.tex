@@ -135,7 +135,7 @@ for cryptosystems based on the hardness of inverting $\varphi_x$.
     \KwOut{A private-public keypair $(g,x)\in G\times X$
     s.t. $x = g\cdot x_0$}
     \Function{\KeyGen{}}{
-        $g \gets_R G$
+        $g \gets \algstyle{Random}(G)$
         \tcp*{$\sigma$ is sampled uniformly at random from $G$}
         $x \gets g\cdot x_0$
         \;
@@ -465,7 +465,7 @@ they also have the same trace $t$ and discriminant $Δ_π$.
 \textbf{It follows that, if $ℓ$ is an Elkies prime for a curve $E$,
   the connected component of $E$ in the graph of $ℓ$-isogenies is a
   finite $2$-regular graph, i.e.\ a cycle.} In the next subsection we
-introduce a group action on this cycle, and determine its size.
+describe a group action on this cycle, and determine its size.
 
 
 \subsection{Complex multiplication}
@@ -761,17 +761,22 @@ but their $j$-invariants.
 \subsection{Computing and sampling isogeny walks}
 
 Given an ideal $\frak s = (\pi-\lambda, \ell)$ and an elliptic curve $E$,
-we will compute $\phi_{\frak s}:E\to E'$ using one of two different algorithms:
+we will compute $\phi_{\frak s}:E\to E'$ using one of two different
+methods:
 \begin{itemize}
-\item Algorithm~\algstyle{ElkiesStep}$(E, \ell, \lambda)$ (Algorithm~\ref{alg:ElkiesStep}) that uses
-	the \emph{modular polynomial} $\Phi_\ell(X, Y)$, and works with any $\frak s$;
-\item Algorithm~\algstyle{VéluStep}$(E, \ell,\lambda)$ (Algorithm~\ref{alg:VéluStep}) that
-	uses \emph{torsion points} on $E$, and can only be used when
-	$\lambda$ satisfies certain properties.
+    \item Algorithms~\ref{alg:ElkiesFirstStep}
+        (\algstyle{ElkiesFirstStep}, for the first application of $\frak{s}$)
+        and~\ref{alg:ElkiesNextStep} 
+        (\algstyle{ElkiesNextStep}, for higher powers of $\frak{s}$)
+        which use the \emph{modular polynomial} $\Phi_\ell(X, Y)$, 
+        and works for any $\frak s$;
+    \item Algorithm~\ref{alg:VéluStep} (\algstyle{VéluStep}),
+	    which uses \emph{torsion points} on $E$, and can only be used when
+	    $\lambda$ satisfies certain properties.
 \end{itemize}
 
-Rostovtsev and Stolbunov only used an analogue of~\algstyle{ElkiesStep},
-which is a classical algorithm.
+Rostovtsev and Stolbunov only used an analogue of~\algstyle{ElkiesStep}.
+%which is a classical algorithm.  %% <- BS: not _that_ classical...
 The introduction of Algorithm~\algstyle{VéluStep}, very different in
 spirit from Algorithm~\algstyle{ElkiesStep} and
 inspired by the SIDH cryptosystem and related protocols,
@@ -789,74 +794,150 @@ Let us now delve into
 the details of these two~\algstyle{Step} algorithms.
 
 \begin{algorithm}
-	\caption{\algstyle{ElkiesStep}}
-	\label{alg:ElkiesStep}
-	\Input{$E\in\Ell_q(\O)$, $(\ell,\lambda)$ defining an ideal $\frak s = (\pi-\lambda,\ell)$}
+	\caption{\algstyle{ElkiesFirstStep}}
+	\label{alg:ElkiesFirstStep}
+	\Input{%
+        $E\in\Ell_q(\O)$; 
+        $(\ell,\lambda)$ defining $\frak s = (\pi-\lambda,\ell) \subset \O$
+    }
 	\Output{$j(\frak s\cdot E)$}
-	$P\gets \Phi_\ell(X, j(E))$ \;
-	$j_1, j_2 \gets$ Roots of $P$ over $\F_q$ \label{line:roots} \;
-	$K\gets$ Kernel of the $\ell$-isogeny from $E$ to some $E_1$ with $j(E_1) = j_1$ \label{line:kernel}\;
-	$Q\gets$ a nonzero point in $K$\;
-	\lIf{$\pi(Q) = [\lambda]Q$}{$j_R\gets j_1$} \label{line:direction}
-	\lElse{$j_R\gets j_2$} \label{line:end_direction}
-	\Return{$j_R$}
+    %
+	$P\gets \Phi_\ell(X, j(E))$ 
+    \;
+    %
+    \label{line:roots}
+    $\{j_1, j_2\} \gets \algstyle{Roots}(P,\F_q)$ 
+    \;
+	%$K\gets$ Kernel of the $\ell$-isogeny from $E$ to some $E_1$ with $j(E_1) = j_1$ \label{line:kernel}\;
+    \label{line:kernel}
+    $K\gets \algstyle{KernelPolynomial}(\algstyle{Isogeny}(E,j_1,\ell))$ 
+    \tcp*{e.g.~BMSS algorithm}
+    %
+	$Q\gets$ a nonzero point in $K$ %\;
+    \tcp*{i.e. $(x,y)\in E(\F_q[x,y]/(y^2-f_E(x),K(x)))$}
+    %
+	\uIf{$\pi(Q) = [\lambda]Q$}{%
+        \Return{$j_1$} \label{line:direction}
+        \;
+    }
+	\Else{%
+        \Return{$j_2$} \label{line:end_direction}
+    }
 \end{algorithm}
 
 \begin{algorithm}
 	\caption{\algstyle{ElkiesNextStep}}
 	\label{alg:ElkiesNextStep}
-	\Input{$(\ell,\lambda)$ defining an ideal $\frak s = (\pi-\lambda,\ell)$;
-		$j_{k-1} = j(\frak s^{k-1}\cdot E)$ and $j_k = j(\frak s^{k}\cdot E)$ for some $E\in\Ell_q(\O)$ and $k\geq 1$}
-	\Output{$j(\frak s^{k+1}\cdot E)$}
-	$P\gets \Phi_\ell(X, j_k) / (X - j_{k-1})$ \;
-	$j_{k+1}\gets$ the unique root of $P$ in $\F_q$ \;
-	\Return{$j_{k+1}$}
+    \Input{%
+        $(\ell,\lambda)$ defining $\frak{s} = (\ell,\pi-\lambda)\subset\O$;
+        $(j_0,j_1) = (j(E),j(\frak{s}\cdot E))$ for some $E$ in $\Ell_q(\O)$
+    }
+    %(\ell,\lambda)$ defining an ideal $\frak s = (\pi-\lambda,\ell)$; $j_{k-1} = j(\frak s^{k-1}\cdot E)$ and $j_k = j(\frak s^{k}\cdot E)$ for some $E\in\Ell_q(\O)$ and $k\geq 1$}
+    \Output{$j(\frak{s}\cdot\frak{s}\cdot E)$}
+    %
+	$P\gets \Phi_\ell(X, j_0) / (X - j_1)$ 
+    \;
+    %
+	$j_2\gets$ the unique root of $P$ in $\F_q$ 
+    \;
+    %
+	\Return{$j_2$}
+    \;
 \end{algorithm}
 
 \begin{algorithm}
 	\caption{\algstyle{ElkiesWalk}}
 	\label{alg:ElkiesWalk}
-	\Input{$E\in \Ell_q(\O)$ with order $C$; $(\ell,\lambda)$ defining an ideal $\frak s = (\pi - \lambda,\ell)$; $k\geq 1$}
+	\Input{%
+        $E\in \Ell_q(\O)$;
+        $(\ell,\lambda)$ defining an ideal $\frak s = (\pi - \lambda,\ell)$;
+        $k\geq 1$
+    }
 	\Output{$\frak s^k \cdot E$}
 	$j_0 \gets j(E)$ \;
-	$j_1 \gets \algstyle{ElkiesStep}(E, \ell, \lambda)$ \;
-	\For{$2\leq i \leq k$}
-	{
-		$j_0, j_1 \gets j_1, \algstyle{ElkiesNextStep}(\ell, \lambda, j_0, j_1)$ \;
+    $j_1 \gets \algstyle{ElkiesFirstStep}(E, (\ell,\lambda))$ \;
+	\For{$2\leq i \leq k$}{
+        $(j_0, j_1) \gets (j_1, \algstyle{ElkiesNextStep}((\ell,\lambda),(j_0,j_1)))$ 
+        \;
 	}
-	$E_R \gets$ an elliptic curve with $j$-invariant $j_1$ and order $C$ \label{line:twist} \;
-	\Return{$E_R$}
+    $E_R \gets \algstyle{EllipticCurveFromJInvariant}(j_1)$ 
+    \;
+    %$E_R \gets$ an elliptic curve with $j$-invariant $j_1$ and order $C$ \label{line:twist} \;
+    \uIf{$\algstyle{CheckTrace}(E_R,t)$}{
+        \Return{$E_R$}
+        \;
+    }
+    \Else{
+        \Return{$\algstyle{QuadraticTwist}(E_R)$}
+        \;
+    }
 \end{algorithm}
 
 \begin{algorithm}
 	\caption{\algstyle{VéluStep}}
 	\label{alg:VéluStep}
-	\Input{$E\in\Ell_q(\O)$, $(\ell,\lambda)$ defining an ideal $\frak s = (\pi-\lambda,\ell)$}
+	\Input{%
+        $E\in\Ell_q(\O)$; 
+        $(\ell,\lambda)$ defining an ideal $\frak s = (\pi-\lambda,\ell)$;
+        $r > 0$;
+        $C_r = \#E(\F_{q^r})$
+    }
 	\Output{$\frak s\cdot E$}
-	$r\gets$ Multiplicative order of $\lambda$ in $\Z/\ell\Z$ \;
-	$C_r \gets \# E(\F_{q^r})$ \label{line:card} \;
+    %
 	\Repeat{$Q \neq 0_E$}{
-		$P\gets$ Random point in $E(\F_{q^r})$ \;
-		$Q\gets [C_r/\ell] P$ \label{line:scalarmult} \;
+        $P\gets \algstyle{Random}(E(\F_{q^r}))$ 
+        \;
+		$Q\gets [C_r/\ell] P$ \label{line:scalarmult}
+        \;
 	}
-	$K\gets$ Subgroup of order $\ell$ generated by $Q$ \;
-	$E_R\gets E/K$ \label{line:quotient} \;
+    $K\gets \prod_{i=0}^{(\ell-1)/2}(X - x([i]Q))$
+    \tcp*{Kernel polynomial of isogeny} %Subgroup of order $\ell$ generated by $Q$ \;
+    %
+    $E_R\gets \algstyle{IsogenyFromKernel}(E,K)$ \label{line:quotient}
+    \tcp*{Apply Vélu's formul\ae} %\;
+    %
 	\Return{$E_R$}
+    \;
+\end{algorithm}
+
+\begin{algorithm}
+	\caption{\algstyle{VéluWalk}}
+	\label{alg:VeluWalk}
+	\Input{%
+        $E\in \Ell_q(\O)$;
+        $(\ell,\lambda)$ defining an ideal $\frak s = (\ell,\pi - \lambda)$; 
+        $k\geq 1$
+    }
+	\Output{$\frak s^k \cdot E$}
+    %
+    $r\gets \algstyle{Order}(\lambda,\ell)$ % Multiplicative order of $\lambda$ in $\Z/\ell\Z$ 
+    \tcp*{Precompute and store for each $(\ell,\lambda)$}
+    % \;
+	$C_r \gets \# E(\F_{q^r})$ \label{line:card}
+    \tcp*{Precompute and store for each $r$} 
+    % \;
+    \For{$1 \le i \le k$}{
+        $E \gets \algstyle{VeluStep}(E,(\ell,\lambda),r,C_r)$
+        \;
+    }
+    \Return{$E$}
 \end{algorithm}
 
 \paragraph{Elkies steps.}
-The validity of Algorithm~\ref{alg:ElkiesStep} is an immediate
-consequence of the following property of the modular polynomial $\Phi_\ell$:
+The correctness of Algorithms~\ref{alg:ElkiesFirstStep}
+and~\ref{alg:ElkiesNextStep} 
+follows from the definition of the modular polynomial $\Phi_\ell$:
 a cyclic $\ell$-isogeny exists between two elliptic
 curves $E$ and $E'$ if and only if $\Phi_\ell(j(E), j(E')) = 0$
 (see~\cite[\S6]{schoof95} and~\cite[\S3]{Elkies98} for the relevant theory).
 In practice, the polynomial $\Phi_\ell$ is precomputed and stored:
 several publicly available databases exist (see~\cite{Echidna}, for example).
 
-The kernel computation at line~\ref{line:kernel} in Algorithm~\ref{alg:ElkiesStep}
-is a classical operation about isogenies; for instance, one can
-use the Bostan--Morain--Salvy--Schost algorithm~\cite{BMSS08}, which
-costs $\softO(\ell)$ $\F_q$-operations using asymptotically fast
+The kernel computation at Line~\ref{line:kernel} 
+in Algorithm~\ref{alg:ElkiesFirstStep}
+is a classic operation in isogeny computations; 
+here we can use the Bostan--Morain--Salvy--Schost algorithm~\cite{BMSS08},
+which costs $\softO(\ell)$ $\F_q$-operations using asymptotically fast
 polynomial arithmetic.
 
 However, at line~\ref{line:direction}, $Q$ is defined over an extension field
@@ -867,23 +948,23 @@ the root computation at
 line~\ref{line:roots} also costs $\softO(\ell\log q)$ $\F_q$-operations
 using a Cantor--Zassenhaus-type algorithm. This is also the critical
 part of Algorithm~\ref{alg:ElkiesNextStep}.
-Thus, the cost of Algorithms~\algstyle{ElkiesStep}
+Thus, the cost of Algorithm~\algstyle{ElkiesFirstStep}
 is $\softO(\ell\log q)$ field operations, and grows quasi-linearly with $\ell$.
 
 If one iterates the action of $\frak s$, an improvement is available.
-Indeed, the second part of the algorithm (lines~\ref{line:kernel}
+Indeed, the second part of the algorithm (Lines~\ref{line:kernel}
 to~\ref{line:end_direction}) determines which $j$-invariant
 between $j_1$ and $j_2$ gives the correct direction in the isogeny
 graph (recall Figure~\ref{fig:cycle}), and is only needed
 for the \emph{first} step since no return
 on the isogeny circle is made. After that, one should use the
 simpler \algstyle{ElkiesNextStep} algorithm (Algorithm~\ref{alg:ElkiesNextStep})
-remembering the previous curve. Algorithm \algstyle{ElkiesWalk}
-(Algorithm~\ref{alg:ElkiesWalk}) shows how to combine these two
+remembering the previous curve. 
+Algorithm~\ref{alg:ElkiesWalk} (\algstyle{ElkiesWalk}) combines these two
 versions of Elkies steps to compute the iterated action of an ideal
-(at line~\ref{line:twist}, if the curve does not have correct order, then
+(at Line~\ref{line:twist}, if the curve does not have correct order, then
 its quadratic twist has).
-Remark that Algorithm~\ref{alg:ElkiesNextStep} still has to compute the
+Note that Algorithm~\ref{alg:ElkiesNextStep} still has to compute the
 roots of a polynomial over $\F_q$, giving roughly the same computational
 cost as above.
 
@@ -939,19 +1020,24 @@ about isogeny computations.
 Hence, if the initial curve $E_0$ admits a Montgomery model, one can
 compute the Vélu steps \emph{first} using Montgomery models,
 and switch to Weierstrass models afterwards. Note that
-we can also avoid computing $y$-coordinates in Algorithm~\ref{alg:ElkiesStep}
-at line~\ref{line:direction} if $\lambda\neq\pm\mu$. In this case,
-choosing the correct quadratic twist at line~\ref{line:end_direction}
-is not an issue.
+we can also avoid computing $y$-coordinates in
+Algorithm~\ref{alg:ElkiesFirstStep}
+at line~\ref{line:direction} if $\lambda\neq\pm\mu$.
+% In this case, choosing the correct quadratic twist at
+% line~\ref{line:end_direction} is not an issue.
+%% BS: I think it's best (and safer) to always ensure we're on the right twist.
 
-Note that when $r = 1$ (hence $\lambda = 1$), which is the best case
-in Algorithm~\ref{alg:VéluStep}, Vélu steps cannot be used in direction $\mu$
-using the algorithm as written above. However, switching to the quadratic
-twist of $E$ changes the sign of the Frobenius eigenvalues; 
-for instance, if $p \equiv -1\pmod{\ell}$ and $\lambda = 1$, then $\mu=-1$ and 
-Vélu steps can be used in both directions with $r=1$.
-In Algorithm~\ref{alg:VéluStep}, only the curve order
-and the random point sampling need to be modified when using quadratic twists.
+\begin{remark}
+    \label{rem:twist-trick}
+    Note that when $r = 1$ (hence $\lambda = 1$), which is the best case
+    in Algorithm~\ref{alg:VéluStep}, Vélu steps cannot be used in direction $\mu$
+    using the algorithm as written above. However, switching to the quadratic
+    twist of $E$ changes the sign of the Frobenius eigenvalues; 
+    for instance, if $p \equiv -1\pmod{\ell}$ and $\lambda = 1$, then $\mu=-1$ and
+    Vélu steps can be used in both directions with $r=1$.
+    In Algorithm~\ref{alg:VéluStep}, only the curve order
+    and the random point sampling need to be modified when using quadratic twists.
+\end{remark}
 
 \paragraph{Key exchange.}
 
@@ -989,86 +1075,142 @@ For each prime $\ell$ appearing in $S$, we define a bound $M_\ell$
 on (the absolute value of) the exponent of ideals of norm $\ell$. As a rule,
 $M_\ell$ will be much bigger in the Vélu case.
 Algorithm~\algstyle{KeyGen} that generates a secret key is now
-easily described (Algorithm~\ref{alg:keygen}).
+easily described (Algorithm~\ref{alg:isogeny-KeyGen}).
 
 \begin{algorithm}
-\caption{\algstyle{KeyGen}}
-\label{alg:keygen}
-\Input{The set $S$ given as $S_E, S_{V,2}, S_{V,1}$; the walk length bounds $M_\ell$}
-\Output{A secret exponent vector $(k_\ell)$}
-\For{$(\ell, \lambda, \mu)\in S_E\cup S_{V, 2}$}
-{
-	$k_\ell\uni [-M_\ell, M_\ell]$ \;
-}
-\For{$(\ell, \lambda)\in S_{V, 1}$}
-{
-	$k_\ell\uni [0,M_\ell]$ \;
-}
-\Return{$(k_\ell)$}
+    \caption{\algstyle{KeyGen} for cryptosystems in the isogeny graph on
+    $\Ell_q(\O)$ with walks based on $S$}
+    \label{alg:isogeny-KeyGen}
+    \Input{%
+        The set $S$ given as $S_E, S_{V,2}, S_{V,1}$;
+        the walk length bounds $(M_\ell)_{\ell\in S}$
+    }
+    \Output{A secret key $(k_\ell)_{\ell\in S}$}
+    \For{$(\ell, \lambda, \mu)\in S_E\cup S_{V, 2}$} {
+        $k_\ell\gets \algstyle{Random}([-M_\ell, M_\ell])$ 
+        \;
+    }
+    \For{$(\ell, \lambda)\in S_{V, 1}$}{%
+        $k_\ell\gets \algstyle{Random}([0,M_\ell])$ 
+        \;
+    }
+    \Return{$(k_\ell)$}
 \end{algorithm}
 
-Then, an isogeny walk is simply a sequence of isogeny
-steps, using either Elkies or Vélu steps as appropriate:
-see Algorithm~\ref{alg:walk}. Algorithm~\ref{alg:keyex}
-then rephrases the generic Diffie--Hellman algorithm~\ref{alg:HHS-DH}
-in our particular setting, making explicit all public parameters involved in the
-protocol.
+%Then, an isogeny walk is simply a sequence of isogeny
+%steps, using either Elkies or Vélu steps as appropriate:
+%see Algorithm~\ref{alg:walk}. 
+%Algorithm~\ref{alg:keyex}
+%then rephrases the generic Diffie--Hellman algorithm~\ref{alg:HHS-DH}
+%in our particular setting, making explicit all public parameters involved in the
+%protocol.
 
-\begin{algorithm}
-	\caption{\algstyle{Walk}: an isogeny walk}
-	\label{alg:walk}
-	\Input{
-		\begin{itemize}
-		\itemsep0em
-		\item An exponent vector $k = (k_\ell)$
-		\item An initial $j$-invariant $j_I$
-		\item The set $S$ given as $S_E,\ S_{V,2},\ S_{V,1}$
-		\item The order $C$ of the public elliptic curve
-		\end{itemize}
-	}
-	$E \gets $ a curve of $j$-invariant $j_I$\;
-	\For{$(\ell, \lambda, \mu)\in S_E$}{
-		\lIf{$k_\ell\geq 1$}{
-			$E\gets \algstyle{ElkiesWalk}(E, C, \ell, \lambda, k_\ell)$
-		}
-		\lElseIf{$k_\ell\leq -1$}{
-			$E\gets \algstyle{ElkiesWalk}(E, C, \ell, \mu, |k_\ell|)$
-		}
-	}
-	\For{$(\ell, \lambda, \mu)\in S_{V,2}$}{
-		\If{$k_\ell\geq 0$}{
-			\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{VéluStep}(E, \ell, \lambda)$}
-		}
-		\Else{
-			\lFor{$1\leq j \leq |k_\ell|$}{$E\gets \algstyle{VéluStep}(E, \ell, \mu)$}
-		}
-	}
-	\For{$(\ell,\lambda)\in S_{V,1}$}{
-		\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{VéluStep}(E, \ell, \lambda)$}
-	}
-	\Return{$j(E)$}
-\end{algorithm}
+Algorithm~\ref{alg:isogeny-DH}
+completes a Diffie--Hellman key exchange
+by applying a combination of Elkies and Vélu walks
+(Algorithms~\ref{alg:ElkiesWalk} and~\ref{alg:VeluWalk}, respectively).
 
 \begin{algorithm}
-  \caption{Key exchange from an isogeny graph}
-  \label{alg:keyex}
-  \Params{
-		\begin{itemize}
-		\itemsep0em
-		\item A prime power $q$ 
-		\item An ordinary elliptic curve $E_0/\F_q$ with order $C$, and maximal endomorphism ring
-		\item The set $S$ given as $S_E,\ S_{V,2},\ S_{V,1}$
-		\item Walk length bounds $M_\ell$
-		\end{itemize}
-	}
-  \Alice{
-    \Samples $k_A = \algstyle{KeySample}(S, (M_\ell))$\;
-    \Sends $j_A = \algstyle{Walk}(k_A, j(E_0), S, C)$ to Bob}
-  \Bob{
-    \Samples $k_B = \algstyle{KeySample}(S, (M_\ell))$\;
-    \Sends $j_B = \algstyle{Walk}(k_B, j(E_0), S, C)$ to Alice}
-  \Key{$j_F = \algstyle{Walk}(k_A, j_B, S, C) = \algstyle{Walk}(k_B, j_A, S, C)$}
+    \caption{\algstyle{DH} for the isogeny graph on $\Ell_q(\O)$
+        with primes in $S$}
+    \label{alg:isogeny-DH}
+    \Input{%
+        A private key \((k_\ell)_\ell\)
+        corresponding to a walk $(\frak{s}_1,\ldots,\frak{s}_n)$;
+        a public key $j_B = j(E_B)$ for $E_B \in \Ell_q(O)$
+    }
+    \Output{%
+        A shared secret $j(\prod_{i=1}^n\frak{s_i}\cdot E_B)$
+    }
+    %
+    $E \gets \algstyle{EllipticCurveFromjInvariant}(j_B)$
+    \;
+    %
+    \If{\textbf{not} $\algstyle{CheckTrace}(E,t)$}{%
+        $E \gets \algstyle{QuadraticTwist}(E)$
+        \;
+    }
+    \For{$(\ell,\lambda,\mu) \in S_E$}{
+        \lIf{$k_\ell \ge 0$}{%
+            $\nu \gets \lambda$
+        }
+        \lElse{%
+            $\nu \gets \mu$
+        }
+        $E \gets \algstyle{ElkiesWalk}(E,(\ell,\nu),|k_\ell|)$
+    }
+    \For{$(\ell,\lambda,\mu) \in S_{V,2}$}{
+        \lIf{$k_\ell \ge 0$}{%
+            $\nu \gets \lambda$
+        }
+        \lElse{%
+            $\nu \gets \mu$
+        }
+        $E \gets \algstyle{VéluWalk}(E,(\ell,\nu),|k_\ell|)$
+        \;
+    }
+    \For{$(\ell,\lambda) \in S_{V,1}$}{
+        $E \gets \algstyle{VéluWalk}(E,(\ell,\lambda),k_\ell)$
+        \;
+    }
+    \Return{$j(E)$}
 \end{algorithm}
+
+%\begin{algorithm}
+%	\caption{\algstyle{Walk}: an isogeny walk}
+%	\label{alg:walk}
+%	\Input{
+%		\begin{itemize}
+%		\itemsep0em
+%		\item An exponent vector $k = (k_\ell)$
+%		\item An initial $j$-invariant $j_I$
+%		\item The set $S$ given as $S_E,\ S_{V,2},\ S_{V,1}$
+%		\item The order $C$ of the public elliptic curve
+%		\end{itemize}
+%	}
+%	$E \gets $ a curve of $j$-invariant $j_I$\;
+%	\For{$(\ell, \lambda, \mu)\in S_E$}{
+%		\lIf{$k_\ell\geq 1$}{
+%			$E\gets \algstyle{ElkiesWalk}(E, C, \ell, \lambda, k_\ell)$
+%		}
+%		\lElseIf{$k_\ell\leq -1$}{
+%			$E\gets \algstyle{ElkiesWalk}(E, C, \ell, \mu, |k_\ell|)$
+%		}
+%	}
+%	\For{$(\ell, \lambda, \mu)\in S_{V,2}$}{
+%		\If{$k_\ell\geq 0$}{
+%			\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{VéluStep}(E, \ell, \lambda)$}
+%		}
+%		\Else{
+%			\lFor{$1\leq j \leq |k_\ell|$}{$E\gets \algstyle{VéluStep}(E, \ell, \mu)$}
+%		}
+%	}
+%	\For{$(\ell,\lambda)\in S_{V,1}$}{
+%		\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{VéluStep}(E, \ell, \lambda)$}
+%	}
+%	\Return{$j(E)$}
+%\end{algorithm}
+
+%\begin{algorithm}
+%  \caption{Key exchange from an isogeny graph}
+%  \label{alg:keyex}
+%  \Params{
+%		\begin{itemize}
+%		\itemsep0em
+%		\item A prime power $q$ 
+%		\item An ordinary elliptic curve $E_0/\F_q$ with order $C$, and maximal endomorphism ring
+%		\item The set $S$ given as $S_E,\ S_{V,2},\ S_{V,1}$
+%		\item Walk length bounds $M_\ell$
+%		\end{itemize}
+%	}
+%  \Alice{
+%    \Samples $k_A = \algstyle{KeySample}(S, (M_\ell))$\;
+%    \Sends $j_A = \algstyle{Walk}(k_A, j(E_0), S, C)$ to Bob}
+%  \Bob{
+%    \Samples $k_B = \algstyle{KeySample}(S, (M_\ell))$\;
+%    \Sends $j_B = \algstyle{Walk}(k_B, j(E_0), S, C)$ to Alice}
+%  \Key{$j_F = \algstyle{Walk}(k_A, j_B, S, C) = \algstyle{Walk}(k_B, j_A, S, C)$}
+%\end{algorithm}
 
 \section{Public parameter selection}
 \label{sec:initcurve}
@@ -1230,7 +1372,7 @@ protocols. Intuitively, these systems rely on two assumptions:
 \item Given two elliptic curves $E,E'$ in $\Ell_q(\O)$, it is hard to
   find a (smooth degree) isogeny $ϕ:E→E'$;
 \item The distribution on $\Ell_q(\O)$ induced by the random walks
-  sampled in Algorithm~\ref{alg:keyex} is computationally
+  sampled in Algorithm~\ref{alg:isogeny-KeyGen} is computationally
   undistinguishable from the uniform distribution.
 \end{enumerate}
 
@@ -1602,21 +1744,22 @@ the security of HHS Diffie--Hellman under the equivalent of CGA-DDH~\cite{Stol}.
 By repeating the same steps, we can prove the following theorem.
 
 \begin{theorem}
-  If the CGA-DDH and IWD assumptions hold, assuming GRH, the
-  key-agreement protocol in Algorithm~\ref{alg:keyex} is session-key
-  secure in the authenticated-links adversarial model of Canetti and
-  Krawczyk~\cite{canetti}.
+    If the CGA-DDH and IWD assumptions hold, assuming GRH, 
+    the key-agreement protocol defined by 
+    Algorithms~\ref{alg:isogeny-KeyGen} and~\ref{alg:isogeny-DH}
+    is session-key secure in the authenticated-links adversarial model 
+    of Canetti and Krawczyk~\cite{canetti}.
 \end{theorem}
 
 Similarly, we can prove the IND-CPA security of the hashed El Gamal
-protocol derived from Algorithm~\ref{alg:keyex} by replicating the
+protocol derived from Algorithm~\ref{alg:isogeny-KeyGen} by replicating the
 classical techniques of, for
 instance,~\cite[20.4.11]{galbraith2012mathematics}.
 
 \begin{theorem}
-  Assuming CGA-CDH and IWD, the hashed El Gamal protocol derived from
-  Algorithm~\ref{alg:keyex} is IND-CPA secure in the random oracle
-  model.
+    Assuming CGA-CDH and IWD, the hashed El Gamal protocol derived from
+    Algorithms~\ref{alg:isogeny-KeyGen} and~\ref{alg:isogeny-DH}
+    is IND-CPA secure in the random oracle model.
 \end{theorem}
 
 
@@ -1625,8 +1768,9 @@ instance,~\cite[20.4.11]{galbraith2012mathematics}.
 From its very definition, the IWD problem depends on
 the probability distribution $σ$ we use to sample
 random walks in the isogeny graph. In this paragraph,
-we provide heuristic arguments indicating that IWD is hard
-using Algorithm~\ref{alg:walk}, provided 
+we provide heuristic arguments suggesting that 
+the IWD instances generated by Algorithm~\ref{alg:isogeny-DH} are hard,
+provided
 \begin{enumerate}
     \item the keyspace size is at least $\sqrt{|Δ_K|}$, and
     \item $S$ is \emph{not too small}, i.e. the number of
@@ -1851,10 +1995,12 @@ we obtain are most likely not the best possible, intuitively
 the outcome does not fall very far from the optimal.
 
 In this way, we obtain a proposal for the bounds $M_\ell$
-to be used in Algorithm~\ref{alg:keygen}. Table~\ref{tab:VéluSteps}
-lists the isogeny degrees amenable to Algorithm~\algstyle{VéluStep}, with
-the corresponding extension degree $r$ (a star denotes that the twisted curve
-allows us to use both directions in the isogeny graph).
+to be used in Algorithm~\ref{alg:isogeny-KeyGen}. Table~\ref{tab:VéluSteps}
+lists the isogeny degrees amenable to Algorithm~\ref{alg:VéluStep}, with
+the corresponding extension degree $r$ 
+(a star denotes that the twisted curve
+allows us to use both directions in the isogeny graph,
+as in Remark~\ref{rem:twist-trick}).
 Table~\ref{tab:ElkiesSteps}
 lists other primes for which we apply Algorithm~\algstyle{ElkiesStep}.
 
@@ -1939,9 +2085,10 @@ lists other primes for which we apply Algorithm~\algstyle{ElkiesStep}.
         % line 6
     \end{tabular}
     \smallskip
-    \caption{Primes $\ell$ amenable to \algstyle{ElkiesStep}
-    (Algorithm~\ref{alg:ElkiesStep}) for our candidate isogeny graph, 
-    with proposed walk length bounds $M_\ell$.}
+    \caption{Primes $\ell$ amenable to 
+        Algorithm~\ref{alg:ElkiesWalk} (\algstyle{ElkiesWalk})
+        for our candidate isogeny graph, 
+        with proposed walk length bounds $M_\ell$.}
     \label{tab:ElkiesSteps}
 \end{table}
 
@@ -1955,8 +2102,9 @@ to be exactly $M_\ell$ for each $\ell$.
 We stress the fact that this implementation
 is \emph{not} optimised. Besides general gains on field arithmetic,
 optimised C code could easily beat our proof-of-concept implementation
-on critical points of our algorithms, for instance the root
-finding step in Algorithm~\ref{alg:ElkiesStep}.
+on critical points of our algorithms, for instance the root finding steps 
+in Algorithms~\ref{alg:ElkiesFirstStep}
+and~\ref{alg:ElkiesNextStep}.
 
 For comparison, without using Algorithm~\ref{alg:VéluStep}, the
 total key-exchange time would exceed 2000 seconds:
