@@ -1452,10 +1452,11 @@ distribution on $S^*$, used to sample secrets in the key exchange
 protocol.
 
 The assumption needed to prove security of the protocols is 
-the hardness of a problem analogous to the classic DDH problem.
+the hardness of a problem analogous to 
+the classic Decisional Diffie--Hellman (DDH) problem.
 
-\begin{definition}[Isogeny Walk Decisional Diffie--Hellman (IW-DDH)]
-    Given a triplet of curves $(E_a,E_b,E_{ab})∈\Ell_q(\O)^3$ 
+\begin{definition}[Isogeny Walk DDH (IW-DDH)]
+    Given a triplet of curves $(E_a,E_b,E_{ab})$
     sampled with probability $\frac{1}{2}$ 
     from one of the following two distributions
   \begin{align*}
@@ -1474,7 +1475,7 @@ commutative squares sampled uniformly at random
 and commutative squares sampled from the distribution $σ$.
 
 \begin{definition}[Isogeny Walk Distinguishing (IWD)]
-    Given a triplet of curves $(E_a,E_b,E_{ab})∈\Ell_q(\O)^3$
+    Given a triplet of curves $(E_a,E_b,E_{ab})$
     sampled with probability $\frac{1}{2}$ 
     from one of the following two distributions
   \begin{align*}
@@ -1491,8 +1492,8 @@ It also appears in~\cite{cryptoeprint:2006:291} under the
 name \emph{vectorization}, and in~\cite{Stol,Stolbunov2012} under the
 name DDHAP.
  
-\begin{definition}[Class Group Action Decisional Diffie--Hellman (CGA-DDH)]
-    Given curves a triplet of curves $(E_a,E_b,E_{ab})∈\Ell_q(\O)^3$ 
+\begin{definition}[Class Group Action DDH (CGA-DDH)]
+    Given a triplet of curves $(E_a,E_b,E_{ab})$
     sampled with probability $\frac{1}{2}$ 
     from one of the following two distributions
   \begin{align*}
@@ -1584,12 +1585,13 @@ etc.).
     \qed
 \end{proof}
 
-Finally, we define an analogue of the classic CDH problem for groups.
+Finally, we define an analogue of the classic 
+Computational Diffie--Hellman (CDH) problem for groups.
 Using the same techniques as above, we can prove the
 security of the relevant protocols based only on CGA-CDH and IWD,
 \emph{without} the generalized Riemann hypothesis.
 
-\begin{definition}[Class Group Action Computational Diffie Hellman (CGA-CDH)]
+\begin{definition}[Class Group Action CDH (CGA-CDH)]
   Given curves $E_a=\frak a·E_0$ and $E_b=\frak b·E_0$, with
   $\frak a,\frak b\uni\Cl(\O)$, compute the curve
   $E_{ab}=\frak{ab}·E_0$.
