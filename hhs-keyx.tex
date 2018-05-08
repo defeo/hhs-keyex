@@ -1581,7 +1581,9 @@ versions of this algorithm, Kuperberg's~\cite{Kup} and Regev's\cite{regev04}.
 However, both are superseded by Kuperberg's recent work~\cite{Kuperberg2013}:
 his new algorithm solves the dHSP in any abelian group of order $N$
 using $2^{O(\sqrt{\log N})}$ quantum queries and classical space,
-but only $O(\log N)$ quantum space.
+but only $O(\log N)$ quantum space. Unfortunately, his analyses
+are only asymptotic and in simplified cases, so cannot be directly used
+for concrete parameter design.
 
 Given this estimate, we expect the bit size of $q$ to grow at
 worst like the square of the security parameter. However,
@@ -1596,9 +1598,9 @@ requires about $2^{4\sqrt{\log N}}$ black-box queries.
 Therefore, we choosing this estimate
 is a reasonable choice to propose concrete parameter sizes
 (we mention that Kuperberg's original analysis only gave 
-a complexity of $8^{\sqrt{\log N}}$ operations).
+a complexity of $2^{3\sqrt{\log N}}$ operations).
 Of course, this assumption is only heuristic, and should be
-vaildated by further study of quantum dHSP solvers; at present
+validated by further study of quantum dHSP solvers; at present
 time, unfortunately, no precise statement can be made.
 
 Table~\ref{tab:sizes} thus proposes three parameter sizes,
