@@ -53,7 +53,7 @@
 
 \begin{document}
 
-\title{Towards practical key exchange from ordinary isogeny graphs}
+\title{Towards practical key exchange\\ from ordinary isogeny graphs}
 \author{
   Luca De Feo\inst{1,3}\orcidID{0000-0002-9321-0773} \and
   Jean Kieffer\inst{2} \and
@@ -61,7 +61,7 @@
 \institute{
   Université Paris Saclay, UVSQ, LMV, Versailles, France \and
   École Normale Supérieure, Paris, France \and
-  Inria Saclay, Palaiseau, France
+  Inria and École polytechnique, Université Paris Saclay, Palaiseau, France
 }
 
 \maketitle
@@ -90,23 +90,37 @@
 \section{Introduction}
 \label{sec:introduction}
 
-A recent trend in cryptography is the development of quantum-safe
-cryptosystems, that are based on mathematical problems not known to
-be solvable in polynomial time by quantum computers. With Shor's
-algorithm~\cite{shor1994algorithms} ruling out systems based on
-integer factorization or discrete logarithms, NIST has launched a
-process to standardize the next generation of \emph{post-quantum}
-public key cryptosystems~\cite{NIST2016}. Among the youngest and least
-explored post-quantum families, \emph{isogeny-based} cryptography features only one
-proposal to the NIST competition: the Supersingular Isogeny Key
-Encapsulation (SIKE)~\cite{SIKE}.
-SIKE is based upon the key-exchange protocol by Jao and De
-Feo~\cite{jao+defeo2011}, known as SIDH, itself inspired by earlier
-key-exchange constructions by Couveignes~\cite{cryptoeprint:2006:291}
+Isogeny-based protocols
+form one of the youngest and least-explored
+families of post-quantum candidate cryptosystems.
+The best-known isogeny-based protocol
+is Jao and De Feo's SIDH key exchange~\cite{jao+defeo2011},
+from which the NIST candidate key-encapsulation mechanism
+SIKE was derived~\cite{SIKE,NIST2016}.
+SIDH was itself inspired by earlier,
+lesser-known,
+and apparently less practical key-exchange constructions
+by Couveignes~\cite{cryptoeprint:2006:291}
 and Rostovtsev and
 Stolbunov~\cite{rostovtsev+stolbunov06,stolbunov-red,Stol}.
 
-The origins of isogeny-based cryptography can be traced back to
+%A recent trend in cryptography is the development of quantum-safe
+%cryptosystems, that are based on mathematical problems not known to
+%be solvable in polynomial time by quantum computers. With Shor's
+%algorithm~\cite{shor1994algorithms} ruling out systems based on
+%integer factorization or discrete logarithms, NIST has launched a
+%process to standardize the next generation of \emph{post-quantum}
+%public key cryptosystems~\cite{NIST2016}. Among the youngest and least
+%explored post-quantum families, \emph{isogeny-based} cryptography features only one
+%proposal to the NIST competition: the Supersingular Isogeny Key
+%Encapsulation (SIKE)~\cite{SIKE}.
+%SIKE is based upon the key-exchange protocol by Jao and De
+%Feo~\cite{jao+defeo2011}, known as SIDH, itself inspired by earlier
+%key-exchange constructions by Couveignes~\cite{cryptoeprint:2006:291}
+%and Rostovtsev and
+%Stolbunov~\cite{rostovtsev+stolbunov06,stolbunov-red,Stol}.
+
+Indeed, the origins of isogeny-based cryptography can be traced back to
 Couveignes' seminal work ``Hard Homogeneous Spaces'', that went
 unpublished for ten years before appearing
 in~\cite{cryptoeprint:2006:291}. 
@@ -117,22 +131,7 @@ the map $\phi_x: g\mapsto g\cdot x$
 is a bijection between $G$ and $X$ for any $x\in X$.
 Couveignes defines a \emph{hard homogeneous space} (HHS) 
 to be a PHS where the action of $G$ on $X$ is efficiently computable, 
-but inverting the isomorphism $φ_x$ is computationally hard for any $x$.
-Any HHS $X$ for an \emph{abelian} group $G$ can be used to construct a
-key exchange based on the hardness of inverting $\varphi_x$,
-as shown in Algorithms~\ref{alg:HHS-KeyGen} and~\ref{alg:HHS-DH}.
-If Alice and Bob have keypairs $(g_A,x_A)$
-and $(g_B,x_B)$, respectively,
-then the commutativity of $G$
-lets them derive a shared secret
-\[
-    \DH(g_A,x_B) 
-    = g_A\cdot g_B\cdot x_0 
-    = g_B\cdot g_A\cdot x_0
-    = \DH(g_B,x_A)
-    \,.
-\]
-The analogy with classic group-based Diffie--Hellman is evident.
+but inverting the isomorphism $φ_x$ is computationally hard for any~$x$.
 
 \begin{algorithm}
     \caption{Key generation for cryptosystems in an HHS $X$ for a
@@ -149,6 +148,23 @@ The analogy with classic group-based Diffie--Hellman is evident.
         \Return{$(g,x)$}
     }
 \end{algorithm}
+
+Any HHS $X$ for an \emph{abelian} group $G$ can be used to construct a
+key exchange based on the hardness of inverting $\varphi_x$,
+as shown in Algorithms~\ref{alg:HHS-KeyGen} and~\ref{alg:HHS-DH}.
+If Alice and Bob have keypairs $(g_A,x_A)$
+and $(g_B,x_B)$, respectively,
+then the commutativity of $G$
+lets them derive a shared secret
+\[
+    \DH(g_A,x_B) 
+    = g_A\cdot g_B\cdot x_0 
+    = g_B\cdot g_A\cdot x_0
+    = \DH(g_B,x_A)
+    \,.
+\]
+The analogy with classic group-based Diffie--Hellman is evident.
+
 
 \begin{algorithm}
     \caption{Diffie--Hellman in an HHS $X$ for a group $G$}
@@ -189,7 +205,7 @@ the way random elements of $G$ are sampled, as we will explain in
 Section~\ref{sec:keyex}. This makes the primitive less flexible, but
 also (relatively) more practical.
 
-Rostovtsev and Stolbunov advertised their protocols as a potential
+Rostovtsev and Stolbunov advertised their cryptosystems as potential
 post-quantum candidates, leading Childs, Jao and Soukharev to introduce
 the first subexponential quantum algorithm capable of breaking
 them~\cite{childs2014constructing}. 
@@ -1786,7 +1802,7 @@ adversaries using at most $t$ resources (running time, queries, etc.).
 	We can consider this sampling as follows:
 	with probability $1-\epsilon$, sample $E_c$ \emph{uniformly},
 	and with probability $\epsilon$ sample it from
-	an unknown probability distribution.
+	an unknown distribution.
 
     Now, if $T$ forwarded $(E_a,E_b,E_{ab})$ untouched, then we immediately get
     \begin{align*}
@@ -1811,9 +1827,9 @@ security of the relevant protocols based only on CGA-CDH and IWD,
 without the generalized Riemann hypothesis.
 
 \begin{definition}[Class Group Action CDH (CGA-CDH)]
-  Given curves $E_a=\frak a·E_0$ and $E_b=\frak b·E_0$, with
-  $\frak a,\frak b\uni\Cl(\O)$, compute the curve
-  $E_{ab}=\frak{ab}·E_0$.
+    Given $E_a=\frak a·E_0$ and $E_b=\frak b·E_0$ 
+    with $\frak a,\frak b\uni\Cl(\O)$, 
+    compute the curve $E_{ab}=\frak{ab}·E_0$.
 \end{definition}
 
 We can now prove the security of our schemes. Stolbunov already proved
@@ -1858,7 +1874,7 @@ Proving rapid mixing of random walks with such
 parameters seems out of reach at present, even under number-theoretic
 hypotheses such as GRH. The best results available,
 like~\cite[Theorem~1.5]{jao+miller+venkatesan09}
-(which we used in the proof of Lemma~\ref{lem:adv}),
+(used in the proof of Lemma~\ref{lem:adv}),
 typically require isogeny degrees in $\Omega((\log q)^B)$
 for some $B>2$, and fully random walks that are not,
 for example, skewed towards smaller-degree isogenies.
@@ -1920,12 +1936,18 @@ verifying that it has the expected order.  This task is easy if the
 factorization of $q+1-t$ is known.
 
 Concretely, the curve given in Section~\ref{sec:initcurve} has order
-\[N = 2^2 · 3^2 · 5 · 7 · 11 · 13^2 · 17 · 103 · 523 · 821 ·
-  1174286389 · m,\] %
-where $m$ is a $432$-bit prime, and its group structure is
+\[
+    N 
+    = 
+    %2^2 · 3^2 · 5 · 7 · 11 · 13^2 · 17 · 103 · 523 · 821 · 1174286389 · m
+    2^2 · 3^2 · 5 · 7 · 11 · 13^2 · 17 · 103 · 523 · 821 · 1174286389
+    · (\text{432-bit prime})
+    \,,
+\] %
+%where $m$ is a $432$-bit prime, 
+and its group structure is
 $ℤ/2ℤ×ℤ/\frac{N}{2}ℤ$. To check that a curve is in the same isogeny
-class, we repeatedly take random points until we find one with order
-$N/2$.
+class, we repeatedly take random points until we find one of order~$N/2$.
 
 \paragraph{Verifying the endomorphism ring level.} 
 The curve order verification proves that $\End(E)$ 
@@ -1935,8 +1957,7 @@ possible rings: their indices in $\O_K$ must divide $d$ where $d^2=Δ_π/Δ_K$.
 Ascending and descending isogenies connect curves with different endomorphism
 rings, thus we are left with the problem of verifying that $E$ is on
 the crater of any $ℓ$-volcano for $ℓ\mid d$.
-
-Assuming that no large prime divides $d$, this check can be
+Assuming no large prime divides $d$, this check can be
 accomplished efficiently by performing random walks in the volcanoes,
 as described in~\cite[\S4.2]{kohel} or~\cite{fouquet+morain02}. 
 Note that if we choose $Δ_π$ square-free, 
