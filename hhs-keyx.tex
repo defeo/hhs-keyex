@@ -1033,13 +1033,13 @@ by using elliptic curve models with more efficient arithmetic;
 we use Montgomery arithmetic here~\cite{Montgomery87,CostelloSmith2017},
 without computing $y$-coordinates. This model also
 offers convenient Vélu formulas~\cite{Renes2018}.
-On the other hand, the Weierstrass model is classical and universal, 
-and is usually the considered model in the literature
-about isogeny computations.
-Hence, if the initial curve $E_0$ admits a Montgomery model, one can
-compute the Vélu steps \emph{first} using Montgomery models,
-and switch to Weierstrass models afterwards. Note that
-we can also avoid computing $y$-coordinates in
+%On the other hand, the Weierstrass model is classical and universal, 
+%and is usually the considered model in the literature
+%about isogeny computations.
+%Hence, if the initial curve $E_0$ admits a Montgomery model, one can
+%compute the Vélu steps \emph{first} using Montgomery models,
+%and switch to Weierstrass models afterwards. 
+Note that we can also avoid computing $y$-coordinates in
 Algorithm~\ref{alg:ElkiesFirstStep}
 at Line~\ref{line:direction} if $\lambda\neq\pm\mu$.
 % In this case, choosing the correct quadratic twist at
