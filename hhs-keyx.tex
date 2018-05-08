@@ -1604,11 +1604,6 @@ step further by explicitly modeling the hardness of distinguishing
 random walks on Cayley graphs from the uniform distribution: this
 yields stronger proofs and a better separation of security concerns.
 
-We will write $x\rand{σ} X$ for an element taken from a set $X$
-according to a probability distribution $σ$. If $X$ is finite,
-then we write $x\uni X$ for an element taken according to the uniform
-distribution.
-
 For the rest of this section $q$ is a prime power, $\O$ is an order in
 a quadratic imaginary field with discriminant $Δ\sim q$, $\Cl(\O)$ is
 the class group of $\O$, $\Ell_q(\O)$ is the (non-empty) set of
@@ -1617,7 +1612,47 @@ fixed curve in $\Ell_q(\O)$. Finally, $S$ is a set of ideals of $\O$
 with norm polynomial in $\log q$, and $σ$ is a probability
 distribution on the set $S^*$ of isogeny walks (i.e. finite
 sequences of elements in $S$) used to sample secrets in the key exchange
-protocol.
+protocol.  
+We write $x\rand{σ} X$ for an element taken from a set $X$
+according to $σ$, 
+and %and if $X$ is finite, then 
+$x\uni X$ for an element taken according to the uniform distribution.
+
+Our security proofs use four distributions on $\Ell_q(\O)^3$:
+\begin{align*}
+    \mathcal{G}_{q,Δ} 
+    & := 
+    \left\{
+        (\frak a·E_0,\frak b·E_0,\frak{ab}·E_0)
+        \suchthat 
+        \frak a,\frak b\uni\Cl(\O)
+    \right\}
+    \,, \\
+    \mathcal{W}_{q,Δ,σ} 
+    & := 
+    \left\{
+        \bigl((\frak a_i)_i·E_0,(\frak b_j)_j·E_0,(\frak a_i)_i·(\frak b_j)_j·E_0\bigr)
+        \suchthat 
+        (\frak a_i)_i,(\frak b_j)_j\rand{σ}S^*
+    \right\}
+    \,, \\
+    \mathcal{R}_{q,Δ,σ} 
+    & := 
+    \left\{
+        \bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,E'\bigr)
+        \suchthat
+        (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*,\; E'\uni\Ell_q(\O)
+    \right\}
+    \,, \\
+    \mathcal{U}_{q,Δ} 
+    & :=
+    \left\{
+        (E_a,E_b,E_{ab}) 
+        \suchthat 
+        E_a,E_b,E_{ab}\uni\Ell_q(\O)
+    \right\}
+    \,.
+\end{align*}
 
 The assumption needed to prove security of the protocols is 
 the hardness of a problem analogous to 
@@ -1626,15 +1661,18 @@ the classic Decisional Diffie--Hellman (DDH) problem.
 \begin{definition}[Isogeny Walk DDH (IW-DDH)]
     Given a triplet of curves $(E_a,E_b,E_{ab})$
     sampled with probability $\frac{1}{2}$ 
-    from one of the following two distributions
-  \begin{align*}
-    \mathcal{R}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,E'\bigr) \suchthat
-                        (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*,\;
-                        E'\uni\Ell_q(\O)\right\},\\
-    \mathcal{W}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,(\frak a_i)·(\frak b_i)·E_0\bigr) \suchthat
-                          (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*\right\},
-  \end{align*}
-  decide from which of the two they were sampled.
+    from $\mathcal{R}_{q,\Delta,sigma}$
+    and $\frac{1}{2}$ from $\mathcal{W}_{q,\Delta,\sigma}$,
+    decide from which it was sampled. 
+    %one of the following two distributions
+%    \begin{align*}
+%        \mathcal{R}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,E'\bigr) \suchthat
+%                            (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*,\;
+%                            E'\uni\Ell_q(\O)\right\},\\
+%        \mathcal{W}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,(\frak a_i)·(\frak b_i)·E_0\bigr) \suchthat
+%                              (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*\right\},
+%    \end{align*}
+%    decide from which of the two they were sampled.
 \end{definition}
 
 We split this problem into two finer-grained problems. 
@@ -1645,14 +1683,17 @@ and commutative squares sampled from the distribution $σ$.
 \begin{definition}[Isogeny Walk Distinguishing (IWD)]
     Given a triplet of curves $(E_a,E_b,E_{ab})$
     sampled with probability $\frac{1}{2}$ 
-    from one of the following two distributions
-  \begin{align*}
-    \mathcal{G}_{q,Δ} &= \left\{(\frak a·E_0,\frak b·E_0,\frak{ab}·E_0) \suchthat
-                        \frak a,\frak b\uni\Cl(\O)\right\},\\
-    \mathcal{W}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,(\frak a_i)·(\frak b_i)·E_0\bigr) \suchthat
-                          (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*\right\},
-  \end{align*}
-  decide from which of the two they were sampled.
+    from $\mathcal{G}_{q,Δ}$
+    and $\frac{1}{2}$ from $\mathcal{W}_{q,Δ,σ}$,
+    decide from which it was sampled.
+%    from one of the following two distributions
+%    \begin{align*}
+%        \mathcal{G}_{q,Δ} &= \left\{(\frak a·E_0,\frak b·E_0,\frak{ab}·E_0) \suchthat
+%                            \frak a,\frak b\uni\Cl(\O)\right\},\\
+%        \mathcal{W}_{q,Δ,σ} &= \left\{\bigl((\frak a_i)_i·E_0,(\frak b_i)_i·E_0,(\frak a_i)·(\frak b_i)·E_0\bigr) \suchthat
+%                              (\frak a_i)_i,(\frak b_i)_i\rand{σ}S^*\right\},
+%    \end{align*}
+%    decide from which of the two they were sampled.
 \end{definition}
 
 The second problem is a group-action analogue of DDH.
@@ -1663,13 +1704,16 @@ name DDHAP.
 \begin{definition}[Class Group Action DDH (CGA-DDH)]
     Given a triplet of curves $(E_a,E_b,E_{ab})$
     sampled with probability $\frac{1}{2}$ 
-    from one of the following two distributions
-  \begin{align*}
-    \mathcal{U}_{q,Δ} &= \left\{(E_a,E_b,E_{ab}) \suchthat E_a,E_b,E_{ab}\uni\Ell_q(\O)\right\},\\
-    \mathcal{G}_{q,Δ} &= \left\{(\frak a·E_0,\frak b·E_0,\frak{ab}·E_0) \suchthat
-                        \frak a,\frak b\uni\Cl(\O)\right\},
-  \end{align*}
-  decide from which of the two they were sampled.
+    from $\mathcal{U}_{q,Δ}$
+    and $\frac{1}{2}$ from $\mathcal{G}_{q,Δ}$,
+    decide from which it was sampled.
+%    from one of the following two distributions
+%    \begin{align*}
+%        \mathcal{U}_{q,Δ} &= \left\{(E_a,E_b,E_{ab}) \suchthat E_a,E_b,E_{ab}\uni\Ell_q(\O)\right\},\\
+%        \mathcal{G}_{q,Δ} &= \left\{(\frak a·E_0,\frak b·E_0,\frak{ab}·E_0) \suchthat
+%                        \frak a,\frak b\uni\Cl(\O)\right\},
+%    \end{align*}
+%    decide from which of the two they were sampled.
 \end{definition}
 
 We want to prove the security of protocols based on the primitive of
