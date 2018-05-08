@@ -1072,69 +1072,122 @@ we will use adapted, or \emph{skewed},
 smooth representations when sampling elements in $\Cl(\O)$
 in order to minimize the total computational cost of a key exchange.
 
-The generating set $S$ will consist of
+We take a generating set consisting of ideals over a set 
+$S$ of small Elkies primes,
+which we partition into three sets according to the step algorithms
+that should be used with them.
+We maintain three lists of tuples encoding these primes:
 
-\begin{enumerate}
-    \item \label{case:elkstep} 
-        Ideals $(\pi - \lambda, \ell)$ and their inverses $(\pi - \mu, \ell)$
-	    for very small Elkies primes $\ell$, 
-        when \emph{neither} $\lambda$ nor $\mu$ are amenable to
-        \algstyle{VéluStep}.
-        We encode these ideals as
-        a list $S_{EE}$ of tuples $(\ell, \lambda, \mu)$,
-        the \emph{Elkies part} of $S$.
-    \item \label{case:velustep-sym}
-        Ideals $(\pi - \lambda, \ell)$ and their inverses $(\pi - \mu, \ell)$
-	    for small Elkies primes $\ell$, 
-        when \emph{both} $\lambda$ and $\mu$ are amenable to \algstyle{VéluStep}.
-        We encode them as a list $S_{VV}$
-        of tuples $(\ell, \lambda, \mu)$, 
-        the \emph{symmetric Vélu part} of $S$.
-    \item \label{case:velustep-asym}
-        Ideals $(\pi - \lambda, \ell)$, \emph{without their inverses},
-	    if $\ell$ is a small Elkies prime 
-        and \emph{only} the eigenvalue $\lambda$ 
-        is amenable to \algstyle{VéluStep}. 
-        We encode them as a list $S_{VE}$ of tuples $(\ell, \lambda)$, 
-        the \emph{asymmetric Vélu part} of $S$.
-\end{enumerate}
+\begin{description}
+    \item[$S_{VV}$]
+        \label{case:velustep-sym}
+        is a list of tuples $(\ell,\lambda,\mu)$
+        such that the ideal $(\ell,\pi - \lambda)$ 
+        and its inverse $(\ell,\pi-\mu)$
+        are \emph{both} amenable to \algstyle{VéluStep}.
+    \item[$S_{VE}$]
+        \label{case:velustep-asym}
+        is a list of tuples $(\ell,\lambda)$
+        such that $(\ell,\pi-\lambda)$ is amenable to
+        \algstyle{VéluStep} but its inverse $(\ell,\pi-\mu)$ is \emph{not}.
+    \item[$S_{EE}$]
+        \label{case:elkstep} 
+        is a list of tuples $(\ell,\lambda,\mu)$
+        such that \emph{neither} $(\ell,\pi - \lambda)$ nor $(\ell,\pi-\mu)$
+        are amenable to \algstyle{VéluStep}.
+\end{description}
 
-Looking back at Figure~\ref{fig:cycle}, in cases~\ref{case:elkstep} and~\ref{case:velustep-sym}
-both directions $\lambda,\mu$ are used, while in case~\ref{case:velustep-asym} only $\lambda$ is
-available.
+In $S_{VV}$ and $S_{EE}$,
+the labelling of eigenvalues as $\lambda$ and $\mu$ 
+is fixed once and for all 
+(that is, the tuples $(\ell,\lambda,\mu)$ and $(\ell,\mu,\lambda)$ do not
+both appear).
+This fixes directions in each of the $\ell$-isogeny cycles.
+Looking back at Figure~\ref{fig:cycle}, 
+for $\ell$ associated with $S_{EE}$ and $S_{VV}$, 
+both directions in the $\ell$-isogeny graph will be available for use in
+walks; for $S_{VE}$, only the Vélu direction will be used.
 
-Recall that secret keys are walks in the isogeny graph.
+Each secret key in the cryptosystem is a walk in the isogeny graph.
 Since the class group $\Cl(\O)$ is commutative, such a walk is fully
 determined by an \emph{exponent vector}, with one exponent for each ideal in $S$
 up to inverse: for an ideal $\frak s\in S$, this exponent can be negative if
 $\frak s^{-1}$ also appears in $S$, and must be nonnegative otherwise.
-
-In order to minimize the cost of computing an isogeny walk, we use a
-\emph{walk length bound} for each ideal, as follows.
+In order to minimize the cost of computing isogeny walks, 
+while maintaining a large keyspace,
+we define a collection of \emph{walk length bounds} for the ideals.
 For each prime $\ell$ appearing in $S$, we define a bound $M_\ell$
-on (the absolute value of) the exponent of ideals of norm $\ell$. As a rule,
-$M_\ell$ will be much bigger in the Vélu case.
-Algorithm~\algstyle{KeyGen} that generates a secret key is now
-easily described (Algorithm~\ref{alg:isogeny-KeyGen}).
+on (the absolute value of) the exponent of ideals of norm $\ell$.
+As a rule, $M_\ell$ will be much bigger for $\ell$
+appearing in $S_{VV}$ and $S_{VE}$, where Vélu steps can be applied.
+We will return to the problem of choosing $S$ and the bounds $M_\ell$ later,
+once we have discussed the security of isogeny walk schemes.
+
+In terms of our encodings,
+this means that a secret key assigns 
+\begin{itemize}
+    \item
+        an exponent in 
+        $[-M_\ell,M_\ell]$ to each tuple $(\ell,\lambda,\mu)$ in $S_{VV}$ and $S_{EE}$
+        (so an exponent $k_\ell$ for the tuple $(\ell,\lambda,\mu)$
+        indicates $|k_\ell|$ steps on the $\ell$-isogeny graph in direction $\lambda$
+        if $k_\ell > 0$, or direction $\mu$ if $k_\ell < 0$); and
+    \item
+        an exponent in $[0,M_\ell]$ to each tuple in $S_{VE}$
+        (we do not use the much slower $\mu$ direction for these
+        primes).
+\end{itemize}
+But assuming these parameters have been properly chosen,
+Algorithm~\ref{alg:isogeny-KeyGen} (\algstyle{KeyGen})
+implements key generation for the resulting cryptographic schemes.
 
 \begin{algorithm}
-    \caption{\algstyle{KeyGen} for cryptosystems in the isogeny graph on
-    $\Ell_q(\O)$ with walks based on $S$}
-    \label{alg:isogeny-KeyGen}
-    \Input{%
-        The set $S$ given as $S_E, S_{V,2}, S_{V,1}$;
-        the walk length bounds $(M_\ell)_{\ell\in S}$
+    \caption{%
+        \algstyle{KeyGen} for cryptosystems in the isogeny graph on
+        $\Ell_q(\O)$ with walks based on $S$, and initial curve $E_0$.
+        The ideal lists $S_{EE}$, $S_{VV}$, and $S_{VE}$,
+        and the walk bounds $M_\ell$, are system parameters.
     }
-    \Output{A secret key $(k_\ell)_{\ell\in S}$}
-    \For{$(\ell, \lambda, \mu)\in S_E\cup S_{V, 2}$} {
+    \label{alg:isogeny-KeyGen}
+    \Input{()}
+    \Output{%
+        A secret key $(k_\ell)_{\ell\in S}$ and the corresponding public
+        key $j(E)$
+    }
+    %
+    $E \gets E_0$
+    \;
+    \For{$(\ell, \lambda, \mu)\in S_{EE}$}{%
         $k_\ell\gets \algstyle{Random}([-M_\ell, M_\ell])$ 
         \;
-    }
-    \For{$(\ell, \lambda)\in S_{V, 1}$}{%
-        $k_\ell\gets \algstyle{Random}([0,M_\ell])$ 
+        \lIf{$k_\ell \ge 0$}{%
+            $\nu \gets \lambda$
+        }
+        \lElse{%
+            $\nu \gets \mu$
+        }
+        $E \gets \algstyle{ElkiesWalk}(E,(\ell,\nu),|k_\ell|)$
         \;
     }
-    \Return{$(k_\ell)$}
+    \For{$(\ell, \lambda, \nu) \in S_{VV}$}{%
+        $k_\ell\gets \algstyle{Random}([-M_\ell, M_\ell])$ 
+        \;
+        \lIf{$k_\ell \ge 0$}{%
+            $\nu \gets \lambda$
+        }
+        \lElse{%
+            $\nu \gets \mu$
+        }
+        $E \gets \algstyle{VeluWalk}(E,(\ell,\nu),|k_\ell|)$
+        \;
+    }
+    \For{$(\ell, \lambda)\in S_{VE}$}{%
+        $k_\ell\gets \algstyle{Random}([0,M_\ell])$ 
+        \;
+        $E \gets \algstyle{VeluWalk}(E,(\ell,\lambda),k_\ell)$
+        \;
+    }
+    \Return{$((k_\ell)_{\ell\in S},j(E))$}
 \end{algorithm}
 
 %Then, an isogeny walk is simply a sequence of isogeny
@@ -1154,14 +1207,17 @@ by applying a combination of Elkies and Vélu walks
     \caption{%
         \algstyle{DH} for the isogeny graph on $\Ell_q(\O)$
         with primes in $S$.
+        The ideal lists $S_{EE}$, $S_{VV}$, and $S_{VE}$,
+        and the walk bounds $M_\ell$, are system parameters.
         Public key validation is not included here,
         but (if desired) should be carried out 
         as detailed in Section~\ref{sec:validation}.
     }
     \label{alg:isogeny-DH}
     \Input{%
-        A private key \((k_\ell)_\ell\)
-        corresponding to a walk $(\frak{s}_1,\ldots,\frak{s}_n)$;
+        A private key \(k_A = (k_{A,\ell})_{\ell\in S}\)
+        corresponding to a walk $(\frak{s}_1,\ldots,\frak{s}_n)$,
+        and
         a public key $j_B = j(E_B)$ for $E_B \in \Ell_q(O)$
     }
     \Output{%
@@ -1175,87 +1231,32 @@ by applying a combination of Elkies and Vélu walks
         $E \gets \algstyle{QuadraticTwist}(E)$
         \;
     }
-    \For{$(\ell,\lambda,\mu) \in S_E$}{
-        \lIf{$k_\ell \ge 0$}{%
+    \For{$(\ell,\lambda,\mu) \in S_{EE}$}{
+        \lIf{$k_{A,\ell} \ge 0$}{%
             $\nu \gets \lambda$
         }
         \lElse{%
             $\nu \gets \mu$
         }
-        $E \gets \algstyle{ElkiesWalk}(E,(\ell,\nu),|k_\ell|)$
+        $E \gets \algstyle{ElkiesWalk}(E,(\ell,\nu),|k_{A,\ell}|)$
     }
-    \For{$(\ell,\lambda,\mu) \in S_{V,2}$}{
-        \lIf{$k_\ell \ge 0$}{%
+    \For{$(\ell,\lambda,\mu) \in S_{VV}$}{
+        \lIf{$k_{A,\ell} \ge 0$}{%
             $\nu \gets \lambda$
         }
         \lElse{%
             $\nu \gets \mu$
         }
-        $E \gets \algstyle{VéluWalk}(E,(\ell,\nu),|k_\ell|)$
+        $E \gets \algstyle{VéluWalk}(E,(\ell,\nu),|k_{A,\ell}|)$
         \;
     }
-    \For{$(\ell,\lambda) \in S_{V,1}$}{
-        $E \gets \algstyle{VéluWalk}(E,(\ell,\lambda),k_\ell)$
+    \For{$(\ell,\lambda) \in S_{VE}$}{
+        $E \gets \algstyle{VéluWalk}(E,(\ell,\lambda),k_{A,\ell})$
         \;
     }
     \Return{$j(E)$}
 \end{algorithm}
 
-%\begin{algorithm}
-%	\caption{\algstyle{Walk}: an isogeny walk}
-%	\label{alg:walk}
-%	\Input{
-%		\begin{itemize}
-%		\itemsep0em
-%		\item An exponent vector $k = (k_\ell)$
-%		\item An initial $j$-invariant $j_I$
-%		\item The set $S$ given as $S_E,\ S_{V,2},\ S_{V,1}$
-%		\item The order $C$ of the public elliptic curve
-%		\end{itemize}
-%	}
-%	$E \gets $ a curve of $j$-invariant $j_I$\;
-%	\For{$(\ell, \lambda, \mu)\in S_E$}{
-%		\lIf{$k_\ell\geq 1$}{
-%			$E\gets \algstyle{ElkiesWalk}(E, C, \ell, \lambda, k_\ell)$
-%		}
-%		\lElseIf{$k_\ell\leq -1$}{
-%			$E\gets \algstyle{ElkiesWalk}(E, C, \ell, \mu, |k_\ell|)$
-%		}
-%	}
-%	\For{$(\ell, \lambda, \mu)\in S_{V,2}$}{
-%		\If{$k_\ell\geq 0$}{
-%			\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{VéluStep}(E, \ell, \lambda)$}
-%		}
-%		\Else{
-%			\lFor{$1\leq j \leq |k_\ell|$}{$E\gets \algstyle{VéluStep}(E, \ell, \mu)$}
-%		}
-%	}
-%	\For{$(\ell,\lambda)\in S_{V,1}$}{
-%		\lFor{$1\leq j \leq k_\ell$}{$E\gets \algstyle{VéluStep}(E, \ell, \lambda)$}
-%	}
-%	\Return{$j(E)$}
-%\end{algorithm}
-
-%\begin{algorithm}
-%  \caption{Key exchange from an isogeny graph}
-%  \label{alg:keyex}
-%  \Params{
-%		\begin{itemize}
-%		\itemsep0em
-%		\item A prime power $q$ 
-%		\item An ordinary elliptic curve $E_0/\F_q$ with order $C$, and maximal endomorphism ring
-%		\item The set $S$ given as $S_E,\ S_{V,2},\ S_{V,1}$
-%		\item Walk length bounds $M_\ell$
-%		\end{itemize}
-%	}
-%  \Alice{
-%    \Samples $k_A = \algstyle{KeySample}(S, (M_\ell))$\;
-%    \Sends $j_A = \algstyle{Walk}(k_A, j(E_0), S, C)$ to Bob}
-%  \Bob{
-%    \Samples $k_B = \algstyle{KeySample}(S, (M_\ell))$\;
-%    \Sends $j_B = \algstyle{Walk}(k_B, j(E_0), S, C)$ to Alice}
-%  \Key{$j_F = \algstyle{Walk}(k_A, j_B, S, C) = \algstyle{Walk}(k_B, j_A, S, C)$}
-%\end{algorithm}
 
 \section{Public parameter selection}
 \label{sec:initcurve}
