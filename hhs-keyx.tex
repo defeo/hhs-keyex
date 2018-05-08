@@ -462,11 +462,14 @@ We do not use any $\ell$ in Case~(0).
 Since all curves in
 the same isogeny class over $\F_q$ have the same number of points,
 they also have the same trace $t$ and discriminant $Δ_π$.
-% todo: do we frown upon bold emphasis?
-\textbf{It follows that, if $ℓ$ is an Elkies prime for a curve $E$,
-  the connected component of $E$ in the graph of $ℓ$-isogenies is a
-  finite $2$-regular graph, i.e.\ a cycle.} In the next subsection we
-describe a group action on this cycle, and determine its size.
+Hence, if $\ell$ is Elkies for some $E$ in $\Ell_q(\O)$,
+then it is Elkies for every curve in $\Ell_q(\O)$.
+
+It follows that if $ℓ$ is an Elkies prime for a curve $E$,
+then the connected component of $E$ in the $\ell$-isogeny graph 
+is a finite $2$-regular graph---that is, a cycle. 
+In the next subsection we describe a group action on this cycle,
+and determine its size.
 
 
 \subsection{Complex multiplication}
@@ -503,9 +506,7 @@ holds~\cite[Prop.~21]{kohel}:
 Notice that the last two cases can only happen if $ℓ$ divides
 $d^2=Δ_π/Δ_K$, and thus correspond to cases (1.x) in the previous
 subsection.
-% todo: do we frown upon bold emphasis?
-\textbf{If $ℓ$ does not divide $Δ_π$, then $ϕ$ is necessarily
-  horizontal.}
+If $ℓ$ does not divide $Δ_π$, then $ϕ$ is necessarily horizontal.
 
 We now present a group action on the set of all curves 
 up to isomorphism having complex
@@ -566,13 +567,14 @@ $\frak a\hat{\frak a} = \hat{\frak a}\frak a = (ℓ)$, implying that
 $\frak a$ and $\hat{\frak a}$ are the inverse of one another in
 $\Cl(\O)$, thus the isogeny $ϕ_{\hat{\frak a}}:\frak a·E→E$ of
 kernel $(\frak a·E)[\hat{\frak a}]$ is the dual of $ϕ_{\frak a}$ (up
-to isomorphism). Hence, 
-% todo: more bold
-\textbf{the eigenvalues $λ$ and $μ$ define two opposite
-  \emph{directions} on the isogeny cycle, independently of the
-  starting curve}, as shown in Figure~\ref{fig:cycle}.  Finally, the
-size of the cycle is the order of $(π-λ,ℓ)$ in $\Cl(\O)$, thus
-partitioning the set $\Ell_q(\O)$ into cycles of equal size.
+to isomorphism). 
+
+Hence, 
+the eigenvalues $λ$ and $μ$ define two opposite directions on the isogeny cycle,
+\emph{independent of the starting curve},
+as shown in Figure~\ref{fig:cycle}.  
+Finally, the size of the cycle is the order of $(π-λ,ℓ)$ in $\Cl(\O)$,
+thus partitioning the set $\Ell_q(\O)$ into cycles of equal size.
 
 \begin{figure}[t]
   \begin{minipage}{0.45\textwidth}
@@ -683,7 +685,7 @@ $S = \{2,2^{-1},3,3^{-1},5,5^{-1}\}$,
 and $X = \langle{x}\rangle\setminus\{1\}$ 
 is a cyclic group of order $13$, minus its identity element.
 The action of $G$ on $X$ is exponentiation: $g·x=x^g$.
-The action of $11$, which takes $x^i$ to $x^{11\cdot i}$,
+The action of $11$, which takes $x^k$ to $x^{11k}$,
 can be expressed using the walks 
 $(2,5,5)$,
 or $(2^{-1},3^{-1})$,
@@ -695,7 +697,7 @@ Returning to the world of isogenies,
 we now take
 \begin{itemize}
     \item $X=\Ell_q(\O)$ as the vertex set, for some well-chosen $q$ and $\O$;
-        in particular we demand that $\O$ be the maximal order (see Section~\ref{sec:sec}).
+        in particular we require $\O$ to be the maximal order (see Section~\ref{sec:sec}).
     \item $G=\Cl(\O)$ as the group acting on $X$;
     \item $S$ a set of small Elkies primes in $\O$.
         %ideals of the form $(π-λ,ℓ)$, where $ℓ$ is an
