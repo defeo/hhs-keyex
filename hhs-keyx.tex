@@ -740,7 +740,7 @@ are not the final elliptic curves,
 but their $j$-invariants.
 
 
-\subsection{Computing and sampling isogeny walks}
+\subsection{Computing isogeny walks}
 
 Since $\Cl(\O)$ is commutative,
 we can break isogeny walks down into a succession of walks
@@ -775,12 +775,6 @@ inspired by the SIDH cryptosystem and related protocols,
 speeds up the protocol by a considerable factor;
 this is the main practical contribution of our work. 
 \algstyle{VéluStep} is also a key ingredient in the CSIDH protocol~\cite{csidh}.
-
-The cost of these algorithms depends on the ideal $\frak{s}$.
-In order to minimize the total computational cost of a key exchange,
-we will use adapted, or \emph{skewed}, 
-smooth representations when sampling elements in $\Cl(\O)$,
-as explained at the end of this subsection.
 
 Let us now delve into
 the details of these two~\algstyle{Step} algorithms.
@@ -970,10 +964,11 @@ otherwise we take the other root of $P(X)$.
 %This is also the critical
 %part of Algorithm~\ref{alg:ElkiesNextStep}.
 
-Algorithm~\ref{alg:ElkiesWalk} (\algstyle{ElkiesWalk}) combines these two
-versions of Elkies steps to compute the iterated action of an ideal
-(at Line~\ref{line:twist}, if the curve does not have correct order, then
-its quadratic twist does).
+Algorithm~\ref{alg:ElkiesWalk} (\algstyle{ElkiesWalk}) 
+combines these algorithms
+to compute the iterated action of $\frak{s}$
+(at Line~\ref{line:twist}, if the curve does not have correct order,
+then its quadratic twist does).
 Both \algstyle{ElkiesFirstStep} and \algstyle{ElkiesFirstStep}
 cost $\softO(\ell\log q)$ field operations,
 with the dominant step in each being the calculation of the roots of $P(X)$.
@@ -982,26 +977,36 @@ with the dominant step in each being the calculation of the roots of $P(X)$.
 
 \paragraph{Vélu steps.}
 
-For some primes, we can completely avoid modular polynomials,
+For some primes $\frak{s} = (\ell,\pi-\lambda)$,
+we can completely avoid modular polynomials,
 and the costly computation of their roots,
-by constructing the kernel from torsion points.
-Algorithm~\ref{alg:VéluStep} is not always valid.
-The goal of this algorithm is to compute an element $Q\in\ker\phi_{\frak s}$,
-which exists over $\F_{q^r}$. To ensure success, $\ker\phi$
-must be the only line in $E[\ell]$ that is defined over $\F_{q^r}$;
-in other words, the multiplicative order of $\mu$, the other Frobenius
-eigenvalue, must not divide $r$.
+by constructing $\ker\phi_{\frak{s}}$ directly from $\ell$-torsion points.
+Let $r$ be the order of $\lambda$ modulo $\ell$;
+then $\ker\phi_{\frak s} \subseteq E(\F_{q^r})$.
+If $r$ is not a multiple of the order of the other eigenvalue $\mu$
+of $\pi$ on $E[\ell]$,
+then $E[\ell](\F_{q^r}) = \ker\phi_{\frak s}$.
+Algorithm~\ref{alg:VéluStep} (\algstyle{VéluStep}) 
+exploits this fact to construct a generator $Q$ of $\ker\phi_{\frak s}$
+by computing a point of order $\ell$ in $E(\F_{q^r})$.
+The roots of the kernel polynomial of $\phi_{\frak s}$
+are then $x(Q), \ldots, x([(\ell-1)/2]Q)$.
 %Notice that the values
 %of $r$ and $C_r$ could be made part of the public parameters, but we
 %leave them here for clarity.
 
-At Line~\ref{line:card}, $C_r$
-can be easily computed from the Frobenius trace $t$:
+Constructing a point $Q$ of order $\ell$ in $E(\F_{q^r})$
+is straightforward:
+we take random points and multiply by the cofactor $C_r/\ell$,
+where $C_r := \#E(\F_{q^r})$.
+Each trial succeeds with probability $1 - 1/\ell$.
+Note that $C_r$ can be easily (pre)computed from the Frobenius trace $t$:
 if we write $C_r = q - t_r + 1$ for 
 $r > 0$ (so $t_1 = t$) and $t_0 = 2$,
 then the $t_r$ satisfy the standard recurrence
-$t_r = t\cdot t_{r-1} - q\cdot t_{r-2}$. Computing
-the quotient curve at Line~\ref{line:quotient} is easily done
+$t_r = t\cdot t_{r-1} - q\cdot t_{r-2}$. 
+
+Computing the quotient curve at Line~\ref{line:quotient} is easily done
 with Vélu's formul\ae~\cite{Velu71} using $O(\ell)$ operations in $\F_q$.
 Since $\log C_r\simeq r\log q$, provided $\ell = O(\log q)$,
 the costly step in Algorithm~\ref{alg:VéluStep} is the scalar
@@ -1011,14 +1016,15 @@ $\softO(r^2\log q)$ $\F_q$-operations.
 \paragraph{Comparing the costs.}
 To summarize:
 \begin{itemize}
-\item An Elkies step costs $\softO(\ell\log q)$ operations in $\F_q$;
-\item A Vélu step costs $\softO(r^2\log q)$ operations in $\F_q$,
-where $r$ is the multiplicative order of $\lambda$ in $\Z/\ell\Z$.
+\item Elkies steps cost $\softO(\ell\log q)$ $\F_q$-operations;
+\item Vélu steps cost $\softO(r^2\log q)$ $\F_q$-operations,
+    where $r$ is the order of $\lambda$ in $\Z/\ell\Z$.
 \end{itemize}
-In the generic case $r = O(\ell)$, so Elkies steps
-should be preferred. However, when $r$ is small,
-a factor $\ell$ is saved using Vélu steps.
-The value of $r$ directly depends on $\lambda$, that is in turn determined by
+In general $r = O(\ell)$, so Elkies steps should be preferred. 
+However, when $r$ is particularly small
+(and not a multiple of the order of the other eigenvalue),
+a factor of $\ell$ can be saved using Vélu steps.
+The value of $r$ directly depends on $\lambda$, which is in turn determined by
 $\#E(\F_p)$ mod $\ell$. Thus, we see that better \algstyle{Step} performances
 depend on the ability to find elliptic curves whose order
 satisfies congruence conditions modulo small primes.
@@ -1056,10 +1062,17 @@ at Line~\ref{line:direction} if $\lambda\neq\pm\mu$.
     and the random point sampling need to be modified when using quadratic twists.
 \end{remark}
 
-\paragraph{Key exchange.}
+\subsection{Sampling isogeny walks and key exchange}
 
 We now describe precisely how one samples secret keys and performs a key
-exchange in our protocol. The generating set $S$ will consist of
+exchange in our protocol. 
+Since the cost of the various isogeny walks depends on the ideals
+chosen,
+we will use adapted, or \emph{skewed}, 
+smooth representations when sampling elements in $\Cl(\O)$
+in order to minimize the total computational cost of a key exchange.
+
+The generating set $S$ will consist of
 
 \begin{enumerate}
 \item \label{case:elkstep} Ideals $(\pi - \lambda, \ell)$ and their inverses $(\pi - \mu, \ell)$
