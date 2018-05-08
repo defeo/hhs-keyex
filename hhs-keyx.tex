@@ -753,16 +753,16 @@ using one of two different methods:
     \item Algorithm~\ref{alg:ElkiesWalk} (\algstyle{ElkiesWalk})
         uses Algorithm~\ref{alg:ElkiesFirstStep}
         (\algstyle{ElkiesFirstStep})
-        followed by a sequence of calls to Algorithm~\ref{alg:ElkiesNextStep} 
+        followed by a series of calls to Algorithm~\ref{alg:ElkiesNextStep} 
         (\algstyle{ElkiesNextStep}),
         both which use the \emph{modular polynomial} $\Phi_\ell(X, Y)$.
         This approach works for any $\frak s$.
     \item
         Algorithm~\ref{alg:VéluWalk} (\algstyle{VéluWalk})
-        uses a sequence of calls to 
+        uses a series of calls to 
         Algorithm~\ref{alg:VéluStep} (\algstyle{VéluStep}).
-        This approach uses \emph{torsion points} on $E$, 
-        and can only be applied when
+        This approach, which uses torsion points on $E$, 
+        can only be applied when
 	    $\lambda$ satisfies certain properties.
 \end{itemize}
 
@@ -776,15 +776,14 @@ speeds up the protocol by a considerable factor;
 this is the main practical contribution of our work. 
 \algstyle{VéluStep} is also a key ingredient in the CSIDH protocol~\cite{csidh}.
 
-Let us now delve into
-the details of these two~\algstyle{Step} algorithms.
+%Let us now delve into the details of these two~\algstyle{Step} algorithms.
 
 \begin{algorithm}
 	\caption{\algstyle{ElkiesFirstStep}}
 	\label{alg:ElkiesFirstStep}
 	\Input{%
         $E\in\Ell_q(\O)$; 
-        $(\ell,\lambda)$ defining an ideal $\frak s = (\pi-\lambda,\ell)$
+        $(\ell,\lambda)$ encoding $\frak s = (\pi-\lambda,\ell)$
     }
 	\Output{$j(\frak s\cdot E)$}
     %
@@ -815,8 +814,8 @@ the details of these two~\algstyle{Step} algorithms.
 	\caption{\algstyle{ElkiesNextStep}}
 	\label{alg:ElkiesNextStep}
     \Input{%
-        $(\ell,\lambda)$ defining an ideal $\frak{s} = (\ell,\pi-\lambda)$;
-        $(j_0,j_1) = (j(E),j(\frak{s}\cdot E))$ for some $E$ in $\Ell_q(\O)$
+        $(\ell,\lambda)$ encoding $\frak{s} = (\ell,\pi-\lambda)$;
+        $(j_0,j_1) = (j(E),j(\frak{s}\cdot E))$ for $E$ in $\Ell_q(\O)$
     }
     %(\ell,\lambda)$ defining an ideal $\frak s = (\pi-\lambda,\ell)$; $j_{k-1} = j(\frak s^{k-1}\cdot E)$ and $j_k = j(\frak s^{k}\cdot E)$ for some $E\in\Ell_q(\O)$ and $k\geq 1$}
     \Output{$j(\frak{s}\cdot\frak{s}\cdot E)$}
@@ -837,7 +836,7 @@ the details of these two~\algstyle{Step} algorithms.
 	\label{alg:ElkiesWalk}
 	\Input{%
         $E\in \Ell_q(\O)$;
-        $(\ell,\lambda)$ defining an ideal $\frak s = (\pi - \lambda,\ell)$;
+        $(\ell,\lambda)$ encoding $\frak s = (\pi - \lambda,\ell)$;
         $k\geq 1$
     }
 	\Output{$\frak s^k \cdot E$}
@@ -851,14 +850,12 @@ the details of these two~\algstyle{Step} algorithms.
     \;
     %$E_R \gets$ an elliptic curve with $j$-invariant $j_1$ and order $C$ 
     \label{line:twist}
-    \uIf{$\algstyle{CheckTrace}(E_R,t)$}{
-        \Return{$E_R$}
+    \If{\textbf{not} $\algstyle{CheckTrace}(E_R,t)$}{
+        $E_R \gets \algstyle{QuadraticTwist}(E_R)$
         \;
     }
-    \Else{
-        \Return{$\algstyle{QuadraticTwist}(E_R)$}
-        \;
-    }
+    \Return{$E_R$}
+    \;
 \end{algorithm}
 
 \begin{algorithm}
@@ -866,7 +863,7 @@ the details of these two~\algstyle{Step} algorithms.
 	\label{alg:VéluStep}
 	\Input{%
         $E\in\Ell_q(\O)$; 
-        $(\ell,\lambda)$ defining an ideal $\frak s = (\pi-\lambda,\ell)$;
+        $(\ell,\lambda)$ encoding $\frak s = (\pi-\lambda,\ell)$;
         $r > 0$;
         $C_r = \#E(\F_{q^r})$
     }
@@ -893,7 +890,7 @@ the details of these two~\algstyle{Step} algorithms.
 	\label{alg:VéluWalk}
 	\Input{%
         $E\in \Ell_q(\O)$;
-        $(\ell,\lambda)$ defining an ideal $\frak s = (\ell,\pi - \lambda)$; 
+        $(\ell,\lambda)$ encoding $\frak s = (\ell,\pi - \lambda)$; 
         $k\geq 1$
     }
 	\Output{$\frak s^k \cdot E$}
@@ -958,8 +955,8 @@ with asymptotically fast polynomial arithmetic.
 Given the polynomial defining the kernel,
 we compute an element $Q$ of $\ker\phi_\frak{s}$
 over an extension of $\F_q$ of degree at most $\frac{\ell-1}{2}$,
-then evaluate $\pi(Q)$ and compare with $[\lambda]Q$.
-If this matches, then we have chosen the right direction;
+then evaluate $\pi(Q)$ and $[\lambda]Q$.
+If they match, then we have chosen the right direction;
 otherwise we take the other root of $P(X)$.
 %This is also the critical
 %part of Algorithm~\ref{alg:ElkiesNextStep}.
@@ -1033,8 +1030,8 @@ Unfortunately, we can only achieve this partially
 to use Vélu steps when we can, and Elkies steps for some other primes.
 
 In practice, Algorithm~\ref{alg:VéluStep} can be improved
-by using elliptic curve models with more efficient arithmetic;
-we use Montgomery arithmetic here~\cite{Montgomery87,CostelloSmith2017},
+by using elliptic curve models with more efficient arithmetic.
+We used Montgomery arithmetic here~\cite{Montgomery87,CostelloSmith2017},
 without computing $y$-coordinates. This model also
 offers convenient Vélu formul\ae~\cite{Renes2018}.
 %On the other hand, the Weierstrass model is classical and universal, 
@@ -1064,8 +1061,7 @@ at Line~\ref{line:direction} if $\lambda\neq\pm\mu$.
 
 \subsection{Sampling isogeny walks for key exchange}
 
-We now describe precisely how one samples secret keys and performs a key
-exchange in our protocol. 
+We now describe how keys are generated and exchanged in our protocol. 
 Since the cost of the various isogeny walks depends on the ideals
 chosen,
 we will use adapted, or \emph{skewed}, 
@@ -1135,9 +1131,8 @@ the secret key assigns
         indicates $|k_\ell|$ steps on the $\ell$-isogeny graph in direction $\lambda$
         if $k_\ell > 0$, or direction $\mu$ if $k_\ell < 0$); and
     \item
-        an exponent in $[0,M_\ell]$ to each tuple in $S_{VE}$
-        (we do not use the much slower $\mu$ direction for these
-        primes).
+        an exponent in $[0,M_\ell]$ to each tuple $(\ell,\lambda)$ in $S_{VE}$
+        (we do not use the much slower $\mu$ direction for these primes).
 \end{itemize}
 
 \begin{algorithm}
@@ -1260,27 +1255,29 @@ by applying a combination of Elkies and Vélu walks
 \section{Public parameter selection}
 \label{sec:initcurve}
 
-It is now evident that the choice of public parameters, especially
-the initial curve $E_0$, has heavy impact on the execution time:
+It is evident that the choice of public parameters
+%, especially the initial curve $E_0$, 
+has a heavy impact on the execution time: 
 smaller Elkies primes,
-and smaller multiplicative orders of the Frobenius eigenvalues, will
-lead to better practical performances. Since all of this information
-is contained in the value of $\# E(\F_q)$, we now face the problem
-of constructing ordinary elliptic curves with prescribed
-order, or more precisely with prescribed order \emph{modulo small
-primes}. Unfortunately, and in contrast with the case of
-supersingular curves, no polynomial-time method to achieve this 
-is known in general; the CM method~\cite{AtkinMorain93,Sutherland2012},
+and smaller multiplicative orders of the Frobenius eigenvalues, 
+will lead to better performance.
+Since all of this information is contained in the value of $\# E(\F_q)$, 
+we now face the problem of constructing ordinary elliptic curves 
+prescribed order \emph{modulo small primes}. 
+Unfortunately, and in contrast with the case of supersingular curves, 
+no polynomial-time method to achieve this is known in general:
+the CM method~\cite{AtkinMorain93,Sutherland2012},
 which solves this problem
-when the corresponding class groups are small, is useless in our
+when the corresponding class groups are small,
+is useless in our
 setting as we will see in Section~\ref{sec:sec}.
 
 In this section, we describe how to use the Schoof--Elkies--Atkin (SEA) point counting
 algorithm with early abort, combined with the use of certain modular curves,
 to construct curves whose order satisfies some constraints
-modulo small prime.
+modulo small primes.
 This is faster than choosing curves at random and computing their orders
-completely until a convenient one is found, but still does not allow us
+completely until a convenient one is found, but it still does not allow us
 to use the full power of Algorithm~\algstyle{VéluStep}.
 
 \paragraph{Early-abort SEA.}
@@ -1293,16 +1290,21 @@ to get the true value of $N$.
 
 Cryptographers are usually interested in generating elliptic curves of
 prime or nearly prime order. In this case, we use an \emph{early-abort}
-mechanism: as soon as we detect $N \equiv 0\pmod{\ell}$ for some $\ell$, the algorithm is aborted
-and a new curve is chosen.
+mechanism: as soon as we detect $N \equiv 0\pmod{\ell}$ for some $\ell$,
+SEA is aborted and a new curve is chosen.
 
 Here, the situation is the opposite: we \emph{want} elliptic curves
 whose cardinality has many small prime divisors.
 To fix ideas, we choose the 512-bit prime
 \[
-    p = 7 \left(\prod_{2\leq\ell\leq 380,\ \ell \text{ prime}} \ell\right) - 1
+    p 
+    = 
+    7 \left(
+        \prod_{2\leq\ell\leq 380,\ \ell \text{ prime}} \ell
+    \right) - 1
+    \,.
 \]
-Then, according to section~\ref{sec:keyex}, Algorithm~\algstyle{VéluStep} can be used
+Then, according to Section~\ref{sec:keyex}, Algorithm~\algstyle{VéluStep} can be used
 for $\ell$-isogenies with $r=1$ in both directions if and only if
 $\# E(\F_p) \equiv0\pmod{\ell}$, for any prime $\ell\leq 380$.
 We now proceed as follows:
@@ -1700,8 +1702,8 @@ IW-DDH oracle to solve both the CGA-DDH and IWD problems, showing that
 at least one of the two must be solvable with non-negligible
 advantage. The only technical difficulty lies in the fact that we need
 an efficient way to simulate the uniform distribution on $\Ell_q(\O)$;
-for this, we use another Cayley graph on $\Ell_q(\O)$, potentially
-with a larger edge set, that is proven
+for this, we use another Cayley graph on $\Ell_q(\O)$,
+with a potentially larger edge set, that is proven
 in~\cite{jao+miller+venkatesan09} to be an expander graph
 under the generalized Riemann hypothesis (GRH).
 
@@ -1710,11 +1712,10 @@ against IW-DDH, defined as the probability that $A$ answers correctly,
 minus $\frac{1}{2}$:
 \[2\Adv[A]{IW-DDH} = \Proba\bigl[A(\mathcal{R}_{q,Δ,σ}) = 1\bigr] -
   \Proba\bigl[A(\mathcal{W}_{q,Δ,σ}) = 1\bigr].\] %
-We define $\Adv[A]{CGA-DDH}$ and $\Adv[A]{IWD}$ similarly. By switching
-answers if needed, we can assume all advantages are positive.
-We let $\Adv{xxx}(t)$ denote the maximum of $\Adv[A]{xxx}$ over all
-adversaries using at most $t$ resources (e.g.\ running time, queries,
-etc.).
+We define $\Adv[A]{CGA-DDH}$ and $\Adv[A]{IWD}$ similarly. 
+Switching answers if needed, we can assume all advantages are positive.
+We let $\Adv{X}(t)$ denote the maximum of $\Adv[A]{X}$ over all
+adversaries using at most $t$ resources (running time, queries, etc.).
 
 \begin{lemma}
 \label{lem:adv}
@@ -1730,7 +1731,7 @@ etc.).
   and returns $A$'s response.
 
   The simulator $T$ receives a triplet $(E_a,E_b,E_{ab})$ taken from
-  $\mathcal{G}_{q,Δ}$ or $\mathcal{W}_{q,Δ,σ}$. It flips a coin
+  $\mathcal{G}_{q,Δ}$ or $\mathcal{W}_{q,Δ,σ}$, and flips a coin
   to decide which of the two following actions it will do:
   \begin{itemize}
   \item It forwards $(E_a,E_b,E_{ab})$ to $A$, and returns the same bit
@@ -1854,7 +1855,7 @@ parameters than those provided by GRH.
 Modern practice in cryptography mandates the use of stronger security
 notions than IND-CPA.  From the DLP assumption, it is easy to
 construct protocols with strong security against active adversaries.
-For example, it is well known that the hashed El Gamal KEM achieves
+For example, it is well-known that the hashed El Gamal KEM achieves
 IND-CCA security in the random oracle model under various
 assumptions~\cite{10.1007/3-540-45353-9_12,cryptoeprint:1999:007,doi:10.1137/S0097539702403773}.
 
@@ -1876,9 +1877,9 @@ on Alice's secret.
 
 Fortunately, key validation is relatively easy for protocols based on
 the CRS primitive. All we need to check is that the received curve has
-the right order, and has maximal endomorphism ring. Notice that,
-because these algorithms only operate on public data, they do not need
-to be constant-time.
+the right order, and has maximal endomorphism ring. 
+%Notice that, because these algorithms only operate on public data, 
+%they do not need to be constant-time.
 
 \paragraph{Verifying the curve order.} Since we already know the trace $t$
 of the Frobenius endomorphism of all curves in $\Ell_q(\O)$, 
