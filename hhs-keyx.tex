@@ -1555,59 +1555,52 @@ It therefore has no impact on our security estimates.
 \label{sec:quantum-attacks}
 
 On a quantum computer, an attack with better asymptotic complexity is
-given in~\cite{childs2014constructing}. It consists of two algorithms:
+given by Childs, Jao and Soukharev
+in~\cite{childs2014constructing}. It consists of two algorithms:
 \begin{enumerate}
 \item A (classical) algorithm that takes as input an elliptic curve
   $E∈\Ell_q(\O)$ and an ideal $\frak a∈\Cl(\O)$, and outputs the curve
   $\frak a·E$;
 \item A generic quantum algorithm for the dihedral hidden subgroup
-  problem (dHSP), based upon previous work of Kuperberg~\cite{Kup,todo} and
+  problem (dHSP), based upon previous work of Kuperberg~\cite{Kup,Kuperberg2013} and
   Regev~\cite{regev04}.
 \end{enumerate}
 
 The ideal evaluation algorithm has sub-exponential complexity
-$L_q(\frac{1}{2},\frac{\sqrt{3}}{2})$.  The dHSP algorithm uses the
+$L_q(\frac{1}{2},\frac{\sqrt{3}}{2})$. However, after a subexponential-time
+precomputation, any adversary can know the exact class group structure;
+then, this ideal evaluation step could possibly performed in polynomial
+time (and non-negligible success probability)
+using LLL-based methods, as discussed in~\cite{Stolbunov2012}
+and~\cite[\S5]{cryptoeprint:2006:291}.
+
+The dHSP algorithm uses the
 ideal evaluation algorithm as a (quantum) black box, the number of
-queries depending on the variant:
-\begin{itemize}
-\item Kuperberg's algorithm uses $O(2^{\sqrt{\log q}})$ queries, and a
-  storage of $O(2^{\sqrt{\log q}})$ qubits;
-\item Regev's algorithm has worse query complexity, using
-  $L_q(\frac{1}{2},1)$ calls to the black box, but only requires a
-  storage of $\poly(\log q)$ qubits.
-\end{itemize}
+queries depending on the variant. Childs--Jao--Soukharev gave two
+versions of this algorithm, Kuperberg's~\cite{Kup} and Regev's\cite{regev04}.
+However, both are superseded by Kuperberg's recent work~\cite{Kuperberg2013}:
+his new algorithm solves the dHSP in any abelian group of order $N$
+using $2^{O(\sqrt{\log N})}$ quantum queries and classical space,
+but only $O(\log N)$ quantum space.
 
-Given these estimates, we expect the bit size of $q$ to grow at
+Given this estimate, we expect the bit size of $q$ to grow at
 worst like the square of the security parameter. However,
-the constants implied in the complexities are not made explicit, 
-so it is hard to estimate the impact of this attack at concrete security levels
+the constants implied in the complexity are not made explicit, 
+so it is very hard to estimate the impact of this attack
+at concrete security levels
 such as those required by NIST~\cite{NIST2016}.
-Nevertheless, we remark that 
-the weaker version of Kuperberg's algorithm described in~\cite[§2.1]{regev04} 
-requires about $2^{\sqrt{8\log q}}$ black-box queries,
-and this was improved by Regev to use only polynomial
-storage at the cost of some overhead.
-Kuperberg designed more efficient versions of his algorithm~\cite{Kup,todo}
-using only about $3^{\sqrt{2 \log_3 q}}$ queries;
-however this number can be taken as a very conservative lower bound,
-%, given that the described algorithm is specific to $h(O_K)=2^n$, and also 
-because Regev's algorithm, with its polynomial storage requirement,
-is a much more realistic candidate to run on a real-world quantum computer.
 
+Nevertheless, we remark that a simplified version of Kuperberg's
+algorithm described in~\cite[§2.1]{regev04} in the case $N = 2^n$ 
+requires about $2^{4\sqrt{\log N}}$ black-box queries.
+Therefore, we believe taking $O = 4$ in Kuperberg's estimate
+is a reasonable choice to propose precise parameter sizes.
+(We mention that Kuperberg's original analysis gave $O = 3$).
+Of course, this assumption is only heuristic, and should be
+vaildated by further study of quantum dHSP solvers; at present
+time, unfortunately, no precise statement can be made.
 
-Since the structure of the class group is available to an
-attacker with subexponential amounts of resources, it is possible
-that a black box query could be done in polynomial time using
-LLL-based methods~\cite[\S5]{cryptoeprint:2006:291}.
-Thus, a conservative approach is to
-ignore the cost of the oracle queries altogether.
-
-%By taking into account the fact that each
-%black box query runs a quantum circuit of subexponential size itself,
-%we estimate that the lower bound on the number of quantum gates is at
-%least the square of the lower bound on the number of quantum
-%queries.
-Table~\ref{tab:sizes} proposes three parameter sizes,
+Table~\ref{tab:sizes} thus proposes three parameter sizes,
 with associated numbers of quantum queries based on the observations above.
 While their quantum security in NIST's sense~\cite{NIST2016}
 would only allow them to fit in poor NIST categories, we believe that query
@@ -1646,19 +1639,20 @@ thus offering 64-bit quantum query complexity
 \begin{table}
     \renewcommand{\arraystretch}{1.4}
     \centering
-    \begin{tabular}{c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c}
+    \begin{tabular}{c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c}
         $\log Δ_K$ & $\log h(\O_K)$
         & \parbox{10ex}{\centering classical security}
-        & \parbox{10ex}{\centering quantum queries} \\
+        & \parbox{10ex}{\centering quantum queries}
+        & \parbox{10ex}{\centering NIST category} \\
         \hline
-        $512$  & $256$ & $2^{128}$ & $> 2^{64}$ \\
-        $768$  & $384$ & $2^{192}$ & $> 2^{78}$ \\
-        $1024$ & $512$ & $2^{256}$ & $> 2^{90}$
+        $512$  & $256$ & $2^{128}$ & $> 2^{64}$ & 1\\
+        $768$  & $384$ & $2^{192}$ & $> 2^{78}$ & 1\\
+        $1024$ & $512$ & $2^{256}$ & $> 2^{90}$ & 1
         \\
         \hline
     \end{tabular}
     \smallskip
-    \caption{Suggested parameter sizes and associated query complexities.}
+    \caption{Suggested parameter sizes and associated query complexities, using heuristic estimations.}
     \label{tab:sizes}
 \end{table}
 
