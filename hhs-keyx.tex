@@ -1559,7 +1559,7 @@ given in~\cite{childs2014constructing}. It consists of two algorithms:
   $E∈\Ell_q(\O)$ and an ideal $\frak a∈\Cl(\O)$, and outputs the curve
   $\frak a·E$;
 \item A generic quantum algorithm for the dihedral hidden subgroup
-  problem (dHSP), based upon previous work of Kuperberg~\cite{Kup} and
+  problem (dHSP), based upon previous work of Kuperberg~\cite{Kup,todo} and
   Regev~\cite{regev04}.
 \end{enumerate}
 
@@ -1575,6 +1575,7 @@ queries depending on the variant:
   storage of $\poly(\log q)$ qubits.
 \end{itemize}
 
+<<<<<<< HEAD
 Given these estimates, we expect the bit size of $q$ to grow at
 worst like the square of the security parameter. However,
 the constants implied in the complexities are not made explicit, 
@@ -1584,14 +1585,14 @@ Nevertheless, we remark that
 the weaker version of Kuperberg's algorithm described in~\cite[§2.1]{regev04} 
 requires about $2^{\sqrt{8\log q}}$ black-box queries,
 and this was improved by Regev to use only polynomial
-storage requirement at the cost of some overhead.
-Kuperberg designed more efficient versions of his algorithm~\cite{todo};
+storage at the cost of some overhead.
+Kuperberg designed more efficient versions of his algorithm~\cite{Kup,todo};
+using only about $3^{\sqrt{2 \log_3 q}}$ queries;
 however this number can be taken as a very conservative lower bound,
 %, given that the described algorithm is specific to $h(O_K)=2^n$, and also 
 because Regev's algorithm, with its polynomial storage requirement,
 is a much more realistic candidate to run on a real-world quantum computer.
-Generalizing Regev's ideas to more efficient
-versions of Kuperberg's algorithm remains an open problem.
+
 
 Since the structure of the class group is available to an
 attacker with subexponential amounts of resources, it is possible
