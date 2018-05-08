@@ -1071,25 +1071,35 @@ in order to minimize the total computational cost of a key exchange.
 The generating set $S$ will consist of
 
 \begin{enumerate}
-\item \label{case:elkstep} Ideals $(\pi - \lambda, \ell)$ and their inverses $(\pi - \mu, \ell)$
-	for very small Elkies primes $\ell$, when \emph{neither} $\lambda$ nor $\mu$
-	are eligible to Vélu steps. We encode them as 
-	a list $S_E$ of tuples $(\ell, \lambda, \mu)$, the \emph{Elkies part} of $S$.
-\item \label{case:velustep-sym} Ideals $(\pi - \lambda, \ell)$ and their inverses $(\pi - \mu, \ell)$
-	for small Elkies primes $\ell$, when \emph{both} $\lambda$ and $\mu$
-	are eligible to Vélu steps. We encode them as
-	a list $S_{V, 2}$ of tuples $(\ell, \lambda, \mu)$, the \emph{symmetric Vélu part} of $S$.
-\item \label{case:velustep-asym} Ideals $(\pi - \lambda, \ell)$, \emph{without their inverses},
-	if $\ell$ is a small Elkies prime and \emph{only} eigenvalue $\lambda$
-	is eligible to Vélu steps. We encode them as a list
-	$S_{V, 1}$ of tuples $(\ell, \lambda)$, the \emph{asymmetric Vélu part} of $S$.
+    \item \label{case:elkstep} 
+        Ideals $(\pi - \lambda, \ell)$ and their inverses $(\pi - \mu, \ell)$
+	    for very small Elkies primes $\ell$, 
+        when \emph{neither} $\lambda$ nor $\mu$ are amenable to
+        \algstyle{VéluStep}.
+        We encode these ideals as
+        a list $S_{EE}$ of tuples $(\ell, \lambda, \mu)$,
+        the \emph{Elkies part} of $S$.
+    \item \label{case:velustep-sym}
+        Ideals $(\pi - \lambda, \ell)$ and their inverses $(\pi - \mu, \ell)$
+	    for small Elkies primes $\ell$, 
+        when \emph{both} $\lambda$ and $\mu$ are amenable to \algstyle{VéluStep}.
+        We encode them as a list $S_{VV}$
+        of tuples $(\ell, \lambda, \mu)$, 
+        the \emph{symmetric Vélu part} of $S$.
+    \item \label{case:velustep-asym}
+        Ideals $(\pi - \lambda, \ell)$, \emph{without their inverses},
+	    if $\ell$ is a small Elkies prime 
+        and \emph{only} the eigenvalue $\lambda$ 
+        is amenable to \algstyle{VéluStep}. 
+        We encode them as a list $S_{VE}$ of tuples $(\ell, \lambda)$, 
+        the \emph{asymmetric Vélu part} of $S$.
 \end{enumerate}
 
 Looking back at Figure~\ref{fig:cycle}, in cases~\ref{case:elkstep} and~\ref{case:velustep-sym}
 both directions $\lambda,\mu$ are used, while in case~\ref{case:velustep-asym} only $\lambda$ is
 available.
 
-Recall that (ephemeral) secret keys are walks in the isogeny graph.
+Recall that secret keys are walks in the isogeny graph.
 Since the class group $\Cl(\O)$ is commutative, such a walk is fully
 determined by an \emph{exponent vector}, with one exponent for each ideal in $S$
 up to inverse: for an ideal $\frak s\in S$, this exponent can be negative if
