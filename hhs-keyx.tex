@@ -738,17 +738,27 @@ but their $j$-invariants.
 
 \subsection{Computing and sampling isogeny walks}
 
-Given an ideal $\frak s = (\pi-\lambda, \ell)$ and an elliptic curve $E$,
-we will compute the isogeny step
-$\phi_{\frak s}:E\to E'$ using one of two different methods:
+Since $\Cl(\O)$ is commutative,
+we can break isogeny walks down into a succession of walks
+corresponding to powers of single primes $\frak{s} = (\ell,\pi-\lambda)$;
+that is, repeated applications of the isogenies $\phi_{\frak{s}}$.
+Depending on $\frak{s}$,
+we will compute each sequence of $\phi_{\frak s}$
+using one of two different methods:
 \begin{itemize}
-    \item Algorithms~\ref{alg:ElkiesFirstStep}
-        and~\ref{alg:ElkiesNextStep} 
-        (\algstyle{ElkiesFirstStep} and \algstyle{ElkiesNextStep}),
-        which use the \emph{modular polynomial} $\Phi_\ell(X, Y)$, 
-        and work for any $\frak s$;
-    \item Algorithm~\ref{alg:VéluStep} (\algstyle{VéluStep}),
-	    which uses \emph{torsion points} on $E$, and can only be used when
+    \item Algorithm~\ref{alg:ElkiesWalk} (\algstyle{ElkiesWalk})
+        uses Algorithm~\ref{alg:ElkiesFirstStep}
+        (\algstyle{ElkiesFirstStep})
+        followed by a sequence of calls to Algorithm~\ref{alg:ElkiesNextStep} 
+        (\algstyle{ElkiesNextStep}),
+        both which use the \emph{modular polynomial} $\Phi_\ell(X, Y)$.
+        This approach works for any $\frak s$.
+    \item
+        Algorithm~\ref{alg:VéluWalk} (\algstyle{VéluWalk})
+        uses a sequence of calls to 
+        Algorithm~\ref{alg:VéluStep} (\algstyle{VéluStep}).
+        This approach uses \emph{torsion points} on $E$, 
+        and can only be applied when
 	    $\lambda$ satisfies certain properties.
 \end{itemize}
 
@@ -758,12 +768,12 @@ Algorithms~\ref{alg:ElkiesFirstStep} and~\ref{alg:ElkiesNextStep}.
 The introduction of Algorithm~\algstyle{VéluStep}, 
 % very different in spirit from Algorithm~\algstyle{ElkiesStep} and
 inspired by the SIDH cryptosystem and related protocols,
-speeds up the protocol by a considerable factor and
-is the main practical contribution of our work. 
+speeds up the protocol by a considerable factor;
+this is the main practical contribution of our work. 
 \algstyle{VéluStep} is also a key ingredient in the CSIDH protocol~\cite{csidh}.
 
-Using these algorithms, the cost of an isogeny step depends
-on the ideal. In order to minimize the global computational cost,
+The cost of these algorithms depends on the ideal $\frak{s}$.
+In order to minimize the total computational cost of a key exchange,
 we will use adapted, or \emph{skewed}, 
 smooth representations when sampling elements in $\Cl(\O)$,
 as explained at the end of this subsection.
@@ -813,7 +823,8 @@ the details of these two~\algstyle{Step} algorithms.
     %(\ell,\lambda)$ defining an ideal $\frak s = (\pi-\lambda,\ell)$; $j_{k-1} = j(\frak s^{k-1}\cdot E)$ and $j_k = j(\frak s^{k}\cdot E)$ for some $E\in\Ell_q(\O)$ and $k\geq 1$}
     \Output{$j(\frak{s}\cdot\frak{s}\cdot E)$}
     %
-	$P\gets \Phi_\ell(X, j_0) / (X - j_1)$ 
+    \label{alg:ElkiesNextStep:step}
+	$P\gets \Phi_\ell(X, j_1) / (X - j_0)$ 
     \;
     %
 	$j_2\gets$ the unique root of $P$ in $\F_q$ 
@@ -881,7 +892,7 @@ the details of these two~\algstyle{Step} algorithms.
 
 \begin{algorithm}
 	\caption{\algstyle{VéluWalk}}
-	\label{alg:VeluWalk}
+	\label{alg:VéluWalk}
 	\Input{%
         $E\in \Ell_q(\O)$;
         $(\ell,\lambda)$ defining an ideal $\frak s = (\ell,\pi - \lambda)$; 
@@ -903,53 +914,74 @@ the details of these two~\algstyle{Step} algorithms.
 \end{algorithm}
 
 \paragraph{Elkies steps.}
-The correctness of Algorithms~\ref{alg:ElkiesFirstStep}
+Algorithms~\ref{alg:ElkiesFirstStep}
 and~\ref{alg:ElkiesNextStep} 
+compute single steps in the $\ell$-isogeny graph.
+Their correctness
 follows from the definition of the modular polynomial $\Phi_\ell$:
 a cyclic $\ell$-isogeny exists between two elliptic
 curves $E$ and $E'$ if and only if $\Phi_\ell(j(E), j(E')) = 0$
 (see~\cite[\S6]{schoof95} and~\cite[\S3]{Elkies98} for the relevant theory).
-In practice, the polynomial $\Phi_\ell$ is precomputed and stored:
+One may use the classical modular polynomials here,
+or alternative, lower-degree modular polynomials
+(Atkin polynomials, for example)
+with minimal adaptation to the algorithms.
+In practice, $\Phi_\ell$ is precomputed and stored:
 several publicly available databases exist (see~\cite{Echidna}, for example).
 
-The kernel computation at Line~\ref{line:kernel} 
-in Algorithm~\ref{alg:ElkiesFirstStep}
-is a classic operation in isogeny computations; 
-here we can use the Bostan--Morain--Salvy--Schost algorithm~\cite{BMSS08},
-which costs $\softO(\ell)$ $\F_q$-operations using asymptotically fast
-polynomial arithmetic.
+Given a $j$-invariant $j(E)$,
+we can compute its two neighbours in the $\ell$-isogeny graph
+by evaluating $P(X) = \Phi_\ell(j(E),X)$
+(a polynomial of degree $\ell+1$),
+and then computing its two roots in $\F_q$.
+Using a Cantor--Zassenhaus-type algorithm,
+this costs
+$\softO(\ell\log q)$ $\F_q$-operations.
 
-However, at Line~\ref{line:direction}, $Q$ is defined over an extension field
-of degree at most $\frac{\ell-1}{2}$ over $\F_q$, bringing the cost
-of the evaluation of $\pi(Q)$ to $\softO(\ell\log q)$ operations;
-since the degree of $P$ is always $\ell+1$,
-the root computation at
-Line~\ref{line:roots} also costs $\softO(\ell\log q)$ $\F_q$-operations
-using a Cantor--Zassenhaus-type algorithm.
+We need to make sure we move to the neighbour in the correct direction.
+If we have already made one such step then this is easy:
+it suffices to avoid backtracking.
+Algorithm~\ref{alg:ElkiesNextStep} (\algstyle{ElkiesNextStep})
+does this by
+removing the factor corresponding to the previous $j$-invariant 
+in Line~\ref{alg:ElkiesNextStep:step};
+this algorithm can be used for all but the first of the steps
+corresponding to $\frak{s}$.
+
+In the first of many steps for $\frak{s}$,
+we must choose the right direction.
+Algorithm~\ref{alg:ElkiesFirstStep}
+takes the two candidates,
+chooses one arbitrarily,
+and computes its kernel explicitly.
+This costs $\softO(\ell)$ $\F_q$-operations
+using the Bostan--Morain--Salvy--Schost algorithm~\cite{BMSS08}
+with asymptotically fast polynomial arithmetic.
+Given the polynomial defining the kernel,
+we compute an element $Q$ of $\ker\phi_\frak{s}$
+over an extension of $\F_q$ of degree at most $\frac{\ell-1}{2}$,
+then evaluate $\pi(Q)$ and compare with $[\lambda]Q$.
+If this matches, then we have chosen the right direction;
+otherwise we take the other root of $P(X)$.
 %This is also the critical
 %part of Algorithm~\ref{alg:ElkiesNextStep}.
-Thus, the cost of Algorithm~\algstyle{ElkiesFirstStep}
-is $\softO(\ell\log q)$ field operations, and grows quasi-linearly with $\ell$.
 
-If one iterates the action of $\frak s$, an improvement is available.
-Indeed, the second part of the algorithm (Lines~\ref{line:kernel}
-to~\ref{line:end_direction}) determines which $j$-invariant
-between $j_1$ and $j_2$ gives the correct direction in the isogeny
-graph (recall Figure~\ref{fig:cycle}), and is only needed
-for the \emph{first} step since no return
-on the isogeny circle is made. After that, one should use the
-simpler \algstyle{ElkiesNextStep} algorithm (Algorithm~\ref{alg:ElkiesNextStep})
-remembering the previous curve. 
 Algorithm~\ref{alg:ElkiesWalk} (\algstyle{ElkiesWalk}) combines these two
 versions of Elkies steps to compute the iterated action of an ideal
 (at Line~\ref{line:twist}, if the curve does not have correct order, then
 its quadratic twist does).
-Note that Algorithm~\ref{alg:ElkiesNextStep} still has to compute the
-roots of a polynomial over $\F_q$, giving roughly the same computational
-cost as above.
+Both \algstyle{ElkiesFirstStep} and \algstyle{ElkiesFirstStep}
+cost $\softO(\ell\log q)$ field operations,
+with the dominant step in each being the calculation of the roots of $P(X)$.
+% and grows quasi-linearly with $\ell$.
+
 
 \paragraph{Vélu steps.}
-In contrast, Algorithm~\ref{alg:VéluStep} is not always valid.
+
+For some primes, we can completely avoid modular polynomials,
+and the costly computation of their roots,
+by constructing the kernel from torsion points.
+Algorithm~\ref{alg:VéluStep} is not always valid.
 The goal of this algorithm is to compute an element $Q\in\ker\phi_{\frak s}$,
 which exists over $\F_{q^r}$. To ensure success, $\ker\phi$
 must be the only line in $E[\ell]$ that is defined over $\F_{q^r}$;
@@ -1089,7 +1121,7 @@ easily described (Algorithm~\ref{alg:isogeny-KeyGen}).
 Algorithm~\ref{alg:isogeny-DH}
 completes a Diffie--Hellman key exchange
 by applying a combination of Elkies and Vélu walks
-(Algorithms~\ref{alg:ElkiesWalk} and~\ref{alg:VeluWalk}, respectively).
+(Algorithms~\ref{alg:ElkiesWalk} and~\ref{alg:VéluWalk}, respectively).
 
 \begin{algorithm}
     \caption{\algstyle{DH} for the isogeny graph on $\Ell_q(\O)$
