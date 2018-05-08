@@ -1967,10 +1967,10 @@ Experiments were conducted on a machine running a 3.2GHz Intel Xeon processor.
 
 First, consider the
 time to compute one step for an ideal $\frak s = (\ell,\pi-\lambda)$.
-Using \algstyle{ElkiesStep}, this is approximately
+Using Elkies steps, this is approximately
 the cost of finding the roots of the modular polynomial,
 which is roughly $0.017\cdot\ell$ seconds in our implementation.
-Using \algstyle{VéluStep}, the cost of a step is approximately
+Using Vélu steps, the cost of a step is approximately
 that of one scalar multiplication in $E(\F_{q^r})$.
 Table~\ref{tab:time-vs-r} lists per-step times in our implementation,
 for the extension degrees relevant to our parameters.
@@ -1990,7 +1990,7 @@ for the extension degrees relevant to our parameters.
     \label{tab:time-vs-r}
 \end{table}
 
-Using this data, finding efficient bounds $M_\ell$
+Using this data, finding efficient walk length bounds $M_\ell$
 offering a sufficient key space size is easily seen to be an
 integer optimization problem. In order to find a
 satisfactory solution, we used the following heuristic procedure.
@@ -2001,12 +2001,12 @@ Then, we look for the \emph{least $T$} such that
 $
 	\algstyle{KeySpaceSize}(T)\geq 2^{256}
 $
-according to Section~\ref{sec:sec}, using dichotomic search.
-While the bounds $M_\ell$
+(according to Section~\ref{sec:sec}), using dichotomic search.
+While the $M_\ell$
 we obtain are most likely not the best possible, intuitively
 the outcome does not fall very far from the optimal.
 
-In this way, we obtain a proposal for the bounds $M_\ell$
+In this way, we obtain a proposal for the walk length bounds $M_\ell$
 to be used in Algorithm~\ref{alg:isogeny-KeyGen}. Table~\ref{tab:VéluSteps}
 lists the isogeny degrees amenable to Algorithm~\ref{alg:VéluStep}, with
 the corresponding extension degree $r$ 
@@ -2014,7 +2014,7 @@ the corresponding extension degree $r$
 allows us to use both directions in the isogeny graph,
 as in Remark~\ref{rem:twist-trick}).
 Table~\ref{tab:ElkiesSteps}
-lists other primes for which we apply Algorithm~\algstyle{ElkiesStep}.
+lists other primes for which we apply Algorithm~\ref{alg:ElkiesWalk}.
 
 \begin{table}
     \centering
@@ -2126,7 +2126,7 @@ parameters would bring further improvement.
 
 \section{Conclusion}
 
-In this work, we demonstrated that the Couveignes-Rostovtsev-Stolbunov
+In this work, we demonstrated that the Couveignes--Rostovtsev--Stolbunov
 framework can be improved to become practical at standard pre- and
 post-quantum security levels, especially if an optimized C implementation
 is made. The main obstacle to better performances is the difficulty
