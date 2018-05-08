@@ -1459,7 +1459,7 @@ To understand Stage~0, recall that all isogenous elliptic curves have
 the same order, and thus the same trace $t$ of the Frobenius
 endomorphism $π$. Define the Frobenius discriminant $Δ_π=t^2-4q$, then
 $\End(E)$ is contained in the ring of integers $\O_K$ of
-$K=ℚ(\sqrt{Δ_π})$. Write $Δ_π=d^2Δ_K$, where $Δ_K$ is the
+$K=ℚ(\sqrt{Δ_π})$. If we write $Δ_π=d^2Δ_K$, where $Δ_K$ is the
 discriminant\footnote{$Δ_K$ is also called a \emph{fundamental
     discriminant}; it is in $\{0,1\}\bmod 4$, and either $Δ_K$ or
   $Δ_K/4$ is squarefree.} of $\O_K$, then for any $ℓ\mid d$ the
@@ -1482,10 +1482,10 @@ $\log q$.
   \begin{tikzpicture}
     \def\crater{7}
     \foreach \i in {1,...,\crater} {
-      \draw[fill] (360/\crater*\i:1cm) circle (5pt);
+      \draw[fill] (360/\crater*\i:1cm) circle (3pt);
       \draw (360/\crater*\i : 1cm) -- (360/\crater*\i+360/\crater : 1cm);
       \foreach \j in {-1,1} {
-        \draw[fill] (360/\crater*\i : 1cm) -- (360/\crater*\i + \j*360/\crater/4 : 2cm) circle (3pt);
+        \draw[fill] (360/\crater*\i : 1cm) -- (360/\crater*\i + \j*360/\crater/4 : 2cm) circle (2pt);
         \foreach \k in {-1,0,1} {
           \draw[fill] (360/\crater*\i + \j*360/\crater/4 : 2cm) --
           (360/\crater*\i + + \j*360/\crater/4 + \k*360/\crater/6 : 2.5cm) circle (1pt);
@@ -1499,20 +1499,21 @@ $\log q$.
   \label{fig:volcano}
 \end{figure}
 
-The class $\Ell_q(\O_K)$ is the smallest among all classes
+The set $\Ell_q(\O_K)$ has the smallest size among all sets
 $\Ell_q(\O)$ for $\O⊂\O_K$, so it is always interesting to
 reduce to it. This justifies using curves with maximal endomorphism
 ring in the definition of the protocol in
 Section~\ref{sec:keyex}. We remark that when $Δ_π$ is square-free, $ℤ[π]$
 is the maximal order, and hence this condition is automatically satisfied.
 
-The collision search in Stage~1 relies on the birthday paradox, thus
-it has a complexity of $O(\sqrt{h(\O_K)})$, where $h(\O_K)=\#\Ell_q(\O_K)$ is the
-class number of $\O_K$.  It is known that, on average,
+The collision search in Stage~1 relies on the birthday paradox, and
+has a complexity of $O(\sqrt{h(\O_K)})$.
+ %where $h(\O_K)=\#\Ell_q(\O_K)$ is the class number of $\O_K$.
+It is known that, on average,
 $h(\O_K)≈0.461\cdots\sqrt{|Δ_K|}$ (see~\cite[5.10]{Cohen1993}), and,
 assuming the extended Riemann hypothesis, we even have a lower bound
 (see~\cite{littlewood1928class})
-\[h(\O_K) ≥ 0.147\cdots\frac{(1+o(1))\sqrt{|Δ_K|}}{\log\log|Δ|}.\]
+\[h(\O_K) ≥ 0.147\cdots\frac{(1+o(1))\sqrt{|Δ_K|}}{\log\log|Δ_K|}.\]
 Since $Δ_K\sim q$, we expect Stage~1 to take time $O(q^{1/4})$,
 thus justifying the choice of a $q$ four times as large as the
 security parameter.  Unfortunately, class numbers are notoriously
@@ -1520,7 +1521,7 @@ difficult to compute, the current record being
 for a discriminant of 300 bits~\cite{10.1007/978-3-642-14081-5_15}.
 Computing the class
 number for a discriminant of ${\sim 500}$ bits seems to be expensive,
-albeit feasible; thus, we will only rely on these heuristic arguments
+albeit feasible; thus, we can only rely on these heuristic arguments
 to justify the security of our proposed parameters.
 % todo: check this is really the latest record
 
@@ -1635,7 +1636,8 @@ the class group of $\O$, $\Ell_q(\O)$ is the (non-empty) set of
 elliptic curves with complex multiplication by $\O$, and $E_0$ is a
 fixed curve in $\Ell_q(\O)$. Finally, $S$ is a set of ideals of $\O$
 with norm polynomial in $\log q$, and $σ$ is a probability
-distribution on $S^*$, used to sample secrets in the key exchange
+distribution on the set $S^*$ of isogeny walks (i.e. finite
+sequences of elements in $S$) used to sample secrets in the key exchange
 protocol.
 
 The assumption needed to prove security of the protocols is 
@@ -1701,7 +1703,8 @@ advantage. The only technical difficulty lies in the fact that we need
 an efficient way to simulate the uniform distribution on $\Ell_q(\O)$;
 for this, we use another Cayley graph on $\Ell_q(\O)$, potentially
 with a larger edge set, that is proven
-in~\cite{jao+miller+venkatesan09} to be an expander.
+in~\cite{jao+miller+venkatesan09} to be an expander graph
+under the generalized Riemann hypothesis (GRH).
 
 We let $\Adv[A]{IW-DDH}$ be the \emph{advantage} of an adversary $A$
 against IW-DDH, defined as the probability that $A$ answers correctly,
@@ -1776,7 +1779,7 @@ Finally, we define an analogue of the classic
 Computational Diffie--Hellman (CDH) problem for groups.
 Using the same techniques as above, we can prove the
 security of the relevant protocols based only on CGA-CDH and IWD,
-\emph{without} the generalized Riemann hypothesis.
+without the generalized Riemann hypothesis.
 
 \begin{definition}[Class Group Action CDH (CGA-CDH)]
   Given curves $E_a=\frak a·E_0$ and $E_b=\frak b·E_0$, with
@@ -1854,7 +1857,7 @@ notions than IND-CPA.  From the DLP assumption, it is easy to
 construct protocols with strong security against active adversaries.
 For example, it is well known that the hashed El Gamal KEM achieves
 IND-CCA security in the random oracle model under various
-assumptions~\cite[§7]{10.1007/3-540-45353-9_12,cryptoeprint:1999:007,doi:10.1137/S0097539702403773}.
+assumptions~\cite{10.1007/3-540-45353-9_12,cryptoeprint:1999:007,doi:10.1137/S0097539702403773}.
 
 All of these constructions crucially rely on \emph{key validation}, 
 i.e.\ Alice must verify that the public data sent by Bob defines valid
