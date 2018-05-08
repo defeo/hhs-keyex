@@ -374,7 +374,7 @@ When we restrict to isogenies defined over $\F_q$,
 the picture becomes more complex.  
 If $E$ and $E'$ are elliptic curves over $\F_q$,
 then an isogeny $ϕ:E→E'$ is defined over $\F_q$
-(maybe up to a twist of $E'$) %% todo BS: I don't think there's a twist here
+(up to a twist of $E'$)
 if and only if the Frobenius endomorphism $\pi$ on $E$ stabilizes $\ker ϕ$.
 We emphasize that the points in $\ker\phi$ need not
 be defined over $\F_q$ themselves.
@@ -1372,7 +1372,7 @@ In our implementation, we used $N = 17$.
 \paragraph{Results.}
 We implemented this search using the Sage computer algebra system.
 Our experiments were conducted on several machines running
-Intel Xeon E5520 processors at 2.27GHz. %todo: more details
+Intel Xeon E5520 processors at 2.27GHz.
 After 17,000 hours of CPU time, we found the Montgomery elliptic curve 
 $
 	E : y^2 = x^3 + A x^2 + x
@@ -1844,8 +1844,6 @@ adversaries using at most $t$ resources (running time, queries, etc.).
 	expander graphs (for instance, an easy adaptation of the proof
 	of~\cite[Lemma~2.1]{jao+miller+venkatesan09}), to sample $E_c$ so
     that any curve in $\Ell_q(\O)$ is taken with probability between
-    % todo: Jean, you mentioned that you could get closer to the uniform
-    % distribution by lengthening the walks?
     $(1-\epsilon)/h(\O)$ and $(1+\epsilon)/h(\O)$,
 	using only $\poly(\log q, \log\epsilon)$ operations.
 	We can consider this sampling as follows:
@@ -2099,7 +2097,6 @@ the computer algebra package Nemo~\cite{nemo},
 to implement basic functionalities
 for elliptic curves over finite fields~\cite{package}.
 Experiments were conducted on a machine running a 3.2GHz Intel Xeon processor.
-%todo: more details ?
 
 First, consider the
 time to compute one step for an ideal $\frak s = (\ell,\pi-\lambda)$.
