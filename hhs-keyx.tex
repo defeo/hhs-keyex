@@ -1151,8 +1151,13 @@ by applying a combination of Elkies and Vélu walks
 (Algorithms~\ref{alg:ElkiesWalk} and~\ref{alg:VéluWalk}, respectively).
 
 \begin{algorithm}
-    \caption{\algstyle{DH} for the isogeny graph on $\Ell_q(\O)$
-        with primes in $S$}
+    \caption{%
+        \algstyle{DH} for the isogeny graph on $\Ell_q(\O)$
+        with primes in $S$.
+        Public key validation is not included here,
+        but (if desired) should be carried out 
+        as detailed in Section~\ref{sec:validation}.
+    }
     \label{alg:isogeny-DH}
     \Input{%
         A private key \((k_\ell)_\ell\)
@@ -1163,7 +1168,7 @@ by applying a combination of Elkies and Vélu walks
         A shared secret $j(\prod_{i=1}^n\frak{s_i}\cdot E_B)$
     }
     %
-    $E \gets \algstyle{EllipticCurveFromjInvariant}(j_B)$
+    $E \gets \algstyle{EllipticCurveFromJInvariant}(j_B)$
     \;
     %
     \If{\textbf{not} $\algstyle{CheckTrace}(E,t)$}{%
@@ -1408,11 +1413,11 @@ of our key-exchange protocol using this curve as system parameter.
 We now address the security of the CRS primitive, and derived
 protocols. Intuitively, these systems rely on two assumptions:
 \begin{enumerate}
-\item Given two elliptic curves $E,E'$ in $\Ell_q(\O)$, it is hard to
-  find a (smooth degree) isogeny $ϕ:E→E'$;
-\item The distribution on $\Ell_q(\O)$ induced by the random walks
-  sampled in Algorithm~\ref{alg:isogeny-KeyGen} is computationally
-  undistinguishable from the uniform distribution.
+    \item given two curves $E$ and $E'$ in $\Ell_q(\O)$, it is hard to
+        find a (smooth degree) isogeny $ϕ:E→E'$; and
+    \item the distribution on $\Ell_q(\O)$ induced by the random walks
+        sampled in Algorithm~\ref{alg:isogeny-KeyGen} is computationally
+        undistinguishable from the uniform distribution.
 \end{enumerate}
 
 We start by reviewing the known attacks for the first problem, both in
@@ -1841,6 +1846,7 @@ parameters than those provided by GRH.
 
 
 \subsection{Key validation and active security}
+\label{sec:validation}
 
 Modern practice in cryptography mandates the use of stronger security
 notions than IND-CPA.  From the DLP assumption, it is easy to
@@ -2153,16 +2159,20 @@ parameters would bring further improvement.
 
 \section{Conclusion}
 
-In this work, we demonstrated that the Couveignes--Rostovtsev--Stolbunov
+We have shown that the Couveignes--Rostovtsev--Stolbunov
 framework can be improved to become practical at standard pre- and
 post-quantum security levels, especially if an optimized C implementation
-is made. The main obstacle to better performances is the difficulty
-to generate efficient system parameters: even with lots of computational
-power, one cannot expect doing \emph{only} Vélu steps. In this regard,
-the CSIDH protocol~\cite{csidh}, which overcomes this problem using
+is made. 
+The main obstacle to better performance 
+is the difficulty of generating optimal system parameters:
+even with a lot of computational power,
+we cannot expect to produce ordinary curve parameters
+that allow us to use \emph{only} Vélu steps. 
+In this regard, the CSIDH protocol~\cite{csidh}, 
+which overcomes this problem using
 supersingular curves instead of ordinary ones, is promising.
 
-A particularly nice feature of our protocol is its key validation property,
+One particularly nice feature of our protocol is its key validation property,
 that opens a lot of cryptographic doors. However, side-channel-resistant
 implementations remain an interesting problem for future work.
 
