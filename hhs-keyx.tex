@@ -1123,8 +1123,10 @@ appearing in $S_{VV}$ and $S_{VE}$, where Vélu steps can be applied.
 We will return to the problem of choosing $S$ and the bounds $M_\ell$ later,
 once we have discussed the security of isogeny walk schemes.
 
+Algorithm~\ref{alg:isogeny-KeyGen} (\algstyle{KeyGen})
+implements key generation following the above scheme.
 In terms of our encodings,
-this means that a secret key assigns 
+the secret key assigns 
 \begin{itemize}
     \item
         an exponent in 
@@ -1137,9 +1139,6 @@ this means that a secret key assigns
         (we do not use the much slower $\mu$ direction for these
         primes).
 \end{itemize}
-But assuming these parameters have been properly chosen,
-Algorithm~\ref{alg:isogeny-KeyGen} (\algstyle{KeyGen})
-implements key generation for the resulting cryptographic schemes.
 
 \begin{algorithm}
     \caption{%
