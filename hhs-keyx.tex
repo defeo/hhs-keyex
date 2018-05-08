@@ -2117,6 +2117,21 @@ our ideas thus bring an improvement by a factor of over 2 over the
 original protocol. A longer search for efficient public
 parameters would bring further improvement.
 
+\section{Conclusion}
+
+In this work, we demonstrated that the Couveignes-Rostovtsev-Stolbunov
+framework can be improved to become practical at standard pre- and
+post-quantum security levels, especially if an optimized C implementation
+is made. The main obstacle to better performances is the difficulty
+to generate efficient system parameters: even with lots of computational
+power, one cannot expect doing \emph{only} Vélu steps. In this regard,
+the CSIDH protocol~\cite{csidh}, which overcomes this problem using
+supersingular curves instead of ordinary ones, is promising.
+
+A particularly nice feature of our protocol is its key validation property,
+that opens a lot of cryptographic doors. However, side-channel-resistant
+implementations remain an interesting problem for future work.
+
 
 \bibliographystyle{splncs04}
 \bibliography{refs}
