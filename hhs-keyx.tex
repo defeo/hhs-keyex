@@ -1213,9 +1213,9 @@ setting as we will see in Section~\ref{sec:sec}.
 
 In this section, we describe how to use the Schoof--Elkies--Atkin (SEA) point counting
 algorithm with early abort, combined with the use of certain modular curves,
-to construct curves whose cardinality satisfies some constraints
+to construct curves whose order satisfies some constraints
 modulo small prime.
-This is faster than choosing curves at random and computing their cardinalities
+This is faster than choosing curves at random and computing their orders
 completely until a convenient one is found, but still does not allow us
 to use the full power of Algorithm~\algstyle{VéluStep}.
 
@@ -1226,6 +1226,7 @@ point counting on elliptic curves over a finite field. In order to compute
 $N = \# E(\F_p)$, it computes the value of $N$ modulo a series
 of small primes $\ell$, before combining the results via the CRT
 to get the true value of $N$.
+
 Cryptographers are usually interested in generating elliptic curves of
 prime or nearly prime order. In this case, we use an \emph{early-abort}
 mechanism: as soon as we detect $N \equiv 0\pmod{\ell}$ for some $\ell$, the algorithm is aborted
@@ -1239,7 +1240,7 @@ To fix ideas, we choose the 512-bit prime
 \]
 Then, according to section~\ref{sec:keyex}, Algorithm~\algstyle{VéluStep} can be used
 for $\ell$-isogenies with $r=1$ in both directions if and only if
-$N := \# E(\F_p)$ satisfies $N \equiv0\pmod{\ell}$.
+$\# E(\F_p) \equiv0\pmod{\ell}$, for any prime $\ell\leq 380$.
 We now proceed as follows:
 \begin{itemize}
 \item Choose a smoothness bound $B$ (we used $B = 13$).
@@ -1261,7 +1262,7 @@ incorporates the test of existence of a Montgomery model for the
 elliptic curve as in~\cite{OKS00}.
 
 \paragraph{Finding the maximal order.}
-Once such a curve $E_1$ has been computed, it is important to find a curve
+Once such a curve $E_1$ has been computed, we want to find a curve
 $E_0$ having the same number of points, but whose endomorphism ring is maximal, and
 to ensure that its discriminant is a large integer. Therefore, we attempt to
 factor the discriminant $Δ_\pi$ of $\Z[\pi]$: if it is squarefree,
@@ -1270,13 +1271,13 @@ factors of $Δ_\pi$ indicate which isogeny volcanoes have to be climbed up
 in order to find $E_0$.
 
 \begin{remark}
-    Factoring random 512-bit integers is not hard, and quadratic discriminants
-    tend to be slightly smoother than random integers
-    (it took less then one hour of GMP-ECM on 10 cores 
-    to factor the 512-bit discriminant given at the end of this section).
-    %todo: which hardware ?
-    A conservative strategy would be to discard any discriminant 
-    that cannot be completely factored,
+    Factoring random 512-bit integers is not hard in general, and quadratic discriminants
+    even tend to be slightly smoother than random integers.
+    %(it took less then one hour of GMP-ECM on 10 cores 
+    %to factor the 512-bit discriminant given at the end of this section).
+    %%todo: which hardware ?
+    In case of failure when a discriminant cannot be completely factored,
+		a conservative strategy would be to discard it,
     but ultimately undetected large prime-square factors
     do not present a security issue
     because computing the possible corresponding large-degree isogenies 
@@ -1328,7 +1329,7 @@ for each $\ell$ in
   \{3, 5, 7, 11, 13, 17, 103, 523, 821, 947, 1723\}
   \,;
 \]
-each of these primes is Elkies.
+in particular each of these primes is Elkies.
 Furthermore, $\End(E)$ is the maximal order, and its discriminant is
 a 511-bit integer that has the following prime factorization:
 \[
@@ -1338,11 +1339,9 @@ a 511-bit integer that has the following prime factorization:
 & \scriptstyle \cdot 68495197685926430905162211241300486171895491480444062860794276603493\,.
 \end{aligned}
 \]
-
 Other proposals for public parameters are given in~\cite{memoire}.
-In the sequel, we will argue that using this curve brings a 128-bit security level
-in the classical as well as quantum setting, and we give running times of the whole
-scheme in our implementation.
+In Section~\ref{sec:exp}, we discuss the practical performances
+of our key-exchange protocol using this curve as system parameter.
 
 \section{Security}
 \label{sec:sec}
