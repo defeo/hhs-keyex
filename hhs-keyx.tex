@@ -330,9 +330,13 @@ an elliptic curve $E/G$ and an $\ell$-isogeny $\phi: E \to E/G$
 such that $\ker \phi = G$,
 and the curve and isogeny are unique up to isomorphism.
 In particular, if $\phi$ is separable then $\deg ϕ=\#\ker ϕ$.
-It follows
-that any isogeny of degree greater than $1$ can be factored as a
-composition of cyclic isogenies of prime degree.
+%It follows
+%that any isogeny of degree greater than $1$ can be factored as a
+%composition of cyclic isogenies of prime degree.
+\footnote{In practice, it is convenient to encode $\ker\phi$ as
+	a polynomial vanishing on the $x$-coordinates of the points
+	in $\ker\phi$, called the \emph{kernel polynomial} of $\phi$.
+}
 
 For any $ℓ$-isogeny $ϕ:E→E'$, there is a unique $ℓ$-isogeny
 $\hat{ϕ}:E'→E$ such that $ϕ∘\hat{ϕ} = [\ell]$ on $E'$
@@ -1003,7 +1007,7 @@ then the $t_r$ satisfy the standard recurrence
 $t_r = t\cdot t_{r-1} - q\cdot t_{r-2}$. 
 
 Computing the quotient curve at Line~\ref{line:quotient} is easily done
-with Vélu's formulas~\cite{Velu71} using $O(\ell)$ operations in $\F_q$.
+with Vélu's formul\ae~\cite{Velu71} using $O(\ell)$ operations in $\F_q$.
 Since $\log C_r\simeq r\log q$, provided $\ell = O(\log q)$,
 the costly step in Algorithm~\ref{alg:VéluStep} is the scalar
 multiplication at Line~\ref{line:scalarmult}, which costs
@@ -1032,7 +1036,7 @@ In practice, Algorithm~\ref{alg:VéluStep} can be improved
 by using elliptic curve models with more efficient arithmetic;
 we use Montgomery arithmetic here~\cite{Montgomery87,CostelloSmith2017},
 without computing $y$-coordinates. This model also
-offers convenient Vélu formulas~\cite{Renes2018}.
+offers convenient Vélu formul\ae~\cite{Renes2018}.
 %On the other hand, the Weierstrass model is classical and universal, 
 %and is usually the considered model in the literature
 %about isogeny computations.
@@ -2014,11 +2018,11 @@ for the extension degrees relevant to our parameters.
 \end{table}
 
 Using this data, finding efficient walk length bounds $M_\ell$
-offering a sufficient key space size is easily seen to be an
+offering a sufficient keyspace size is easily seen to be an
 integer optimization problem. In order to find a
 satisfactory solution, we used the following heuristic procedure.
 Given a time bound $T$, let \algstyle{KeySpaceSize}$(T)$ be
-the key space size obtained when each $M_\ell$ is the greatest such
+the keyspace size obtained when each $M_\ell$ is the greatest such
 that the \emph{total time spent on $\ell$-isogenies} is less than $T$.
 Then, we look for the \emph{least $T$} such that
 $
