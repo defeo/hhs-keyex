@@ -91,41 +91,49 @@
 \label{sec:introduction}
 
 A recent trend in cryptography is the development of quantum-safe
-cryptosystems: protocols based on mathematical problems not known to
+cryptosystems, that are based on mathematical problems not known to
 be solvable in polynomial time by quantum computers. With Shor's
 algorithm~\cite{shor1994algorithms} ruling out systems based on
 integer factorization or discrete logarithms, NIST has launched a
 process to standardize the next generation of \emph{post-quantum}
-public key cryptosystems~\cite{NIST2016}. In response, NIST has
-received 69 proposals, most of them belonging to the three more
-popular post-quantum families: lattice-based systems, code-based
-systems, and multivariate systems. Among the youngest and least
-explored families, \emph{isogeny-based} cryptography features only one
+public key cryptosystems~\cite{NIST2016}. Among the youngest and least
+explored post-quantum families, \emph{isogeny-based} cryptography features only one
 proposal to the NIST competition: the Supersingular Isogeny Key
 Encapsulation (SIKE)~\cite{SIKE}.
-
 SIKE is based upon the key-exchange protocol by Jao and De
 Feo~\cite{jao+defeo2011}, known as SIDH, itself inspired by earlier
 key-exchange constructions by Couveignes~\cite{cryptoeprint:2006:291}
 and Rostovtsev and
-Stolbunov~\cite{rostovtsev+stolbunov06,stolbunov-red,Stol}. The
-origins of isogeny-based cryptography can be traced back to
+Stolbunov~\cite{rostovtsev+stolbunov06,stolbunov-red,Stol}.
+
+The origins of isogeny-based cryptography can be traced back to
 Couveignes' seminal work ``Hard Homogeneous Spaces'', that went
 unpublished for ten years before appearing
 in~\cite{cryptoeprint:2006:291}. 
-
 A \emph{principal homogeneous space} for a group $G$ is a set $X$ with an
-action of $G$ on $X$ such that for any $x∈X$ the map $φ_x:g↦g·x$ is an
-isomorphism between $G$ and $X$. Intuitively, one can think of $X$ as
-a copy (or, rather, many different copies) of $G$ where
-the identity element has been forgotten. 
-
+action of $G$ on $X$ such that for any $x,x'\in X$, there is a
+unique $g\in G$ such that $g\cdot x = x'$. Equivalently,
+the map $\phi_x: g\mapsto g\cdot x$
+is a bijection between $G$ and $X$ for any $x\in X$.
 Couveignes defines a \emph{hard homogeneous space} (HHS) 
 to be a principal homogeneous space 
 where the action of $G$ on $X$ is efficiently computable, 
 but inverting the isomorphism $φ_x$ is computationally hard for any $x$.
-Algorithm~\ref{alg:HHS-KeyGen} generates private-public keypairs
-for cryptosystems based on the hardness of inverting $\varphi_x$.
+Any HHS $X$ for an \emph{abelian} group $G$ can be used to construct a
+key exchange based on the hardness of inverting $\varphi_x$,
+as shown in Algorithms~\ref{alg:HHS-KeyGen} and~\ref{alg:HHS-DH}.
+If Alice and Bob have keypairs $(g_A,x_A)$
+and $(g_B,x_B)$, respectively,
+then the commutativity of $G$
+lets them derive a shared secret
+\[
+    \DH(g_A,x_B) 
+    = g_A\cdot g_B\cdot x_0 
+    = g_B\cdot g_A\cdot x_0
+    = \DH(g_B,x_A)
+    \,.
+\]
+The analogy with classic group-based Diffie--Hellman is evident.
 
 \begin{algorithm}
     \caption{Key generation for cryptosystems in an HHS $X$ for a
@@ -143,21 +151,6 @@ for cryptosystems based on the hardness of inverting $\varphi_x$.
     }
 \end{algorithm}
 
-Any HHS $X$ for an abelian group $G$ can be used to construct a
-key exchange as shown in Algorithm~\ref{alg:HHS-DH}.
-If Alice and Bob have keypairs $(g_A,x_A)$
-and $(g_B,x_B)$, respectively,
-then the commutativity of $G$
-lets them derive a shared secret
-\[
-    \DH(g_A,x_B) 
-    = g_A\cdot g_B\cdot x_0 
-    = g_B\cdot g_A\cdot x_0
-    = \DH(g_B,x_A)
-    \,.
-\]
-The analogy with classic group-based Diffie--Hellman is evident.
-
 \begin{algorithm}
     \caption{Diffie--Hellman in an HHS $X$ for a group $G$}
     \label{alg:HHS-DH}
@@ -172,24 +165,9 @@ The analogy with classic group-based Diffie--Hellman is evident.
 \end{algorithm}
 
 
-%\begin{algorithm}
-%  \caption{Generic key exchange from a hard homogeneous space}
-%  \label{proto:hhs}
-%  \Params{A \emph{base point} $x_0∈X$}
-%  \Alice{
-%    \Samples a random element $a∈G$\;
-%    \Sends $x_a = a·x_0$ to Bob}
-%  \Bob{
-%    \Samples a random element $b∈G$\;
-%    \Sends $x_b = b·x_0$ to Alice}
-%  \Key{$a·x_b = b·x_a = ab·x_0$}
-%\end{algorithm}
-
-
-If $X$ is a
-cyclic group $〈x〉$ of order $p$, and $G=ℤ/pℤ$ acting on $X$ by
-$g·x=x^g$, then %this is simply the Diffie--Hellman key exchange, and %% <- BS: nope!
-inverting $φ_x$ is the discrete logarithm problem (DLP) in $X$.
+For instance, if $X$ is a
+cyclic group $〈x〉$ of order $p$, and $G=(\Z/p\Z)^*$ acts on $X\setminus\{1\}$ by
+$g·x=x^g$, then inverting $φ_x$ is the discrete logarithm problem (DLP) in $X$.
 But for other homogeneous spaces, inverting $φ_x$ may have no relationship
 with any DLP,
 and might resist attacks based on Shor's algorithm in the quantum setting.
@@ -215,11 +193,12 @@ Rostovtsev and Stolbunov advertised their protocols as a potential
 post-quantum candidates, leading Childs, Jao and Soukharev to introduce
 the first subexponential quantum algorithm capable of breaking
 them~\cite{childs2014constructing}. Hence, being already slow enough to
-be impractical in a classical security setting, the
-Rostovtsev--Stolbunov primitive became even more unusable in a quantum
-security setting. This led Jao and De Feo to create the SIDH
-key-exchange protocol~\cite{jao+defeo2011}, which to the present day
-is not victim to any subexponential attack.
+be impractical in a classical security setting, their
+primitive became even more unusable in a quantum
+security setting.
+%This led Jao and De Feo to create the SIDH
+%key-exchange protocol~\cite{jao+defeo2011}, which to the present day
+%is not victim to any subexponential attack.
 
 The aim of the present paper is to improve and modernize the
 Couveignes--Rostovtsev--Stolbunov (CRS) construction, borrowing
@@ -228,19 +207,18 @@ making it usable in a post-quantum setting.  Our main contributions
 are in Sections~\ref{sec:keyex}--\ref{sec:initcurve}, where we present
 a new, more efficient way of computing the CRS group action, and in
 Section~\ref{sec:sec} where we give precise classic and quantum
-security estimates, we formalize hardness assumptions, and sketch
-security proofs in models stronger than what was previously
-considered.
+security estimates, formalize hardness assumptions, and sketch
+security proofs in stronger models than what was previously
+considered. We also discuss the cryptographic advantages
+that this primitive has over SIDH.
 Finally, in Section~\ref{sec:exp} we present a
 proof-of-concept implementation and measure its performance.
 
 
 
-Although the final result is far from being practical, we believe it
+Although the final result is far from being competitive, we believe it
 constitutes progress in the direction of having a valid isogeny-based
-alternative to SIDH.  Furthermore, the CRS primitive presents some
-distinct advantages over SIDH, that we shall discuss in
-Section~\ref{sec:sec}. 
+alternative to SIDH.
 
 \paragraph{CSIDH.}
 While preparing this paper we were informed of
