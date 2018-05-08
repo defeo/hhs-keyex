@@ -1553,38 +1553,81 @@ hard to estimate the impact of this attack at concrete security levels
 such as those required by NIST~\cite{NIST2016}. Nevertheless, we
 remark that the weaker version of Kuperberg's algorithm described
 in~\cite[§2.1]{regev04}, requires about $2^{\sqrt{8\log q}}$ queries
-to the black box; this number can be taken as a very conservative
-lower bound, given that the described algorithm is specific to
-$h(O_K)=2^n$, and also because Regev's algorithm, with its polynomial
+to the black box, and was improved by Regev to use only polynomial
+storage requirement at the cost of some overhead.
+Kuperberg designed more efficient versions of his algorithm~\cite{todo};
+however this number can be taken as a very conservative
+lower bound,
+%, given that the described algorithm is specific to $h(O_K)=2^n$, and also 
+because Regev's algorithm, with its polynomial
 storage requirement, is a much more realistic candidate to run on a
-real world quantum computer. By taking into account the fact that each
-black box query runs a quantum circuit of subexponential size itself,
-we estimate that the lower bound on the number of quantum gates is at
-least the square of the lower bound on the number of quantum
-queries. Based on these observations, we propose in
-Table~\ref{tab:sizes} parameter sizes matching three of the NIST
-categories~\cite{NIST2016}.
-According to this table, the public parameters we proposed
-in Section~\ref{sec:initcurve} fit in NIST category~2.
+real-world quantum computer. Generalizing Regev's ideas to more
+efficient
+versions of Kuperberg's algorithm largely remain an open problem.
+
+Since the structure of the class group is available to an
+attacker with subexponential amounts of resources, it is possible
+that a black box query could be done in polynomial time using
+LLL-based methods~\cite{todo}. Thus, a conservative approach is to
+ignore the cost of the oracle queries altogether.
+
+%By taking into account the fact that each
+%black box query runs a quantum circuit of subexponential size itself,
+%we estimate that the lower bound on the number of quantum gates is at
+%least the square of the lower bound on the number of quantum
+%queries.
+Based on these observations, we propose in
+Table~\ref{tab:sizes} three parameter sizes and associated numbers
+of quantum queries. While their quantum security in NIST's sense~\cite{NIST2016}
+would only allow them to fit in poor NIST categories, we believe that query
+complexity alone gives confidence in the post-quantum security properties
+of our scheme.
+%matching three of the NIST
+%categories~\cite{NIST2016}.
+%According to this table, the public parameters we proposed
+%in Section~\ref{sec:initcurve} fit in NIST category~2.
+
+The system parameters we proposed in Section~\ref{sec:initcurve}
+correspond to the first line of Table~\ref{tab:sizes}, thus offering 64-bit
+quantum query complexity.
+
+%\begin{table}
+    %\renewcommand{\arraystretch}{1.4}
+    %\centering
+    %\begin{tabular}{c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c}
+        %$\log Δ_K$ & $\log h(\O_K)$
+        %& \parbox{10ex}{\centering classical security}
+        %& \parbox{10ex}{\centering quantum queries}
+        %& \parbox{10ex}{\centering quantum security}
+        %& \parbox{10ex}{\centering NIST category}\\
+        %\hline
+        %$512$  & $256$ & $2^{128}$ & $> 2^{64}$ & $2^{128}$ & 2\\
+        %$768$  & $384$ & $2^{192}$ & $> 2^{78}$ & $> 2^{156}$ & 3\\
+        %$1024$ & $512$ & $2^{256}$ & $> 2^{90}$ & $> 2^{180}$ & 5
+        %\\
+        %\hline
+    %\end{tabular}
+    %\smallskip
+    %\caption{Suggested parameter sizes at different security levels.}
+    %\label{tab:sizes}
+%\end{table}
 
 \begin{table}
     \renewcommand{\arraystretch}{1.4}
     \centering
-    \begin{tabular}{c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c}
+    \begin{tabular}{c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c}
         $\log Δ_K$ & $\log h(\O_K)$
         & \parbox{10ex}{\centering classical security}
-        & \parbox{10ex}{\centering quantum queries}
-        & \parbox{10ex}{\centering quantum security}
-        & \parbox{10ex}{\centering NIST category}\\
+        & \parbox{10ex}{\centering quantum queries} \\
         \hline
-        $512$  & $256$ & $2^{128}$ & $> 2^{64}$ & $2^{128}$ & 2\\
-        $768$  & $384$ & $2^{192}$ & $> 2^{78}$ & $> 2^{156}$ & 3\\
-        $1024$ & $512$ & $2^{256}$ & $> 2^{90}$ & $> 2^{180}$ & 5
+        $512$  & $256$ & $2^{128}$ & $> 2^{64}$ \\
+        $768$  & $384$ & $2^{192}$ & $> 2^{78}$ \\
+        $1024$ & $512$ & $2^{256}$ & $> 2^{90}$
         \\
         \hline
     \end{tabular}
     \smallskip
-    \caption{Suggested parameter sizes at different security levels.}
+    \caption{Suggested parameter sizes and associated query complexities.}
     \label{tab:sizes}
 \end{table}
 
