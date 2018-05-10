@@ -1,6 +1,6 @@
 using Nemo
 #using Primes
-import EllipticCurves: ShortWeierstrass, Montgomery, Point, XZPoint, unsafe_kernelpoly, j_invariant, coordinates, projective_scalar_mul, base_extend, xdouble, xadd, isinfinity
+import EllipticCurves: ShortWeierstrass, Montgomery, Point, XZPoint, unsafe_kernelpoly, j_invariant, from_j_invariant, coordinates, projective_scalar_mul, base_extend, xdouble, xadd, xinfinity, isinfinity, normalized
 
 include("bipolys.jl")
 include("c_libs.jl")
@@ -13,15 +13,15 @@ Degree = UInt64
 
 struct VeluPrimeData
     max_steps::UInt16
-    ev_right::Degree
-    ev_left::Nullable{Degree}
     ev_order::UInt16
+    use_left::Bool
+    use_right::Bool
 end
 
 struct ElkiesPrimeData
     max_steps::UInt16
-    ev_right::Degree
     ev_left::Degree
+    ev_right::Degree
     mod_pol::BiPoly
 end
 
@@ -168,22 +168,34 @@ function VeluWalk(E::Montgomery,
         prime_data = params.velu_primes[ell]
         ext = prime_data.ev_order
         if ext == 1
-            Fext, Cardext = params.Fp, params.order
+            Fext, ord = params.Fp, params.order
         else
-            Fext, Cardext = params.FpExts[ext]
+            Fext, ord = params.FpExts[ext]
+        end
+        
+        # correct if we use points on the twist
+        if dir == left
+            @assert prime_data.use_left
+            legendre = 1
+        else
+            @assert prime_data.use_right
+            legendre = -1
+            ord = 2*p^Int(ext) + 2 - ord
         end
 
         # Start walking
         for step in 1:steps
-            # TODO: support other direction
 	    Eext = base_extend(E, Fext)
-            # TODO: improve this
-            cofactor = div(Cardext, ell)
-            legendre = 1
-            P = XZPoint(zero(Fext), zero(Fext), Eext)
-            while legendre == -1 || isinfinity(P) || !isinfinity(ell*P)
-                P = cofactor*XZPoint(rand(Fext), one(Fext), Eext)
-                legendre = ((P.X^3 + Eext.A*P.X^2 + P.X)*Eext.B)^div(order(Fext) - 1, 2)
+            cofactor = div(ord, ell)
+            P = xinfinity(Eext)
+            i = 1
+            while isinfinity(P) || !isinfinity(ell*P)
+                P = XZPoint(gen(Fext) + i, one(Fext), Eext)
+                i += 1
+                if (P.X*(P.X^2 + Eext.A*P.X + 1)*Eext.B)^div(order(Fext) - 1, 2) != legendre
+                    continue
+                end
+                P = cofactor*P
             end
             Q, R = P, xdouble(P)
             σ = σ1 = zero(Fext)
@@ -217,9 +229,7 @@ function Walk(params::SystemParams, key::Dict{T, Tuple{Direction, T}}) where T <
     end
     j = j_invariant(E)
     for (ell, (dir, steps)) in elkies
-        a = -j * (j - 1728)
-        b = -a * (j - 1728)
-        E = ShortWeierstrass(3*a, 2*b)
+        E = from_j_invariant(j)
         j = ElkiesWalk(E, ell, dir, steps, params)
     end
     return j

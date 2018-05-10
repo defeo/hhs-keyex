@@ -3,6 +3,6 @@ julia:
   - release
   - nightly
 script:
-  - julia -e 'Pkg.add("Nemo");Pkg.add("Primes");Pkg.clone("https://github.com/defeo/ClassPolynomials.jl"); Pkg.clone("https://github.com/defeo/EllipticCurves.jl")'
+  - julia -e 'Pkg.add("Nemo");Pkg.add("Primes");Pkg.clone("https://github.com/defeo/ClassPolynomials.jl"); Pkg.build("ClassPolynomials"); Pkg.clone("https://github.com/defeo/EllipticCurves.jl")'
   - cd implementation
   - julia runtests.jl

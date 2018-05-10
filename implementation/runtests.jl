@@ -14,40 +14,39 @@ include("keyex.jl")
 p = ZZ(101)
 Fp, _ = FiniteField(p, 1, "u")
 FpX, X = PolynomialRing(Fp, "X")
-E = ShortWeierstrass(Fp(30), Fp(2))
-M = Montgomery(Fp(34), Fp(2))
+E = ShortWeierstrass(Fp(36), Fp(95))
+M = Montgomery(Fp(34), Fp(1))
+ord = ZZ(120)
 params = SystemParams(p, Fp, Dict(
-    2 => (FiniteField(p, 2, "u")[1], 10080),
-    3 => (FiniteField(p, 3, "u")[1], 1029924),
-    4 => (FiniteField(p, 4, "u")[1], 104065920),
-    5 => (FiniteField(p, 5, "u")[1], 10510238004),
-    6 => (FiniteField(p, 6, "u")[1], 1061522068320),
-    7 => (FiniteField(p, 7, "u")[1], 107213555841924),
-    8 => (FiniteField(p, 8, "u")[1], 10828567233953280),
-    9 => (FiniteField(p, 9, "u")[1], 1093685273798712084),
-), FpX, M, ZZ(84), Dict(
-    3  => VeluPrimeData(1, 1, 2, 1),
-    7  => VeluPrimeData(1, 1, 3, 1),
-    61 => VeluPrimeData(1, 47, 32, 3),
-    67 => VeluPrimeData(1, 48, 37, 3),
+    i => (FiniteField(p, i, "u")[1],
+          EllipticCurves.card_over_extension(ord, p, UInt(i)))
+    for i in 2:3
+), FpX, M, ord, Dict(
+    3   => VeluPrimeData(1, 1, true, true),
+    7   => VeluPrimeData(1, 1, false, true),
+    61  => VeluPrimeData(1, 3, false, true),
+    67  => VeluPrimeData(1, 3, false, true),
+    409 => VeluPrimeData(1, 3, true, false),
 ), Dict(
     3  => ElkiesPrimeData(1, 1, 2, load_Atkin(3, Fp)),
     7  => ElkiesPrimeData(1, 1, 3, load_Atkin(7, Fp)),
     23 => ElkiesPrimeData(1, 16, 2, load_Atkin(23, Fp)),
 ))
 
-[[ElkiesWalk(E, 3, left, i, params) for i in 1:10],
- [ElkiesWalk(E, 7, right, i, params) for i in 1:10],
- [j_invariant(VeluWalk(M, 3, right, i, params)) for i in 1:10],
- [j_invariant(VeluWalk(M, 7, right, i, params)) for i in 1:10],
- [j_invariant(VeluWalk(M, 61, right, i, params)) for i in 1:10],
- [j_invariant(VeluWalk(M, 67, right, i, params)) for i in 1:10],
+[
+    [ElkiesWalk(E, 3, right, i, params) for i in 1:10],
+    [ElkiesWalk(E, 7, left, i, params) for i in 1:10],
+    [j_invariant(VeluWalk(M, 3, right, i, params)) for i in 1:10],
+    [j_invariant(VeluWalk(M, 7, right, i, params)) for i in 1:10],
+    [j_invariant(VeluWalk(M, 61, right, i, params)) for i in 1:10],
+    [j_invariant(VeluWalk(M, 67, right, i, params)) for i in 1:10],
+    [j_invariant(VeluWalk(M, 409, left, i, params)) for i in 1:10],
 ]
 
 Walk(params, Dict(
     3  => (left, 5),
-    7  => (left, 5),
+    7  => (right, 5),
     23 => (left, 3),
-    61 => (left, 2),
-    67 => (left, 2),
+    61 => (right, 2),
+    67 => (right, 2),
 ))
