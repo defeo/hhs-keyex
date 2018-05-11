@@ -809,8 +809,8 @@ this is the main practical contribution of our work.
 	$Q\gets$ a nonzero point in $K$ %\;
     \tcp*{e.g. $(x,y)\in E(\F_q[x,y]/(y^2-f_E(x),K(x)))$}
     %
-	\uIf{$\pi(Q) = [\lambda]Q$}{%
-        \Return{$j_1$} \label{line:direction}
+	\uIf{\label{line:direction} $\pi(Q) = [\lambda]Q$}{%
+        \Return{$j_1$}
         \;
     }
 	\Else{%
@@ -1039,7 +1039,8 @@ to use Vélu steps when we can, and Elkies steps for some other primes.
 
 In practice, Algorithm~\ref{alg:VéluStep} can be improved
 by using elliptic curve models with more efficient arithmetic.
-We used $x$-only arithmetic on Montgomery models~\cite{Montgomery87,CostelloSmith2017},
+In our implementation (see Section~\ref{sec:exp}),
+we used $x$-only arithmetic on Montgomery models~\cite{Montgomery87,CostelloSmith2017},
 which also have convenient Vélu formul\ae~\cite{CostelloH17,Renes2018}.
 %On the other hand, the Weierstrass model is classical and universal, 
 %and is usually the considered model in the literature
@@ -1049,21 +1050,28 @@ which also have convenient Vélu formul\ae~\cite{CostelloH17,Renes2018}.
 %and switch to Weierstrass models afterwards. 
 Note that we can also avoid computing $y$-coordinates in
 Algorithm~\ref{alg:ElkiesFirstStep}
-at Line~\ref{line:direction} if $\lambda\neq\pm\mu$.
-% In this case, choosing the correct quadratic twist at
-% Line~\ref{line:end_direction} is not an issue.
-%% BS: I think it's best (and safer) to always ensure we're on the right twist.
+at Line~\ref{line:direction} if $\lambda\neq\pm\mu$:
+this is the typical case for Elkies steps, and we used this
+optimization for all Elkies primes in our implementation.
 
 \begin{remark}
     \label{rem:twist-trick}
-    Note that when $r = 1$ (hence $\lambda = 1$), which is the best case
-    in Algorithm~\ref{alg:VéluStep}, Vélu steps cannot be used in direction $\mu$
-    using the algorithm as written above. However, switching to the quadratic
-    twist of $E$ changes the sign of the Frobenius eigenvalues; 
-    for instance, if $p \equiv -1\pmod{\ell}$ and $\lambda = 1$, then $\mu=-1$ and
-    Vélu steps can be used in both directions with $r=1$.
-    In Algorithm~\ref{alg:VéluStep}, only the curve order
-    and the random point sampling need to be modified when using quadratic twists.
+    Note that, in principle, Algorithm~\ref{alg:VéluStep}, can only be
+    used to walk in one direction $\frak s_λ=(ℓ,π-λ)$, and not in the
+    opposite one $\frak s_μ=(ℓ,π-μ)$. Indeed we have assumed that
+    $E[\frak s_λ]$ is in $E(\F_{q^r})$, while $E[\frak s_μ]$ is not.
+    However, switching to a quadratic twist $\tilde{E}$ of $E$ over
+    $\F_{q^r}$ changes the sign of the Frobenius eigenvalues, thus it
+    may happen that $\tilde{E}[\frak s_{-μ}]$ is in
+    $\tilde{E}(\F_{q^r})$, while $\tilde{E}[\frak s_{-λ}]$ is not.  It
+    is easy to force this behavior by asking that
+    $p \equiv -1\pmod{\ell}$, indeed then $\lambda = -1/μ$.
+
+    For these eigenvalue pairs we can thus walk in both directions
+    using Vélu steps at no additional cost, following either the
+    direction $λ$ on $E$, or the direction $-μ$ on a twist. In
+    Algorithm~\ref{alg:VéluStep}, only the curve order and the random
+    point sampling need to be modified when using quadratic twists.
 \end{remark}
 
 \subsection{Sampling isogeny walks for key exchange}
@@ -1313,9 +1321,10 @@ To fix ideas, we choose the 512-bit prime
     \right) - 1
     \,.
 \]
-Then, according to Section~\ref{sec:keyex}, Algorithm~\algstyle{VéluStep} can be used
-for $\ell$-isogenies with $r=1$ in both directions if and only if
-$\# E(\F_p) \equiv0\pmod{\ell}$ for any prime $\ell\leq 380$.
+Then, according to Remark~\ref{rem:twist-trick},
+Algorithm~\algstyle{VéluStep} can be used for $\ell$-isogenies in both
+directions for any prime $\ell\leq 380$, as soon as the order of its
+eigenvalues is small enough.
 We now proceed as follows:
 \begin{itemize}
     \item 
@@ -1594,7 +1603,7 @@ Given this estimate, we expect the bit size of $q$ to grow at
 worst like the square of the security parameter.
 
 Unfortunately, the analysis of Kuperberg's new algorithm is only asymptotic, 
-and considers particularly special $N$; it cannot be directly used
+and limited to $N$ of a special form; it cannot be directly used
 to draw conclusions on concrete cryptographic parameters at this stage,
 especially since the value of the constant hidden by the $O()$ in the
 exponent is unclear.
@@ -1603,26 +1612,24 @@ at concrete security levels
 such as those required by NIST~\cite{NIST2016}.
 
 Nevertheless, we remark that a simplified version of Kuperberg's
-algorithm described in~\cite[§2.1]{regev04} in the case $N = 2^n$ 
-requires about $2^{4\sqrt{\log N}}$ black-box queries.
-Therefore, choosing this estimate
-is a reasonable choice to propose concrete parameter sizes
-(we mention that Kuperberg's original analysis only gave 
-a complexity of $2^{3\sqrt{\log N}}$ operations).
-Of course, this assumption is only heuristic, and should be
-validated by further study of quantum dHSP solvers; at present
-time, unfortunately, no precise statement can be made.
+algorithm described in~\cite[§2.1]{regev04} in the favorable case
+$N = 2^n$ requires about $2^{4\sqrt{\log N}}$ black-box
+queries\footnote{We mention that Kuperberg's original analysis only
+  gave a complexity of $2^{3\sqrt{\log N}}$ operations.}.  We will
+take this as a crude lower bound for the query complexity of Kuperberg's
+algorithm in the general case.  Of course, this assumption is only heuristic,
+and should be validated by further study of quantum dHSP solvers; at
+present time, unfortunately, no precise statement can be made.
 
-Table~\ref{tab:sizes} thus proposes three parameter sizes,
-with associated numbers of quantum queries based on the observations above.
-While their quantum security in NIST's sense~\cite{NIST2016}
-would only allow them to fit in poor NIST categories, we believe that query
-complexity alone gives confidence in the post-quantum security properties
-of our scheme.
-%matching three of the NIST
-%categories~\cite{NIST2016}.
-%According to this table, the public parameters we proposed
-%in Section~\ref{sec:initcurve} fit in NIST category~2.
+Table~\ref{tab:sizes} thus proposes three parameter sizes, with
+associated numbers of quantum queries based on the observations above.
+By using the above query complexity as a lower bound for the quantum
+cost of the Childs-Jao-Soukharev attack, we match them to three of
+NIST's security categories~\cite{NIST2016}. We believe that using
+query complexity alone is a very conservative choice, and should give
+more than enough confidence in the post-quantum security properties of
+our scheme.
+
 The system parameters we proposed in Section~\ref{sec:initcurve}
 correspond to the first line of Table~\ref{tab:sizes}, 
 thus offering 64-bit quantum query complexity 
@@ -1658,9 +1665,9 @@ thus offering 64-bit quantum query complexity
         & \parbox{10ex}{\centering quantum queries}
         & \parbox{10ex}{\centering NIST category} \\
         \hline
-        $512$  & $256$ & $2^{128}$ & $> 2^{64}$ & 1\\
-        $768$  & $384$ & $2^{192}$ & $> 2^{78}$ & 1\\
-        $1024$ & $512$ & $2^{256}$ & $> 2^{90}$ & 1
+        $512$  &  $256$ & $2^{128}$ & $> 2^{64}$ & 1\\
+        $1152$ &  $576$ & $2^{288}$ & $> 2^{96}$ & 3\\
+        $2048$ & $1024$ & $2^{512}$ & $> 2^{128}$ & 5
         \\
         \hline
     \end{tabular}
@@ -2099,16 +2106,18 @@ practical post-quantum scheme was known prior to~\cite{csidh}.
 \section{Experimental results}
 \label{sec:exp}
 
-In order to demonstrate that our key-exchange protocol is usable
-at standard security levels, we implemented it in the Julia
-programming language. This proof of concept also allows
-us to estimate the cost of isogeny steps, which is needed
-in the process of generating the initial curve in Section~\ref{sec:initcurve}.
-We developed a small Julia package, built upon 
-the computer algebra package Nemo~\cite{nemo},
-to implement basic functionalities
-for elliptic curves over finite fields~\cite{package}.
-Experiments were conducted on a machine running a 3.2GHz Intel Xeon processor.
+In order to demonstrate that our key-exchange protocol is usable at
+standard security levels, we implemented it in the Julia programming
+language. This proof of concept also allows us to estimate the cost of
+isogeny steps, which is needed in the process of generating the
+initial curve in Section~\ref{sec:initcurve}.  We developed several
+Julia packages\footnote{The main code is available at
+  \url{https://github.com/defeo/hhs-keyex/}, and the additional
+  dependencies at \url{https://github.com/defeo/EllipticCurves.jl/}
+  and \url{https://github.com/defeo/ClassPolynomials.jl/}.}, built
+upon the computer algebra package Nemo~\cite{nemo}.  Experiments were
+conducted on a Linux OS, with an Intel Core i7-5600U cpu at 2.60GHz,
+using Julia 0.6 and Nemo 0.7.3.
 
 First, consider the
 time to compute one step for an ideal $\frak s = (\ell,\pi-\lambda)$.
@@ -2182,13 +2191,13 @@ lists other primes for which we apply Algorithm~\ref{alg:ElkiesWalk}.
         \\
         1 & 409 & 523, 821, 947, 1723
         &
-        5 & 34 & 31, 61, 1321
+        5 & 34 & 31*, 61*, 1321
         &
-        9 & 6 & 1693
+        9 & 6 & 37*, 1693
         \\
-        3 & 81 & 19, 661
+        3 & 81 & 19*, 661
         &
-        7 & 10 & 547
+        7 & 10 & 29*, 71*, 547
         & & 
         \\
         \hline
@@ -2248,37 +2257,30 @@ lists other primes for which we apply Algorithm~\ref{alg:ElkiesWalk}.
         % line 1
         20 & 23
         &
-        9  & 47
+        6  & 73
         &
         2  & 157, 163, 167, 191, 193, 197, 223, 229
         \\
         % line 2
-        16 & 29
-        &
-        6  & 71, 73
-        &
-        1  & 241, 251, 257, 277, 283, 293, 307,
-        \\
-        % line 3
-        12 & 37
+        11 & 41
         &
         5  & 89
         &
-        1  & 317, 349, 359, 373, 383, 401, 421,
+        1  & 241, 251, 257, 277, 283, 293, 307
         \\
-        % line 4
-        11 & 41
+        % line 3
+        10 & 43
         &
         4  & 107, 109, 113
         &
-        1  & 431, 433, 439, 443, 449, 457, 467
+        1  & 317, 349, 359
         \\
-        % line 5
-        10 & 43
+        % line 4
+        9 & 47
         &
         3  & 131, 151
-        &
-        \\
+        & &
+      \\
         \hline
         % line 6
     \end{tabular}
@@ -2290,12 +2292,13 @@ lists other primes for which we apply Algorithm~\ref{alg:ElkiesWalk}.
     \label{tab:ElkiesSteps}
 \end{table}
 
-Using this proposal, we estimate the cost of a single walk in the
-isogeny graph to be approximately 465 seconds, bringing the global
-Diffie--Hellman key-exchange cost to 930 seconds (with $T = 8.2s$).
+Using these parameters, we perform one isogeny walk in
+approximately 520 seconds.
 These timings are~\emph{worst-case}
 in the sense that the number of isogeny steps is taken
 to be exactly $M_\ell$ for each $\ell$.
+This is about as fast as Stolbunov's largest parameter~\cite{Stol},
+which is for a prime of 428 bits and a keyspace of only 216 bits.
 
 We stress the fact that this implementation
 is \emph{not} optimised. Besides general gains on field arithmetic,
@@ -2305,8 +2308,8 @@ in Algorithms~\ref{alg:ElkiesFirstStep}
 and~\ref{alg:ElkiesNextStep}.
 
 For comparison, without using Algorithm~\ref{alg:VéluStep}, the
-total key-exchange time would exceed 2000 seconds:
-our ideas thus bring an improvement by a factor of over 2 over the
+total isogeny walk time would exceed 2000 seconds:
+our ideas thus bring an improvement by a factor of over 4 over the
 original protocol. A longer search for efficient public
 parameters would bring further improvement.
 

@@ -55,14 +55,14 @@ function ElkiesWalk(E::ShortWeierstrass,
         Ψ = prime_data.mod_pol
         eigenvalue = dir == right ? prime_data.ev_right : prime_data.ev_left
 
-        # TODO: check degenerate Atkin roots
-        
         # First step
         j_vec = eval_vec(j, lenJ(Ψ))
 
         # We get two roots
         Ψ_F_j = evalJ(Ψ, j_vec)          # Ψ(F, j)
-        (f1, r1), (f2, r2) = my_roots(params.FpX(Ψ_F_j))
+        roots = my_roots(params.FpX(Ψ_F_j))
+        @assert length(roots) == 2
+        (f1, r1), (f2, r2) = roots
         @assert r1 == r2 == 1
 
         # We try our chance with the first root
@@ -70,35 +70,43 @@ function ElkiesWalk(E::ShortWeierstrass,
         Ψ_f_J = evalF(Ψ, f_vec)          # Ψ(f1, J)
         f_quo, f_rem = divrem(params.FpX(transpose(Ψ_f_J)), gen(FpX) - j)
         @assert f_rem == 0
-        (j1, r), = my_roots(f_quo)
-        @assert r == 1
+        roots = my_roots(f_quo)
 
-        # Elkies' formulas
-        j1_vec  = eval_vec(j1, lenJ(Ψ))
-        dj_vec  = diff1(j_vec)
-        dj1_vec = diff1(j1_vec)
-        df_vec  = diff1(f_vec)
-        Ψ_df_j  = transpose(df_vec) * Ψ_F_j
-        Ψ_df_j1 = evalJF(Ψ, j1_vec, df_vec)
-        Ψ_f_dj, Ψ_f_dj1 = Ψ_f_J * hcat(dj_vec, dj1_vec)
+        # try each root until one works
+        j1 = zero(params.Fp)
+        φ = one(params.FpX)
+        for (j1, r) in roots
+            # Elkies' formulas
+            j1_vec  = eval_vec(j1, lenJ(Ψ))
+            dj_vec  = diff1(j_vec)
+            dj1_vec = diff1(j1_vec)
+            df_vec  = diff1(f_vec)
+            Ψ_df_j  = transpose(df_vec) * Ψ_F_j
+            Ψ_df_j1 = evalJF(Ψ, j1_vec, df_vec)
+            Ψ_f_dj, Ψ_f_dj1 = Ψ_f_J * hcat(dj_vec, dj1_vec)
 
-        dF  = f1 * Ψ_df_j
-        dJ  = j  * Ψ_f_dj
-        dF1 = f1 * Ψ_df_j1
-        dJ1 = j1 * Ψ_f_dj1 * ell
-        
-        jj = j1 // (j1 - 1728)
-        tmp = ell^2 * dF1 * dJ * E.b // (dJ1 * dF * E.a)
-        # Image curve
-        a1 = -27 * tmp^2 * jj // 4
-        b1 = a1 * tmp
-        E1 = ShortWeierstrass(a1, b1)
+            dF  = f1 * Ψ_df_j
+            dJ  = j  * Ψ_f_dj
+            dF1 = f1 * Ψ_df_j1
+            dJ1 = j1 * Ψ_f_dj1 * ell
+            
+            jj = j1 // (j1 - 1728)
+            tmp = ell^2 * dF1 * dJ * E.b // (dJ1 * dF * E.a)
+            # Image curve
+            a1 = -27 * tmp^2 * jj // 4
+            b1 = a1 * tmp
+            E1 = ShortWeierstrass(a1, b1)
 
-        # We get the kernel polynomial and check the eigenvalue
-        issq, φ = issquare(unsafe_kernelpoly(E, E1, ell)[2])
-        @assert issq
+            # We get the kernel polynomial and check the eigenvalue
+            issq, φ = issquare(unsafe_kernelpoly(E, E1, ell)[2])
+            if issq
+                break
+            end
+        end
+        @assert φ ≠ 1
         # @assert EllipticCurves.divisionpolynomial(E, ell) % φ == 0
 
+        # TODO: handle multiple Atkin roots
         if is_frobenius_eigenvalue(eigenvalue, φ, E, params)
             f = f1
             j = j1
@@ -195,21 +203,22 @@ function VeluWalk(E::Montgomery,
                 if (P.X*(P.X^2 + Eext.A*P.X + 1)*Eext.B)^div(order(Fext) - 1, 2) != legendre
                     continue
                 end
-                P = cofactor*P
+                P = cofactor*P     # more than 70% of time is spent here
             end
             Q, R = P, xdouble(P)
             σ = σ1 = zero(Fext)
             π = one(Fext)
             for i in 1:div(ell-1, 2)
-                σ  += Q.X // Q.Z
+                tmp = Q.X // Q.Z
+                σ  += tmp
                 σ1 += Q.Z // Q.X
-                π  *= Q.X // Q.Z
+                π  *= tmp
                 Q, R = R, xadd(R, P, Q)
             end
             σ = Nemo.convert(σ, params.Fp)
             σ1 = Nemo.convert(σ1, params.Fp)
             π = Nemo.convert(π, params.Fp)
-	    E = Montgomery((6*σ1 - 6*σ + E.A)*π^2, E.B)
+	    E = Montgomery((6*(σ1 - σ) + E.A)*π^2, E.B)
         end
     end
     return E
@@ -217,18 +226,18 @@ end
 
 ###
 
-function Walk(params::SystemParams, key::Dict{T, Tuple{Direction, T}}) where T <: Integer
-    elkies = Dict()
+function Walk(params::SystemParams, key::Array{T}) where T <: Tuple{Integer, Direction, Integer}
+    elkies = []
     E = params.E0
-    for (ell, (dir, steps)) in key
+    for (ell, dir, steps) in key
         if haskey(params.velu_primes, ell)
             E = VeluWalk(E, ell, dir, steps, params)
         else
-            elkies[ell] = (dir, steps)
+            push!(elkies, (ell, dir, steps))
         end
     end
     j = j_invariant(E)
-    for (ell, (dir, steps)) in elkies
+    for (ell, dir, steps) in elkies
         E = from_j_invariant(j)
         j = ElkiesWalk(E, ell, dir, steps, params)
     end
