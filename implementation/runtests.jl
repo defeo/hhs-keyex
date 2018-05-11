@@ -52,8 +52,8 @@ params = SystemParams(p, Fp, Dict(
 
 p = ZZ(2)^128 + 51
 Fp, _ = FiniteField(p, 1, "u")
-FpX, _ = PolynomialRing(F, "X")
-E = EllipticCurve(Fp(1), Fp(9))
+FpX, _ = PolynomialRing(Fp, "X")
+E = Montgomery(Fp(1), Fp(9))
 ord = ZZ(340282366920938463477190161499806233971)
 
 # primes_use_step = []
