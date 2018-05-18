@@ -55,16 +55,16 @@
 \begin{document}
 
 \title{Towards practical key exchange\\ from ordinary isogeny graphs}
-%\author{
-%  Luca De Feo\inst{1,3}\orcidID{0000-0002-9321-0773} \and
-%  Jean Kieffer\inst{2} \and
-%  Benjamin Smith\inst{3}
-%}
-%\institute{
-%  Université Paris Saclay, UVSQ, LMV, Versailles, France \and
-%  École Normale Supérieure, Paris, France \and
-%  Inria and École polytechnique, Université Paris Saclay, Palaiseau, France
-%}
+\author{
+ Luca De Feo\inst{1,3}\orcidID{0000-0002-9321-0773} \and
+ Jean Kieffer\inst{2} \and
+ Benjamin Smith\inst{3}
+}
+\institute{
+ Université Paris Saclay, UVSQ, LMV, Versailles, France \and
+ École Normale Supérieure, Paris, France \and
+ Inria and École polytechnique, Université Paris Saclay, Palaiseau, France
+}
 
 \maketitle
 
@@ -254,6 +254,11 @@ against basic side-channel attacks.
 Uniform and constant-time algorithms for arbitrary-degree isogeny computations
 are an interesting open problem,
 but they are beyond the scope of this work.
+
+\paragraph{Acknowledgments.}
+We would like to thank Wouter Castryk, Tanja Lange, Chloe Martindale,
+Lorenz Panny, and Joost Renes for sharing a draft of their paper with
+us, and Alexandre Gélin and François Morain for fruitful discussions.
 
 \section{Isogenies and complex multiplication}
 \label{sec:math}
@@ -1585,7 +1590,7 @@ in~\cite{childs2014constructing}. It consists of two algorithms:
 
 The ideal evaluation algorithm has sub-exponential complexity
 $L_q(\frac{1}{2},\frac{\sqrt{3}}{2})$. However, after a subexponential-time
-precomputation, any adversary can know the exact class group structure;
+classical precomputation, any adversary can know the exact class group structure;
 in that case, this ideal evaluation step could possibly be performed in polynomial
 time (and non-negligible success probability)
 using LLL-based methods, as discussed in~\cite{Stolbunov2012}
@@ -1611,28 +1616,34 @@ Thus, it is hard to estimate the impact of this attack
 at concrete security levels
 such as those required by NIST~\cite{NIST2016}.
 
-Nevertheless, we remark that a simplified version of Kuperberg's
-algorithm described in~\cite[§2.1]{regev04} in the favorable case
-$N = 2^n$ requires about $2^{4\sqrt{\log N}}$ black-box
-queries\footnote{We mention that Kuperberg's original analysis only
-  gave a complexity of $2^{3\sqrt{\log N}}$ operations.}.  We will
-take this as a crude lower bound for the query complexity of Kuperberg's
-algorithm in the general case.  Of course, this assumption is only heuristic,
-and should be validated by further study of quantum dHSP solvers; at
-present time, unfortunately, no precise statement can be made.
+Nevertheless, we remark that the first version of Kuperberg's
+algorithm, as described in~\cite[Algorithm~5.1 and
+Remark~5.2]{regev04} requires $O(2^{3\sqrt{\log N}}\log N)$ black-box
+queries and $\sim 2^{3\sqrt{\log N}}$ qubits of memory.  Although the
+quantum memory requirements of this algorithm are rather high, we will
+take its query complexity as a crude lower bound for the complexity of
+Kuperberg's newer algorithm in the general case.  Of course, this
+assumption is only heuristic, and should be validated by further study
+of quantum dHSP solvers; at present time, unfortunately, no precise
+statement can be made.
 
-Table~\ref{tab:sizes} thus proposes three parameter sizes, with
-associated numbers of quantum queries based on the observations above.
-By using the above query complexity as a lower bound for the quantum
-cost of the Childs-Jao-Soukharev attack, we match them to three of
-NIST's security categories~\cite{NIST2016}. We believe that using
-query complexity alone is a very conservative choice, and should give
-more than enough confidence in the post-quantum security properties of
-our scheme.
+Table~\ref{tab:sizes} thus proposes various parameter sizes, with
+associated numbers of quantum queries based on the observations above;
+we also indicate the estimated time to (classically) precompute the
+class group structure according
+to~\cite{10.1007/978-3-642-14081-5_15}\footnote{Note however that
+  computing the class group structure can be seen as an instance of
+  the hidden subgroup problem, and thus can be solved in quantum
+  polynomial time by Shor's algorithm.}.  Whenever the quantum query
+complexity alone is enough to put a parameter in one of NIST's
+security categories~\cite{NIST2016}, we indicate it in the table. We
+believe that using query complexity alone is a very conservative
+choice, and should give more than enough confidence in the
+post-quantum security properties of our scheme.
 
 The system parameters we proposed in Section~\ref{sec:initcurve}
 correspond to the first line of Table~\ref{tab:sizes}, 
-thus offering 64-bit quantum query complexity 
+thus offering at least 56-bit of quantum security 
 (and 128-bit classical security).
 
 %\begin{table}
@@ -1659,22 +1670,27 @@ thus offering 64-bit quantum query complexity
 \begin{table}
     \renewcommand{\arraystretch}{1.4}
     \centering
-    \begin{tabular}{c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c}
+    \begin{tabular}{c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c}
         $\log Δ_K$ & $\log h(\O_K)$
         & \parbox{10ex}{\centering classical security}
+        & $L_{|Δ_K|}(1/2,1)$ 
         & \parbox{10ex}{\centering quantum queries}
         & \parbox{10ex}{\centering NIST category} \\
         \hline
-        $512$  &  $256$ & $2^{128}$ & $> 2^{64}$ & 1\\
-        $1152$ &  $576$ & $2^{288}$ & $> 2^{96}$ & 3\\
-        $2048$ & $1024$ & $2^{512}$ & $> 2^{128}$ & 5
+        $512$  &  $256$ & $2^{128}$ &  $2^{56.6}$ & $> 2^{56}$ \\
+        $688$  &  $344$ & $2^{172}$ &  $2^{67.0}$ & $> 2^{64}$ & 1\\
+        $768$  &  $384$ & $2^{192}$ &  $2^{71.4}$ & $> 2^{67}$ & 1\\
+        $1024$ &  $512$ & $2^{256}$ &  $2^{84.2}$ & $> 2^{76}$ & 1\\
+        $1656$ &  $828$ & $2^{414}$ & $2^{110.8}$ & $> 2^{96}$ & 3\\
+        $3068$ & $1534$ & $2^{767}$ & $2^{156.9}$ & $> 2^{128}$ & 5
         \\
         \hline
     \end{tabular}
     \smallskip
-    \caption{Suggested parameter sizes and associated query
-    complexities, using the heuristic estimations of
-    Section~\ref{sec:quantum-attacks}.}
+    \caption{Suggested parameter sizes and associated classical
+      security, class group computation time, and query complexity,
+      using the heuristic estimations of
+      Section~\ref{sec:quantum-attacks}.}
     \label{tab:sizes}
 \end{table}
 
