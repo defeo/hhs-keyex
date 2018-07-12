@@ -1,0 +1,15 @@
+Dear Luca De Feo; Jean Kieffer; Benjamin Smith,
+
+You can now provide the feedback to the reviews of your submission "Towards practical key exchange from ordinary isogeny graphs" via the following link:
+
+https://secure.iacr.org/websubrev/ac2018/submit/rebuttal.php
+
+The credentials are the ones you received when submitting:
+Submission-ID: 301
+Password:      6gweFQ8oar
+
+Remember that the deadline for the rebuttals is July 13th, 11:45 UTC.
+
+Sincerely,
+
+The program chairs

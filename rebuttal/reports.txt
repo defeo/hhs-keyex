@@ -1,0 +1,133 @@
+Dear Luca De Feo; Jean Kieffer; Benjamin Smith,
+
+Below please find the reviewer comments on your paper
+
+  "Towards practical key exchange from ordinary isogeny graphs"
+
+that was submitted to ASIACRYPT 2018. 
+
+Sincerely,
+
+The program chair(s)
+
+************************************************************************
+
+This paper revisits the key exchange protocol based on ordinary elliptic curve
+isogenies first introduced by Couveignes in the late 1990s, and independently
+rediscovered by Rostovtsev and Stolbunov in 2006. The submission offers no
+significant conceptual contribution on top of those earlier works (especially
+if one factors in other developments since then), but it improves upon them in
+a number of ways that add up to a pleasant and interesting paper, which is
+certainly quite timely in view of the renewed interest in isogeny-based
+cryptography in recent years. In particular:
+
+* this paper is actually well written; the same unfortunately cannot be said
+of the two eprint papers it extends (especially the Rostovtsev-Stolbunov
+paper, which is famously riddled with typos and small errors);
+
+* it contains a proper, up-to-date security analysis, both in terms of the
+underlying ordinary curve isogeny problems, and of the key exchange protocol
+itself;
+
+* since ordinary curve isogeny walks involve isogenies of varying degrees, the
+paper comes with a detailed description of the corresponding isogeny
+computation algorithms and a careful assessment of their complexity, which
+leads to interesting optimizations of the overall protocol based on a proper
+selection of the elliptic curve used as public parameter;
+
+* using that and other optimizations, as well as the concrete bit security
+estimates obtained from the aforementioned security analysis, the authors also
+describe an actual implementation of the protocol which achieves similar
+performance to Rostovtsev-Stolbunov despite achieving a significantly higher
+security level.
+
+Overall, while not groundbreaking, the paper is useful, nicely written and
+timely, and it does meaningfully improve upon the state of the art. I lean
+towards acceptance.
+
+
+Minor typo:
+* page 24, before section 6: "has hard as breaking the system" -> "as hard"
+
+========================================================================
+
+The paper revisits Couveignes's hard homogeneous space idea and instantiation
+based on ordinary curves, with the goal of making it practical. 
+
+Pros and cons of this approach vs SIDH are well-known: a subexponential
+quantum algorithm in the ordinary case, torsion point images revealed in SIDH
+case, poor efficiency in the ordinary case (mostly due to the need to compute
+"large" degree isogenies), key validation issues in SIDH case.
+
+The paper contains a careful analysis of the various existing algorithms for
+performing isogeny steps depending on all relevant parameters. The main idea
+in this paper is then to choose special parameters for the system such that
+the overall isogeny computation is as efficient as possible. This can be done
+by picking random curves until their order satisfies some congruence
+conditions, and an optimized version of this is presented in Section 4.
+
+The paper is very well written and it does contain some neat algorithmic
+tricks. Unfortunately, the final result is a key exchange running in minutes
+(520 seconds per isogeny walk) so the outcome is rather negative. 
+
+
+
+Further comments:
+- Interest for this work is not so clear in your introduction, especially
+given your end result: the scheme is much slower and less secure (existing
+quantum attack) than SIDH, so why this alternative? In the motivation I would
+emphasize the potential weaknesses of SIDH, in particular the short paths and
+the fact that the images of torsion points are revealed (cfr Section 7 in
+[11]). 
+- Algorithm 3, line 3: refer to [6] for BMSS algorithm 
+- p13, l11-12: "only only"
+- hardness of problem 1 will depend on how the curves are generated
+- p17: what is the purpose of stage 2?
+- p22-23: paragraph before section 5.4 looks a bit like wishful thinking to me
+
+========================================================================
+
+This paper revisits the key exchange protocol of Couveignes, rediscovered by
+Rostovtsev and Stolbunov.
+
+The main novelty in the paper is the following: for Elkies primes, Frobenius
+acts as multiplication by mu and lambda on the respective eigenspaces.  This
+immediately implies that these eigenspaces are defined over an extension of
+F_q whose degree equals the order of these eigenvalues modulo l.  If these
+orders therefore are small, it is possible to compute the kernel of the
+isogeny directly by simply considering points over the extension F_q^k, and
+constructing an l-torsion point.  When the orders of the eigenvalues are
+different, this is guaranteed to be a generator of the kernel.
+
+This immediately leads to a search for suitable elliptic curves, namely, find
+an elliptic curve E over F_p such that #E(F_p) = p + 1 - t has many small
+prime factors or such that the orders of the eigenvalues for many small primes
+ell is small as well.
+
+The remainder of the paper is mostly a rehash of known works.
+
+The overall result obtained by the authors is a key agreement requiring
+several hundreds of seconds, which is hardly practical, even though it is much
+faster than the original CRS scheme.
+
+The main algorithm described above however is instrumental in the development
+of the CSIDH scheme that followed it, and which only makes one small change,
+namely to consider the case t = 0, which makes it super easy to write down an
+optimal curve.  As such the paper is valuable as a stepping stone to better
+works that followed it.
+
+Detailed comments: 
+
+- p6: the definition of having CM by an order O seems to allow also for
+suborders, which would invalidate the class group formula
+
+- p6: the correspondence between ideals and isogenies does not take into
+account the inseparable part
+
+- p7: it would be simpler to make the dependency on t explicit by having
+Ell_{q,t} so there is no confusion and no need to consider two components
+
+- p11: even if the order of mu and lambda are the same (note that my is
+different from lambda), then you can still find eigenvectors easily by taking
+a random l-torsion point P and computing Frob(P) - lambda*P which will give an
+eigenvector corresponding to mu (and vice versa).

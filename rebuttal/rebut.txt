@@ -1,0 +1,11 @@
+We thank the reviewers for their useful feedback, and their careful reading of our paper. We appreciate the mathematical points raised by each reviewer, and will make some adjustments to notation and definitions to take them into account. Some specific replies follow:
+
+Reviewer 1:
+- "Unfortunately, the final result is a key exchange running in minutes... so the outcome is rather negative." We agree that our result is still impractical, but this is only negative if our results are taken to be the end of the road. They are not. CSIDH uses our results to produce something far more practical, and we look forward to further improvements. Our concrete measurements of this scheme using the best known algorithms provides a valuable reference point for future algorithmic advances, parameter choices, and implementations. This is why we used "*Towards* practical..." for our title.
+- We agree that the advantages of this scheme over SIDH were not highlighted clearly in the introduction. We will address this in the revised version, providing a more clearly developed motivation.
+- Yes, the hardness of Problem 1 depends on the way the curves are generated (and this was taken into account in our parameter selection). We will add a remark to emphasise this.
+- The point of Stage 2 (on p17) is to make the solution representable in poly space and evaluatable in poly time. We will add a line to explain this.
+
+Reviewer 2:
+We strongly disagree that "the remainder of the paper is a rehash of known works". This completely ignores our security analysis, which is a significant new contribution (as Reviewer 3 notes). While a substantial part of the paper describes prior work, it does so in a systematic way that improves substantially on previous treatments (as Reviewer 3 notes). We see this "cleaning up" as a worthwhile contribution in itself, and one that will facilitate future improvements on these results.
+
