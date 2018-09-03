@@ -809,7 +809,7 @@ this is the main practical contribution of our work.
 	%$K\gets$ Kernel of the $\ell$-isogeny from $E$ to some $E_1$ with $j(E_1) = j_1$ \label{line:kernel}\;
     \label{line:kernel}
     $K\gets \algstyle{KernelPolynomial}(\algstyle{Isogeny}(E,j_1,\ell))$ 
-    \tcp*{e.g.~BMSS algorithm}
+    \tcp*{e.g.~BMSS algorithm~\cite{BMSS08}}
     %
 	$Q\gets$ a nonzero point in $K$ %\;
     \tcp*{e.g. $(x,y)\in E(\F_q[x,y]/(y^2-f_E(x),K(x)))$}
@@ -1141,7 +1141,7 @@ $\ell$-isogeny steps in direction $\mu$.
 \end{itemize}
 For the tuples $(\ell,\lambda)$ in $S_{VE}$, 
 where we do not use the slower $\mu$-direction,
-we only only allow non-negative exponents.
+we only allow non-negative exponents.
 We choose bounds $M_\ell$ on the absolute value of the exponents $k_\ell$
 so as to minimize the total cost of computing isogeny walks, 
 while maintaining a large keyspace.
@@ -2107,7 +2107,7 @@ we conclude that key validation is not only possible,
 but highly efficient for protocols based on the CRS construction. 
 This stands in stark contrast to the case of SIDH,
 where key validation is known to be
-problematic~\cite{galbraithsecurity}, and even conjectured to be has
+problematic~\cite{galbraithsecurity}, and even conjectured to be as
 hard as breaking the system~\cite{cryptoeprint:2018:336}.
 
 Thanks to this efficient key validation, 
