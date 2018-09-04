@@ -1000,10 +1000,13 @@ Algorithm~\ref{alg:VéluStep} (\algstyle{VéluStep})
 exploits this fact to construct a generator $Q$ of $\ker\phi_{\frak s}$
 by computing a point of order $\ell$ in $E(\F_{q^r})$.
 The roots of the kernel polynomial of $\phi_{\frak s}$
-are then $x(Q), \ldots, x([(\ell-1)/2]Q)$.
-%Notice that the values
-%of $r$ and $C_r$ could be made part of the public parameters, but we
-%leave them here for clarity.
+$x(Q), \ldots, x([(\ell-1)/2]Q)$.%
+\footnote{If the order of $μ$ divides $r$,
+  Algorithm~\ref{alg:VéluStep} can be extended as follows: take
+  $P∈E[ℓ]$, and compute $π(P) - [μ]P$; the result is either zero, or
+  an eigenvector for $λ$. %
+  This is not necessary for any of the primes in our proposed
+  parameters.}
 
 Constructing a point $Q$ of order $\ell$ in $E(\F_{q^r})$
 is straightforward:
@@ -1068,7 +1071,7 @@ optimization for all Elkies primes in our implementation.
     However, switching to a quadratic twist $\tilde{E}$ of $E$ over
     $\F_{q^r}$ changes the sign of the Frobenius eigenvalues, thus it
     may happen that $\tilde{E}[\frak s_{-μ}]$ is in
-    $\tilde{E}(\F_{q^r})$, while $\tilde{E}[\frak s_{-λ}]$ is not \footnote{Even if the orders of $λ$ and $μ$ are equal, we can still construct an eigenvector for $λ$ (resp. $μ$) by computing $π(P) - [μ]P$ (resp. $π(P) - [λ]P$) where $P$ is $\ell$-torsion. This is not necessary for any of the primes in our proposed parameters.}. It
+    $\tilde{E}(\F_{q^r})$, while $\tilde{E}[\frak s_{-λ}]$ is not. It
     is easy to force this behavior by asking that
     $p \equiv -1\pmod{\ell}$, indeed then $\lambda = -1/μ$.
 
