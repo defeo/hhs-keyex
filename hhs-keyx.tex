@@ -182,12 +182,12 @@ The analogy with classic group-based Diffie--Hellman is evident.
 \end{algorithm}
 
 
-For instance, if $X$ is a
-cyclic group $〈x〉$ of order $p$, and $G=(\Z/p\Z)^*$ acts on $X\setminus\{1\}$ by
+For example, if $X=\langle{x}\rangle$ is cyclic of order $p$ 
+and $G=(\Z/p\Z)^*$ acts on $X\setminus\{1\}$ by
 $g·x=x^g$, then inverting $φ_x$ is the discrete logarithm problem (DLP) in $X$.
-But for other homogeneous spaces, inverting $φ_x$ may have no relationship
-with any DLP,
-and might resist attacks based on Shor's algorithm in the quantum setting.
+But inverting $φ_x$ for other homogeneous spaces may not be related
+to any DLP,
+and might resist attacks based on Shor's quantum algorithm.
 Similar ideas have occasionally appeared in the
 literature in different forms~\cite{10.1007/3-540-44598-6_10,monico2007}.
 
@@ -196,16 +196,17 @@ various flavors of Diffie--Hellman-like systems. Nevertheless, he
 suggested using a specific HHS based on the theory of complex
 multiplication of elliptic curves, in a sense generalizing 
 % to the HHS framework 
-the class-group-based Diffie--Hellman key exchange of
-Buchmann and Williams~\cite{Buchmann1988}. Independently, Rostovtsev
+Buchmann and Williams'
+class-group-based Diffie--Hellman key exchange~\cite{Buchmann1988}.
+Independently, Rostovtsev
 and Stolbunov proposed in~\cite{rostovtsev+stolbunov06} a public key
 encryption scheme based on the same HHS. Later, Stolbunov~\cite{Stol}
-derived more protocols from their primitive, including an interactive
+derived more protocols from this, including an interactive
 key exchange scheme similar to Algorithm~\ref{alg:HHS-DH}.  Rostovtsev
-and Stolbunov's proposal crucially deviates from the HHS paradigm in
+and Stolbunov's proposal deviates from the HHS paradigm in
 the way random elements of $G$ are sampled, as we will explain in
 Section~\ref{sec:keyex}. This makes the primitive less flexible, but
-also (relatively) more practical.
+also more practical.
 
 Rostovtsev and Stolbunov advertised their cryptosystems as potential
 post-quantum candidates, leading Childs, Jao and Soukharev to introduce
@@ -310,13 +311,13 @@ mapped to $0_{E'}$.
 An isogeny $ϕ$ is \emph{cyclic} 
 if $\ker ϕ$ is a cyclic group.
 
-An \emph{isomorphism} is an isogeny of degree one.
+An \emph{isomorphism} is an isogeny of degree~\(1\).
 %It is a
 %group isomorphism on $\Fbar_q$-points, but not necessarily on $\F_q$-points
 %unless the isomorphism is defined over $\F_q$. 
 An \emph{isomorphism class} of elliptic curves is
-fully determined by their common \emph{$j$-invariant}, which is an
-element of $\Fbar_q$. If any curve in the isomorphism class is defined
+fully determined by their common \emph{$j$-invariant} in $\Fbar_q$. 
+If any curve in the isomorphism class is defined
 over $\F_q$, then its $j$-invariant is in $\F_q$.
 
 Any isogeny can be factored as a composition of a \emph{separable} and
@@ -376,8 +377,7 @@ over $\Fbar_q$ will be an infinite $(ℓ+1)$-regular
 graph (a notable exception is the finite connected component of
 \emph{supersingular} curves, used in SIDH and related protocols).
 
-In the sequel we restrict to isogenies defined over $\F_q$, 
-which makes the picture more complex.  
+We now restrict to isogenies defined over $\F_q$.
 If $E$ and $E'$ are elliptic curves over $\F_q$,
 then an isogeny $ϕ:E→E'$ is defined over $\F_q$
 (up to a twist of $E'$)
@@ -394,11 +394,11 @@ a stronger equivalence.
 If $E$ and $\tilde{E}$ are not $\F_q$-isomorphic
 but $j(E) = j(\tilde{E})$,
 then $\tilde{E}$ is the \emph{quadratic twist} of $E$
-(which is defined and unique up to $\F_q$-isomorphism).\footnote{
+(which is defined and unique up to $\F_q$-isomorphism).\footnote{%
     There is a slight technicality here for $j$-invariants $0$ and $1728$,
     where non-quadratic twists may exist.
-    We can ignore these special cases
-    because these curves will never appear in our cryptosystem:
+    We ignore these special cases
+    because these curves never appear in our cryptosystem:
     the class groups of their endomorphism rings are trivial,
     and keyspaces of size 1 are of limited utility in cryptography.
 }
@@ -412,7 +412,8 @@ of the same degree between the quadratic twists.
 The component of the $\F_q$-isogeny graph containing an ordinary curve 
 and the component containing its twist are thus isomorphic;
 we are therefore justified in identifying them,
-using $j$-invariants in $\F_q$ for vertices in the $\F_q$-graph.\footnote{
+using $j$-invariants in $\F_q$ for vertices in the
+$\F_q$-graph.\footnote{%
     The situation is much more complicated for supersingular graphs,
     because the curve and its twist are in the same component
     of the graph; see~\cite[\S2]{DelfsG16} for details.
@@ -494,9 +495,10 @@ The ring of integers $\O_K$ of $K=ℚ(\sqrt{Δ_π})$ is its
 \emph{maximal order}: it contains any other order of $K$.  Hence
 $ℤ[π]⊂\End(E)⊂\O_K$, and there is only a finite number of possible
 choices for $\End(E)$. If we write $Δ_π=d^2Δ_K$, where $Δ_K$ is the
-discriminant\footnote{$Δ_K$ is also called 
-    a \emph{fundamental discriminant}; 
-    it is in $\{0,1\}\bmod 4$, and either $Δ_K$ or $Δ_K/4$ is squarefree.
+discriminant\footnote{%
+    $Δ_K$ is 
+    a \emph{fundamental discriminant}:
+    $\Delta_K\equiv0,1\pmod 4$, and $Δ_K$ or $\frac{Δ_K}{4}$ is squarefree.
 } 
 of $\O_K$, then the index $[\O_K:\End(E)]$ must divide $d=[\O_K:ℤ[π]]$.
 
@@ -558,14 +560,13 @@ The order of $\Cl(\O)$ is called the \emph{class number} of $\O$, and
 denoted by $h(\O)$. An immediate consequence of the theorem is that
 $\#\Ell_q(\O)=h(\O)$.
 
-As before, in practice we work with $\F_q$-isomorphism classes.
+As before, we work with $\F_q$-isomorphism classes.
 Then $\Ell_q(\O)$ decomposes into two isomorphic PHSes under $\Cl(\O)$,
 each containing the quadratic twists of the curves in the other. 
 We choose one of these
 two components, that we will also denote $\Ell_q(\O)$ in the sequel.
-(The choice is equivalent to the choice of isomorphism of $\End(E)$ with
-$\O$, which is determined by a choice of sign on the image of Frobenius
-in $\O$.)
+(The choice is equivalent to a choice of isomorphism $\End(E) \cong \O$,
+and thus to a choice of sign on the image of~\(\pi\) in $\O$.)
 %This choice is equivalent to fixing the image of the Frobenius
 %endomorphism $\pi$ in $\O$,
 %and not only up to sign. 
@@ -584,13 +585,12 @@ $\Cl(\O)$, thus the isogeny $ϕ_{\hat{\frak a}}:\frak a·E→E$ of
 kernel $(\frak a·E)[\hat{\frak a}]$ is the dual of $ϕ_{\frak a}$ (up
 to isomorphism). 
 
-Hence, 
-the eigenvalues $λ$ and $μ$ define two opposite directions on the
+The eigenvalues $λ$ and $μ$ define opposite directions on the
 $\ell$-isogeny cycle,
 independent of the starting curve,
 as shown in Figure~\ref{fig:cycle}.  
 The size of the cycle is the order of $(π-λ,ℓ)$ in $\Cl(\O)$,
-thus partitioning the set $\Ell_q(\O)$ into cycles of equal size.
+thus partitioning $\Ell_q(\O)$ into cycles of equal size.
 
 \begin{figure}[t]
   \begin{minipage}{0.45\textwidth}
@@ -1019,7 +1019,7 @@ $r > 0$ (so $t_1 = t$) and $t_0 = 2$,
 then the $t_r$ satisfy the recurrence
 $t_r = t\cdot t_{r-1} - q\cdot t_{r-2}$. 
 
-We compute the quotient curve at Line~\ref{line:quotient} 
+We compute the quotient curve in Line~\ref{line:quotient} 
 with Vélu's formul\ae~\cite{Velu71} in $O(\ell)$ $\F_q$-operations.
 Since $\log C_r\simeq r\log q$, provided $\ell = O(\log q)$,
 the costly step in Algorithm~\ref{alg:VéluStep} is the scalar
@@ -1307,7 +1307,7 @@ to use the full power of Algorithm~\algstyle{VéluStep}.
 The SEA algorithm~\cite{schoof95,Morain95}
 is the state-of-the-art point-count\-ing algorithm
 for elliptic curves over large-characteristic finite fields.
-In order to compute $N = \# E(\F_p)$, it computes the value of $N$ modulo a series
+In order to compute $N = \# E(\F_p)$, it computes $N$ modulo a series
 of small Elkies primes~$\ell$, before combining the results via the CRT
 to get the true value of $N$.
 
@@ -1469,12 +1469,14 @@ We start by addressing the following, more general, problem:
   $(ϕ_i)_{1≤i≤n}$ such that $ϕ_n∘\cdots∘ϕ_1(E)=E'$.
 \end{problem}
 
-Here, let us consider $E$ and $E'$ are sampled uniformly (although this is never exactly the case in practice).
-This problem was studied for some time before the emergence of
+The curves in Problem~\ref{prob:isog} are supposed to be sampled
+uniformly, though this is never exactly the case in practice.
+%Here, let us consider $E$ and $E'$ are sampled uniformly (although this is never exactly the case in practice).
+This problem was studied before the emergence of
 isogeny-based cryptography~\cite{Gal,GHS,galbraith+stolbunov11},
-because of its applications to conventional elliptic curve
-cryptography~\cite{GHS,teske06,jao+miller+venkatesan09}.  The
-algorithm with the best asymptotic complexity is due to Galbraith,
+because of its applications to conventional elliptic-curve
+cryptography~\cite{GHS,teske06,jao+miller+venkatesan09}.
+The algorithm with the best asymptotic complexity is due to Galbraith,
 Hess and Smart~\cite{GHS}. It consists of three stages:
 \begin{description}
 \item[Stage 0.] Use walks of \emph{ascending} isogenies to reduce to the case where
@@ -1539,8 +1541,8 @@ The set $\Ell_q(\O_K)$ has the smallest size among all sets
 $\Ell_q(\O)$ for $\O⊂\O_K$, so it is always interesting to
 reduce to it. This justifies using curves with maximal endomorphism
 ring in the definition of the protocol in
-Section~\ref{sec:keyex}. We remark that when $Δ_π$ is square-free, $ℤ[π]$
-is the maximal order, and this condition is automatically satisfied.
+Section~\ref{sec:keyex}. When $Δ_π$ is square-free, $ℤ[π]$
+is the maximal order, and the condition is automatically true.
 
 The collision search in Stage~1 relies on the birthday paradox, and
 has a complexity of $O(\sqrt{h(\O_K)})$.
@@ -1636,10 +1638,12 @@ Table~\ref{tab:sizes} thus proposes various parameter sizes, with
 associated numbers of quantum queries based on the observations above;
 we also indicate the estimated time to (classically) precompute the
 class group structure according
-to~\cite{10.1007/978-3-642-14081-5_15}\footnote{Note however that
-  computing the class group structure can be seen as an instance of
+to~\cite{10.1007/978-3-642-14081-5_15}.\footnote{%
+  Computing the class group structure is an instance of
   the hidden subgroup problem, and thus can be solved in quantum
-  polynomial time by Shor's algorithm.}.  Whenever the quantum query
+  polynomial time by Shor's algorithm.
+}
+Whenever the quantum query
 complexity alone is enough to put a parameter in one of NIST's
 security categories~\cite{NIST2016}, we indicate it in the table. We
 believe that using query complexity alone is a very conservative
@@ -1648,8 +1652,8 @@ post-quantum security properties of our scheme.
 
 The system parameters we proposed in Section~\ref{sec:initcurve}
 correspond to the first line of Table~\ref{tab:sizes}, 
-thus offering at least 56-bit quantum security 
-(and 128-bit classical security).
+thus offering at least 56-bit quantum 
+and 128-bit classical security.
 
 %\begin{table}
     %\renewcommand{\arraystretch}{1.4}
@@ -1818,11 +1822,11 @@ combined. To do this we give a lemma showing that CGA-DDH and IWD
 together imply IW-DDH. The technique is straightforward: we use an
 IW-DDH oracle to solve both the CGA-DDH and IWD problems, showing that
 at least one of the two must be solvable with non-negligible
-advantage. The only technical difficulty lies in the fact that we need
+advantage. The only technical difficulty is that we need
 an efficient way to simulate the uniform distribution on $\Ell_q(\O)$;
 for this, we use another Cayley graph on $\Ell_q(\O)$,
 with a potentially larger edge set, that is proven
-in~\cite{jao+miller+venkatesan09} to be an expander graph
+in~\cite{jao+miller+venkatesan09} to be an expander 
 under the generalized Riemann hypothesis (GRH).
 
 We let $\Adv[A]{IW-DDH}$ be the \emph{advantage} of an adversary $A$
@@ -1920,9 +1924,9 @@ without the generalized Riemann hypothesis.
     compute the curve $E_{ab}=\frak{ab}·E_0$.
 \end{definition}
 
-Stolbunov already proved
+Stolbunov proved
 the security of HHS Diffie--Hellman under the equivalent of CGA-DDH~\cite{Stol}.
-By repeating the same steps, we can prove the following theorem.
+Repeating the same steps, we can prove the following theorem.
 
 \begin{theorem}
     If the CGA-DDH and IWD assumptions hold, assuming GRH, 
@@ -1932,13 +1936,12 @@ By repeating the same steps, we can prove the following theorem.
     of Canetti and Krawczyk~\cite{canetti}.
 \end{theorem}
 
-Similarly, we can prove the IND-CPA security of the hashed El Gamal
+Similarly, we can prove the IND-CPA security of the hashed ElGamal
 protocol derived from Algorithm~\ref{alg:isogeny-KeyGen} by replicating the
-classical techniques of, for
-instance,~\cite[20.4.11]{galbraith2012mathematics}.
+techniques of e.g.~\cite[\S20.4.11]{galbraith2012mathematics}.
 
 \begin{theorem}
-    Assuming CGA-CDH and IWD, the hashed El Gamal protocol derived from
+    Assuming CGA-CDH and IWD, the hashed ElGamal protocol derived from
     Algorithms~\ref{alg:isogeny-KeyGen} and~\ref{alg:isogeny-DH}
     is IND-CPA secure in the random oracle model.
 \end{theorem}
@@ -1988,7 +1991,7 @@ parameters than those provided by GRH.
 Modern practice in cryptography mandates the use of stronger security
 notions than IND-CPA.  From the DLP assumption, it is easy to
 construct protocols with strong security against active adversaries.
-For example, it is well-known that the hashed El Gamal KEM achieves
+For example, it is well-known that the hashed ElGamal KEM achieves
 IND-CCA security in the random oracle model under various
 assumptions~\cite{10.1007/3-540-45353-9_12,cryptoeprint:1999:007,doi:10.1137/S0097539702403773}.
 
@@ -2127,28 +2130,28 @@ practical post-quantum scheme was known prior to~\cite{csidh}.
 \section{Experimental results}
 \label{sec:exp}
 
-In order to demonstrate that our key-exchange protocol is usable at
+In order to demonstrate that our protocol is usable at
 standard security levels, we implemented it in the Julia programming
-language. This proof of concept also allows us to estimate the cost of
-isogeny steps, which is needed in the process of generating the
+language. This proof of concept also allowed us to estimate 
+isogeny step costs, which we needed to generate the
 initial curve in Section~\ref{sec:initcurve}.  We developed several
 Julia packages\footnote{The main code is available at
   \url{https://github.com/defeo/hhs-keyex/}, and the additional
   dependencies at \url{https://github.com/defeo/EllipticCurves.jl/}
   and \url{https://github.com/defeo/ClassPolynomials.jl/}.}, built
-upon the computer algebra package Nemo~\cite{nemo}.  Experiments were
-conducted on a Linux OS, with an Intel Core i7-5600U cpu at 2.60GHz,
-using Julia 0.6 and Nemo 0.7.3.
+upon the computer algebra package Nemo~\cite{nemo}.
+Experiments were conducted
+using Julia 0.6 and Nemo 0.7.3 on Linux, with an Intel Core i7-5600U cpu at 2.60GHz.
 
-First, consider the
+Consider the
 time to compute one step for an ideal $\frak s = (\ell,\pi-\lambda)$.
 Using Elkies steps, this is approximately
-the cost of finding the roots of the modular polynomial,
-which is roughly $0.017\cdot\ell$ seconds in our implementation.
-Using Vélu steps, the cost of a step is approximately
-that of one scalar multiplication in $E(\F_{q^r})$.
-Table~\ref{tab:time-vs-r} lists per-step times in our implementation,
-for the extension degrees relevant to our parameters.
+the cost of finding the roots of the modular polynomial:
+roughly $0.017\cdot\ell$ seconds in our implementation.
+Using Vélu steps, the cost is approximately
+that of one scalar multiplication in $E(\F_{q^r})$;
+timings for the extension degrees \(r\) relevant to our parameters
+appear in Table~\ref{tab:time-vs-r}.
 
 \begin{table}
     \centering
@@ -2315,22 +2318,22 @@ lists other primes for which we apply Algorithm~\ref{alg:ElkiesWalk}.
 
 Using these parameters, we perform one isogeny walk in
 approximately 520 seconds.
-These timings are~\emph{worst-case}
-in the sense that the number of isogeny steps is taken
+These timings are~\emph{worst-case}:
+the number of isogeny steps is taken
 to be exactly $M_\ell$ for each $\ell$.
 This is about as fast as Stolbunov's largest parameter~\cite{Stol},
 which is for a prime of 428 bits and a keyspace of only 216 bits.
 
-We stress the fact that this implementation
-is \emph{not} optimised. Besides general gains on field arithmetic,
+We stress that our implementation
+is \emph{not} optimised. General gains in field arithmetic aside,
 optimised code could easily beat our proof-of-concept implementation
-on critical points of our algorithms, for instance the root finding steps 
+at critical points of our algorithms, such as the root finding steps 
 in Algorithms~\ref{alg:ElkiesFirstStep}
 and~\ref{alg:ElkiesNextStep}.
 
-For comparison, without using Algorithm~\ref{alg:VéluStep}, the
+For comparison, without Algorithm~\ref{alg:VéluStep} the
 total isogeny walk time would exceed 2000 seconds:
-our ideas thus bring an improvement by a factor of over 4 over the
+our ideas thus yield an improvement by a factor of over 4 over the
 original protocol. A longer search for efficient public
 parameters would bring further improvement.
 
