@@ -1556,10 +1556,12 @@ albeit feasible; thus, we can only rely on these heuristic arguments
 to justify the security of our proposed parameters.
 % todo: check this is really the latest record
 
-Finally, Stage~2,
-which outputs an isogeny walk of size polynomial in $\log q$,
-has a complexity bounded by that of Stage~1.
-It therefore has no impact on our security estimates.
+The horizontal isogeny produced by Stage~1 is represented by an ideal
+constructed as a product of exponentially many small ideals.
+Stage~2 converts this into a sequence of small ideals of length
+polynomial in \(\log q\).
+Its complexity is bounded by that of Stage~1,
+so it has no impact on our security estimates.
 
 \begin{remark}
   The Cohen--Lenstra heuristic~\cite{10.1007/BFb0099440} predicts that
