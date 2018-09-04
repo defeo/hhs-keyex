@@ -521,22 +521,22 @@ We now present a group action on the set of all curves
 up to isomorphism having complex
 multiplication by a fixed order $\O$; the key exchange protocol of
 Section~\ref{sec:keyex} will be built on this action. Let $\frak a$ be
-an invertible ideal in $\End(E)≃\O$, and define the
+an invertible ideal in $\End(E)≃\O$ of norm prime to $p$, and define the
 \emph{${\frak a}$-torsion} subgroup of $E$ as
 \[
 E[\frak a] = \set{P\in E(\Fbar_q) \suchthat σ(P) = 0\ 
 \text{ for all }σ\in\frak a}.
 \]
-This subgroup is the kernel of an isogeny $\phi_{\frak a}$;
+This subgroup is the kernel of a separable isogeny $\phi_{\frak a}$\footnote{In fact, one can define $\phi_{\frak a}$ for any invertible ideal $\frak a$, but it is not always separable.};
 the codomain $E/E[\frak a]$ of $\phi_{\frak a}$ is well-defined up to isomorphism
 and will be denoted $\frak a\cdot E$.
 The isogeny $\phi_{\frak a}$ is
 always horizontal---that is, $\End(\frak a \cdot E) = \End(E)$---and its
-degree is the \emph{norm} of $\frak a$ as an ideal of $\End(E)$ \footnote{This is at least true when the norm of $\frak a$ is prime to $p$. Otherwise an inseparable part could be missing in our definition of $\phi_{\frak a}$, but $\frak a\cdot E$ remains the same.}.
+degree is the \emph{norm} of $\frak a$ as an ideal of $\End(E)$.
 
 Let $\Ell_q(\O)$ be the set of isomorphism classes over $\Fbar_q$
 of curves with complex multiplication by $\O$, and assume it is non-empty. 
-It turns out that the construction above extends
+It turns out that the construction above can be extended
 to an action of the group of fractional ideals of $\O$ on $\Ell_q(\O)$.
 Furthermore, the principal ideals act trivially 
 (the corresponding isogenies are endomorphisms), 
@@ -1480,7 +1480,7 @@ Hess and Smart~\cite{GHS}. It consists of three stages:
   from $E$ and $E'$; detect the
   moment when they collide using a Pollard-rho type of algorithm.
 \item[Stage 2.] Reduce the size of the obtained walk using
-  index-calculus techniques, in order to represent the walk in polynomial space.
+  index-calculus techniques.
 \end{description}
 
 To understand Stage~0, recall that all isogenous elliptic curves have
