@@ -485,7 +485,7 @@ then $\End(E)$ is isomorphic to an
     An \emph{order} is a subring which is a $ℤ$-module of rank $2$.
 } in the quadratic imaginary field
 $ℚ(\sqrt{Δ_π})$ (see~\cite[III.9]{silverman:elliptic}).
-A curve whose endomorphism ring contains an order $\O$ is said to
+A curve whose endomorphism ring is isomorphic to an order $\O$ is said to
 have \emph{complex multiplication} by $\O$.
 For a detailed treatment of the theory of complex multiplication,
 see~\cite{lang1987elliptic,silverman:advanced}.
@@ -532,7 +532,7 @@ the codomain $E/E[\frak a]$ of $\phi_{\frak a}$ is well-defined up to isomorphis
 and will be denoted $\frak a\cdot E$.
 The isogeny $\phi_{\frak a}$ is
 always horizontal---that is, $\End(\frak a \cdot E) = \End(E)$---and its
-degree is the \emph{norm} of $\frak a$ as an ideal of $\End(E)$.
+degree is the \emph{norm} of $\frak a$ as an ideal of $\End(E)$ \footnote{This is at least true when the norm of $\frak a$ is prime to $p$. Otherwise an inseparable part could be missing in our definition of $\phi_{\frak a}$, but $\frak a\cdot E$ remains the same.}.
 
 Let $\Ell_q(\O)$ be the set of isomorphism classes over $\Fbar_q$
 of curves with complex multiplication by $\O$, and assume it is non-empty. 
@@ -1466,6 +1466,7 @@ We start by addressing the following, more general, problem:
   $(ϕ_i)_{1≤i≤n}$ such that $ϕ_n∘\cdots∘ϕ_1(E)=E'$.
 \end{problem}
 
+Here, let us consider $E$ and $E'$ are sampled uniformly (although this is never exactly the case in practice).
 This problem was studied for some time before the emergence of
 isogeny-based cryptography~\cite{Gal,GHS,galbraith+stolbunov11},
 because of its applications to conventional elliptic curve
@@ -1479,7 +1480,7 @@ Hess and Smart~\cite{GHS}. It consists of three stages:
   from $E$ and $E'$; detect the
   moment when they collide using a Pollard-rho type of algorithm.
 \item[Stage 2.] Reduce the size of the obtained walk using
-  index-calculus techniques.
+  index-calculus techniques, in order to represent the walk in polynomial space.
 \end{description}
 
 To understand Stage~0, recall that all isogenous elliptic curves have
