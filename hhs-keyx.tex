@@ -220,21 +220,21 @@ security setting.
 %key-exchange protocol~\cite{jao+defeo2011}, which to the present day
 %is not victim to any subexponential attack.
 
-The aim of the present paper is to improve and modernize the
+This paper aims to improve and modernize the
 Couveignes--Rostovtsev--Stolbunov (CRS) construction, borrowing
 techniques from SIDH and point-counting algorithms, to the point of
 making it usable in a post-quantum setting.  Our main contributions
 are in Sections~\ref{sec:keyex}--\ref{sec:initcurve}, where we present
 a new, more efficient way of computing the CRS group action, and in
-Section~\ref{sec:sec} where we give precise classic and quantum
+Section~\ref{sec:sec}, where we give precise classic and quantum
 security estimates, formalize hardness assumptions, and sketch
 security proofs in stronger models than those previously
 considered. We also discuss the cryptographic advantages
 that this primitive has over SIDH.
-Finally, in Section~\ref{sec:exp} we present a
+In Section~\ref{sec:exp} we present a
 proof-of-concept implementation and measure its performance.
-While the final result is far from being competitive, we believe it
-constitutes progress in the direction of having a valid isogeny-based
+The final result is far from being competitive, but we believe it
+constitutes progress towards a valid isogeny-based
 alternative to SIDH.
 
 \paragraph{CSIDH.}
@@ -243,7 +243,7 @@ recent work by Castryk, Lange, Martindale, Panny, and Renes,
 introducing CSIDH, 
 an efficient post-quantum primitive very similar to CRS~\cite{csidh}.
 Their work builds upon the ideas presented in
-Sections~\ref{sec:keyex}--\ref{sec:initcurve}, and uses them in a
+Sections~\ref{sec:keyex}--\ref{sec:initcurve}, using them in a
 different homogeneous space where they apply effortlessly.  Their
 breakthrough confirms that, if anything, our techniques were a
 fundamental step towards the first practical post-quantum
@@ -2170,20 +2170,21 @@ appear in Table~\ref{tab:time-vs-r}.
 
 Using this data, finding efficient walk length bounds $M_\ell$
 offering a sufficient keyspace size is easily seen to be an
-integer optimization problem. In order to find a
-satisfactory solution, we used the following heuristic procedure.
+integer optimization problem. 
+We used the following heuristic procedure
+to find a satisfactory solution.
 Given a time bound $T$, let \algstyle{KeySpaceSize}$(T)$ be
 the keyspace size obtained when each $M_\ell$ is the greatest such
 that the \emph{total time spent on $\ell$-isogenies} is less than $T$.
-Then, if $n$ denotes the (classical) security parameter,
+Then, if $n$ is the (classical) security parameter,
 we look for the \emph{least $T$} such that
 $
 	\algstyle{KeySpaceSize}(T)\geq 2^{2n}
 $
-(according to Section~\ref{sec:sec}), using dichotomic search.
+(according to Section~\ref{sec:sec}), using binary search.
 While the $M_\ell$
 we obtain are most likely not the best possible, intuitively
-the outcome does not fall very far from the optimal.
+the outcome is not too far from optimal.
 
 In this way, we obtain a proposal for the walk length bounds $M_\ell$
 to be used in Algorithm~\ref{alg:isogeny-KeyGen} along with the curve
@@ -2332,8 +2333,8 @@ in Algorithms~\ref{alg:ElkiesFirstStep}
 and~\ref{alg:ElkiesNextStep}.
 
 For comparison, without Algorithm~\ref{alg:VéluStep} the
-total isogeny walk time would exceed 2000 seconds:
-our ideas thus yield an improvement by a factor of over 4 over the
+total isogeny walk time would exceed 2000 seconds.
+Our ideas thus yield an improvement by a factor of over 4 over the
 original protocol. A longer search for efficient public
 parameters would bring further improvement.
 
