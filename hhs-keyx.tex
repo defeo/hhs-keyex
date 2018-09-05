@@ -206,7 +206,7 @@ key exchange scheme similar to Algorithm~\ref{alg:HHS-DH}.  Rostovtsev
 and Stolbunov's proposal deviates from the HHS paradigm in
 the way random elements of $G$ are sampled, as we will explain in
 Section~\ref{sec:keyex}. This makes the primitive less flexible, but
-also more practical.
+also more practical. While being very slow, it does not suffer from potential cryptographic weaknesses SIDH has (such as short paths and the publication of image points), and permits static-static protocols.
 
 Rostovtsev and Stolbunov advertised their cryptosystems as potential
 post-quantum candidates, leading Childs, Jao and Soukharev to introduce
@@ -215,7 +215,7 @@ them~\cite{childs2014constructing}.
 Hence, being already slow enough to
 be impractical in a classical security setting, their
 primitive appeared even more impractical in a quantum
-security setting.
+security setting. 
 %This led Jao and De Feo to create the SIDH
 %key-exchange protocol~\cite{jao+defeo2011}, which to the present day
 %is not victim to any subexponential attack.
