@@ -216,7 +216,7 @@ key exchange scheme similar to Algorithm~\ref{alg:HHS-DH}.  Rostovtsev
 and Stolbunov's proposal deviates from the HHS paradigm in
 the way random elements of $G$ are sampled, as we will explain in
 Section~\ref{sec:keyex}. This makes the primitive less flexible, but
-also more practical. While being very slow, it does not suffer from potential cryptographic weaknesses SIDH has (such as short paths and the publication of image points), and permits static-static protocols.
+also more practical.
 
 Rostovtsev and Stolbunov advertised their cryptosystems as potential
 post-quantum candidates, leading Childs, Jao and Soukharev to introduce
@@ -230,20 +230,27 @@ security setting.
 %key-exchange protocol~\cite{jao+defeo2011}, which to the present day
 %is not victim to any subexponential attack.
 
-This paper aims to improve and modernize the
-Couveignes--Rostovtsev--Stolbunov (CRS) construction, borrowing
-techniques from SIDH and point-counting algorithms, to the point of
-making it usable in a post-quantum setting.  Our main contributions
+But the Couveignes--Rostovtsev--Stolbunov primitive (CRS)
+has some important advantages over SIDH which make it worth pursuing.
+Unlike SIDH, 
+CRS offers efficient and safe public key validation,
+making it suitable for non-interactive key exchange (NIKE).
+Further, CRS does not suffer from the potential cryptographic weaknesses that SIDH has
+such as short paths and the publication of image points.
+
+This paper aims to improve and modernize the CRS construction, 
+borrowing techniques from SIDH and point-counting algorithms,
+to the point of making it usable in a post-quantum setting.  
+Our main contributions
 are in Sections~\ref{sec:keyex}--\ref{sec:initcurve}, where we present
 a new, more efficient way of computing the CRS group action, and in
 Section~\ref{sec:sec}, where we give precise classic and quantum
 security estimates, formalize hardness assumptions, and sketch
 security proofs in stronger models than those previously
-considered. We also discuss the cryptographic advantages
-that this primitive has over SIDH.
+considered. 
 In Section~\ref{sec:exp} we present a
 proof-of-concept implementation and measure its performance.
-The final result is far from being competitive, but we believe it
+While the final result is far from competitive, we believe it
 constitutes progress towards a valid isogeny-based
 alternative to SIDH.
 
