@@ -235,7 +235,8 @@ has some important advantages over SIDH which make it worth pursuing.
 Unlike SIDH, 
 CRS offers efficient and safe public key validation,
 making it suitable for non-interactive key exchange (NIKE).
-Further, CRS does not suffer from the potential cryptographic weaknesses that SIDH has
+Further, CRS does not suffer from 
+some of the potential cryptographic weaknesses that SIDH has,
 such as short paths and the publication of image points.
 
 This paper aims to improve and modernize the CRS construction, 
@@ -256,9 +257,9 @@ alternative to SIDH.
 
 \paragraph{CSIDH.}
 While preparing this paper we were informed of
-recent work by Castryk, Lange, Martindale, Panny, and Renes,
+recent work by Castryck, Lange, Martindale, Panny, and Renes,
 introducing CSIDH, 
-an efficient post-quantum primitive very similar to CRS~\cite{csidh}.
+an efficient post-quantum primitive based on CRS~\cite{csidh}.
 Their work builds upon the ideas presented in
 \S\S\ref{sec:keyex}--\ref{sec:initcurve}, using them in a
 different homogeneous space where they apply effortlessly.  Their
