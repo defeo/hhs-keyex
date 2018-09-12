@@ -116,22 +116,6 @@ and Rostovtsev and
 Stolbunov~\cite{rostovtsev+stolbunov06,stolbunov-red,Stol},
 which were widely considered unwieldy and impractical.
 
-%A recent trend in cryptography is the development of quantum-safe
-%cryptosystems, that are based on mathematical problems not known to
-%be solvable in polynomial time by quantum computers. With Shor's
-%algorithm~\cite{shor1994algorithms} ruling out systems based on
-%integer factorization or discrete logarithms, NIST has launched a
-%process to standardize the next generation of \emph{post-quantum}
-%public key cryptosystems~\cite{NIST2016}. Among the youngest and least
-%explored post-quantum families, \emph{isogeny-based} cryptography features only one
-%proposal to the NIST competition: the Supersingular Isogeny Key
-%Encapsulation (SIKE)~\cite{SIKE}.
-%SIKE is based upon the key-exchange protocol by Jao and De
-%Feo~\cite{jao+defeo2011}, known as SIDH, itself inspired by earlier
-%key-exchange constructions by Couveignes~\cite{cryptoeprint:2006:291}
-%and Rostovtsev and
-%Stolbunov~\cite{rostovtsev+stolbunov06,stolbunov-red,Stol}.
-
 Indeed, the origins of isogeny-based cryptography can be traced back to
 Couveignes' ``Hard Homogeneous Spaces'' manuscript,
 that went unpublished for ten years before appearing
@@ -205,7 +189,6 @@ Couveignes viewed HHS chiefly as a general framework encompassing
 various Diffie--Hellman-like systems. Nevertheless, he
 suggested using a specific HHS based on the theory of complex
 multiplication of elliptic curves, in a sense generalizing 
-% to the HHS framework 
 Buchmann and Williams'
 class-group-based Diffie--Hellman key exchange~\cite{Buchmann1988}.
 Independently, Rostovtsev
@@ -226,9 +209,6 @@ Hence, being already slow enough to
 be impractical in a classical security setting, their
 primitive appeared even more impractical in a quantum
 security setting. 
-%This led Jao and De Feo to create the SIDH
-%key-exchange protocol~\cite{jao+defeo2011}, which to the present day
-%is not victim to any subexponential attack.
 
 But the Couveignes--Rostovtsev--Stolbunov primitive (CRS)
 has some important advantages over SIDH which make it worth pursuing.
@@ -286,7 +266,6 @@ P141580-3069086/DOS0044212.
 \section{Isogenies and complex multiplication}
 \label{sec:math}
 
-%We recall here basic facts on isogenies of elliptic curves defined
 We begin by recalling some basic facts on isogenies of elliptic curves 
 over finite fields. For an in-depth introduction to these concepts, we
 refer the reader to~\cite{silverman:elliptic}. For a general
@@ -334,9 +313,6 @@ An isogeny $ϕ$ is \emph{cyclic}
 if $\ker ϕ$ is a cyclic group.
 
 An \emph{isomorphism} is an isogeny of degree~\(1\).
-%It is a
-%group isomorphism on $\Fbar_q$-points, but not necessarily on $\F_q$-points
-%unless the isomorphism is defined over $\F_q$. 
 An \emph{isomorphism class} of elliptic curves is
 fully determined by their common \emph{$j$-invariant} in $\Fbar_q$. 
 If any curve in the isomorphism class is defined
@@ -354,9 +330,6 @@ an elliptic curve $E/G$ and an $\ell$-isogeny $\phi: E \to E/G$
 such that $\ker \phi = G$,
 and the curve and isogeny are unique up to isomorphism.
 In particular, if $\phi$ is separable then $\deg ϕ=\#\ker ϕ$.
-%It follows
-%that any isogeny of degree greater than $1$ can be factored as a
-%composition of cyclic isogenies of prime degree.
 It is convenient to encode $\ker\phi$ as
 the polynomial whose roots are the $x$-coordinates of the points
 in $\ker\phi$, called the \emph{kernel polynomial} of $\phi$.
@@ -380,8 +353,6 @@ These are
 (multi)-graphs whose vertices are
 elliptic curves up to isomorphism, and whose edges are isogenies
 between them (again up to isomorphism).
-%Because of the dual isogeny theorem, isogeny graphs are typically
-%considered undirected.  %% BS: removed this sentence because we never use it.
 The use of isogeny graphs for algorithmic applications 
 goes back to Mestre and Oesterlé~\cite{Mestre},
 followed notably by Kohel~\cite{kohel},
@@ -481,11 +452,7 @@ for ordinary curves $Δ_π≠0$, so only a finite number
 of $ℓ$ will fall in these cases, and they will be mostly
 irrelevant to our cryptosystem.
 We do not use any $\ell$ in Case~(0).
-%Following the literature on the SEA point-counting algorithm,
-%if $ℓ$ falls into case~(0) it will be called an \emph{Atkin prime}, 
-%if it falls into case~(2) it will be called an \emph{Elkies prime}.
 
-%We will chiefly be interested in Elkies primes. 
 Since all curves in
 the same isogeny class over $\F_q$ have the same number of points,
 they also have the same trace $t$ and discriminant $Δ_π$.
@@ -589,9 +556,6 @@ We choose one of these
 two components, that we will also denote $\Ell_q(\O)$ in the sequel.
 (The choice is equivalent to a choice of isomorphism $\End(E) \cong \O$,
 and thus to a choice of sign on the image of~\(\pi\) in $\O$.)
-%This choice is equivalent to fixing the image of the Frobenius
-%endomorphism $\pi$ in $\O$,
-%and not only up to sign. 
 
 Now let $ℓ$ be an Elkies prime for $E\in\Ell_q(\O)$. So far, we have seen that the
 connected component of $E$ in the $ℓ$-isogeny graph is a cycle of
@@ -803,15 +767,11 @@ using one of two different methods:
 
 Rostovtsev and Stolbunov only used analogues of 
 Algorithms~\ref{alg:ElkiesFirstStep} and~\ref{alg:ElkiesNextStep}.
-%which is a classical algorithm.  %% <- BS: not _that_ classical...
 The introduction of \algstyle{VéluStep}, 
-% very different in spirit from Algorithm~\algstyle{ElkiesStep} and
 inspired by SIDH and related protocols
 (and now a key ingredient in the CSIDH protocol~\cite{csidh}),
 speeds up our protocol by a considerable factor;
 this is the main practical contribution of our work. 
-
-%Let us now delve into the details of these two~\algstyle{Step} algorithms.
 
 \begin{algorithm}
 	\caption{\algstyle{ElkiesFirstStep}}
@@ -852,7 +812,6 @@ this is the main practical contribution of our work.
         $(\ell,\lambda)$ encoding $\frak{s} = (\pi-\lambda,\ell)$;
         $(j_0,j_1) = (j(E),j(\frak{s}\cdot E))$ for $E$ in $\Ell_q(\O)$
     }
-    %(\ell,\lambda)$ defining an ideal $\frak s = (\pi-\lambda,\ell)$; $j_{k-1} = j(\frak s^{k-1}\cdot E)$ and $j_k = j(\frak s^{k}\cdot E)$ for some $E\in\Ell_q(\O)$ and $k\geq 1$}
     \Output{$j(\frak{s}\cdot\frak{s}\cdot E)$}
     %
     \label{alg:ElkiesNextStep:step}
@@ -884,7 +843,6 @@ this is the main practical contribution of our work.
 	}
     $E_R \gets \algstyle{EllipticCurveFromJInvariant}(j_1)$ 
     \;
-    %$E_R \gets$ an elliptic curve with $j$-invariant $j_1$ and order $C$ 
     \label{line:twist}
     \If{\textbf{not} $\algstyle{CheckTrace}(E_R,t)$}{
         $E_R \gets \algstyle{QuadraticTwist}(E_R)$
@@ -993,8 +951,6 @@ over an extension of $\F_q$ of degree at most $\frac{\ell-1}{2}$,
 then evaluate $\pi(Q)$ and $[\lambda]Q$.
 If they match, then we have chosen the right direction;
 otherwise we take the other root of $P(X)$.
-%This is also the critical
-%part of Algorithm~\ref{alg:ElkiesNextStep}.
 
 Algorithm~\ref{alg:ElkiesWalk} (\algstyle{ElkiesWalk}) 
 combines these algorithms
@@ -1004,7 +960,6 @@ is the the correct component of the $\ell$-isogeny graph.
 Both \algstyle{ElkiesFirstStep} and \algstyle{ElkiesNextStep}
 cost $\softO(\ell\log q)$ $\F_q$-operations,
 dominated by the calculation of the roots of $P(X)$.
-% and grows quasi-linearly with $\ell$.
 
 
 \paragraph{Vélu steps.}
@@ -1072,12 +1027,6 @@ by using elliptic curve models with more efficient arithmetic.
 In our implementation (see \S\ref{sec:exp}),
 we used $x$-only arithmetic on Montgomery models~\cite{Montgomery87,CostelloSmith2017},
 which also have convenient Vélu formul\ae~\cite{CostelloH17,Renes2018}.
-%On the other hand, the Weierstrass model is classical and universal, 
-%and is usually the considered model in the literature
-%about isogeny computations.
-%Hence, if the initial curve $E_0$ admits a Montgomery model, one can
-%compute the Vélu steps \emph{first} using Montgomery models,
-%and switch to Weierstrass models afterwards. 
 Note that we can also avoid computing $y$-coordinates in
 Algorithm~\ref{alg:ElkiesFirstStep}
 at Line~\ref{line:direction} if $\lambda\neq\pm\mu$:
@@ -1229,14 +1178,6 @@ which is a problem we will return to in \S\ref{sec:exp}.
     \Return{$((k_\ell)_{\ell\in S},j(E))$}
 \end{algorithm}
 
-%Then, an isogeny walk is simply a sequence of isogeny
-%steps, using either Elkies or Vélu steps as appropriate:
-%see Algorithm~\ref{alg:walk}. 
-%Algorithm~\ref{alg:keyex}
-%then rephrases the generic Diffie--Hellman algorithm~\ref{alg:HHS-DH}
-%in our particular setting, making explicit all public parameters involved in the
-%protocol.
-
 Algorithm~\ref{alg:isogeny-DH}
 completes a Diffie--Hellman key exchange
 by applying a combination of Elkies and Vélu walks
@@ -1301,7 +1242,6 @@ by applying a combination of Elkies and Vélu walks
 \label{sec:initcurve}
 
 It is evident that the choice of public parameters
-%, especially the initial curve $E_0$, 
 has a heavy impact on the execution time: 
 smaller Elkies primes,
 and smaller multiplicative orders of the Frobenius eigenvalues, 
@@ -1392,9 +1332,6 @@ in order to find $E_0$.
     Factoring random 512-bit integers is not hard in general, 
     and discriminants of quadratic fields
     even tend to be slightly smoother than random integers.
-    %(it took less then one hour of GMP-ECM on 10 cores 
-    %to factor the 512-bit discriminant given at the end of this section).
-    %%todo: which hardware ?
     If a discriminant fails to be completely factored,
 		a conservative strategy would be to discard it,
     but ultimately undetected large prime-square factors
@@ -1493,7 +1430,6 @@ We start by addressing the following, more general, problem:
 
 The curves in Problem~\ref{prob:isog} are supposed to be sampled
 uniformly, though this is never exactly the case in practice.
-%Here, let us consider $E$ and $E'$ are sampled uniformly (although this is never exactly the case in practice).
 This problem was studied before the emergence of
 isogeny-based cryptography~\cite{Gal,GHS,galbraith+stolbunov11},
 because of its applications to conventional elliptic-curve
@@ -1568,7 +1504,7 @@ is the maximal order, and the condition is automatically true.
 
 The collision search in Stage~1 relies on the birthday paradox, and
 has a complexity of $O(\sqrt{h(\O_K)})$.
- %where $h(\O_K)=\#\Ell_q(\O_K)$ is the class number of $\O_K$.
+%where $h(\O_K)=\#\Ell_q(\O_K)$ is the class number of $\O_K$.
 It is known that, on average,
 $h(\O_K)≈0.461\cdots\sqrt{|Δ_K|}$ (see~\cite[5.10]{Cohen1993}), and,
 assuming the extended Riemann hypothesis, we even have a lower bound
@@ -1582,7 +1518,6 @@ for a discriminant of 300 bits~\cite{10.1007/978-3-642-14081-5_15}.
 Computing class numbers for ${\sim 500}$-bit discriminants seems to be expensive,
 albeit feasible; thus, we can only rely on these heuristic arguments
 to justify the security of our proposed parameters.
-% todo: check this is really the latest record
 
 The horizontal isogeny produced by Stage~1 is represented by an ideal
 constructed as a product of exponentially many small ideals.
@@ -1677,27 +1612,6 @@ correspond to the first line of Table~\ref{tab:sizes},
 thus offering at least 56-bit quantum 
 and 128-bit classical security.
 
-%\begin{table}
-    %\renewcommand{\arraystretch}{1.4}
-    %\centering
-    %\begin{tabular}{c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c@{\;}|@{\;}c}
-        %$\log Δ_K$ & $\log h(\O_K)$
-        %& \parbox{10ex}{\centering classical security}
-        %& \parbox{10ex}{\centering quantum queries}
-        %& \parbox{10ex}{\centering quantum security}
-        %& \parbox{10ex}{\centering NIST category}\\
-        %\hline
-        %$512$  & $256$ & $2^{128}$ & $> 2^{64}$ & $2^{128}$ & 2\\
-        %$768$  & $384$ & $2^{192}$ & $> 2^{78}$ & $> 2^{156}$ & 3\\
-        %$1024$ & $512$ & $2^{256}$ & $> 2^{90}$ & $> 2^{180}$ & 5
-        %\\
-        %\hline
-    %\end{tabular}
-    %\smallskip
-    %\caption{Suggested parameter sizes at different security levels.}
-    %\label{tab:sizes}
-%\end{table}
-
 \begin{table}
     \renewcommand{\arraystretch}{1.4}
     \centering
@@ -1752,7 +1666,7 @@ sequences of elements in $S$) used to sample secrets in the key exchange
 protocol.  
 We write $x\rand{σ} X$ for an element taken from a set $X$
 according to $σ$, 
-and %and if $X$ is finite, then 
+and 
 $x\uni X$ for an element taken according to the uniform distribution.
 
 Our security proofs use four distributions on $\Ell_q(\O)^3$:
@@ -1829,13 +1743,6 @@ name DDHAP.
     and 
     $\frac{1}{2}$ from $\mathcal{U}_{q,Δ}$,
     decide from which it was sampled.
-%    from one of the following two distributions
-%    \begin{align*}
-%        \mathcal{U}_{q,Δ} &= \left\{(E_a,E_b,E_{ab}) \suchthat E_a,E_b,E_{ab}\uni\Ell_q(\O)\right\},\\
-%        \mathcal{G}_{q,Δ} &= \left\{(\frak a·E_0,\frak b·E_0,\frak{ab}·E_0) \suchthat
-%                        \frak a,\frak b\uni\Cl(\O)\right\},
-%    \end{align*}
-%    decide from which of the two they were sampled.
 \end{definition}
 
 We want to prove the security of protocols based on the primitive of
@@ -2054,12 +1961,10 @@ Concretely, the curve given in \S\ref{sec:initcurve} has order
 \[
     N 
     = 
-    %2^2 · 3^2 · 5 · 7 · 11 · 13^2 · 17 · 103 · 523 · 821 · 1174286389 · m
     2^2 · 3^2 · 5 · 7 · 11 · 13^2 · 17 · 103 · 523 · 821 · 1174286389
     · (\text{432-bit prime})
     \,,
 \] %
-%where $m$ is a $432$-bit prime, 
 and its group structure is
 $ℤ/2ℤ×ℤ/\frac{N}{2}ℤ$. To check that a curve is in the same isogeny
 class, we repeatedly take random points until we find one of order~$N/2$.
@@ -2258,40 +2163,6 @@ lists other primes for which we apply Algorithm~\ref{alg:ElkiesWalk}.
     \label{tab:VéluSteps}
 \end{table}
 
-%
-%\begin{table}
-%    \centering
-%    \begin{tabular}{l|@{\;}r@{\;}|@{\;}l@{\;}||@{\;}l|r@{\;}|@{\;}l}
-%        $r$ & $M_\ell$ & $\ell$
-%        &
-%        $r$ & $M_\ell$ & $\ell$
-%        \\
-%        \hline
-%        1* & 409 & 3, 5, 7, 11, 13, 17, 103
-%        &
-%        5 & 34 & 31, 61, 1321
-%        \\
-%        1 & 409 & 523, 821, 947, 1723
-%        &
-%        7 & 10 & 547
-%        \\
-%        3 & 81 & 19, 661
-%        &
-%        8 & 7 & 881
-%        \\
-%        4 & 54 & 1013, 1181
-%        &
-%        9 & 6 & 1693
-%        \\
-%        \hline
-%    \end{tabular}
-%    \smallskip
-%    \caption{Primes $\ell$ amenable to \algstyle{VéluStep}
-%    (Algorithm~\ref{alg:VéluStep}) for our candidate isogeny graph,
-%    with corresponding $r$-values and proposed walk length bounds $M_\ell$.}
-%    \label{tab:VéluSteps}
-%\end{table}
-
 \begin{table}
     \centering
     \begin{tabular}{r@{\;}|@{\;}l@{\;}||@{\;}r@{\;}|@{\;}l@{\;}||@{\;}r@{\;}|@{\;}l@{\;}}
@@ -2302,35 +2173,30 @@ lists other primes for which we apply Algorithm~\ref{alg:ElkiesWalk}.
         $M_\ell$ & $\ell$
         \\
         \hline
-        % line 1
         20 & 23
         &
         6  & 73
         &
         2  & 157, 163, 167, 191, 193, 197, 223, 229
         \\
-        % line 2
         11 & 41
         &
         5  & 89
         &
         1  & 241, 251, 257, 277, 283, 293, 307
         \\
-        % line 3
         10 & 43
         &
         4  & 107, 109, 113
         &
         1  & 317, 349, 359
         \\
-        % line 4
         9 & 47
         &
         3  & 131, 151
         & &
-      \\
+        \\
         \hline
-        % line 6
     \end{tabular}
     \smallskip
     \caption{Primes $\ell$ amenable to 
